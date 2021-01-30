@@ -48,7 +48,7 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 // mongoose
-mongoose.connect('mongodb://localhost/raise_it', {
+mongoose.connect('mongodb://localhost/productivity_system_app', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
