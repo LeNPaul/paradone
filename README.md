@@ -1,3 +1,3 @@
-# raise-it
+# productivity-system-app
 
-Question-asking software to allow people in the audience to submit questions to a lecturer during a talk.
+A productivity app that allows you to choose what productivity system you want to implement, and it automatically organizes your tasks to fit that productivity system paradigm.
