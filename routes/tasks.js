@@ -10,6 +10,17 @@ function uuidv4() {
   });
 }
 
+/* Get tasks for a user */
+router.get('/', function(req, res) {
+  Task.find({username: req.user.username}, function(err, tasks) {
+    if (!err) {
+      res.json(tasks);
+    } else {
+      res.status(500).json([]);
+    }
+  });
+});
+
 /* Create a new task */
 // curl --header "Content-Type: application/json" --data '{"username": "paul", "content": "Another test taskasdfasdfasdf"}' localhost:8080/tasks
 router.post('/', function(req, res) {
@@ -26,7 +37,6 @@ router.post('/', function(req, res) {
     order:        req.body.order,
     due_datetime: req.body.due_datetime,
   })
-  console.log(req.body.content);
   newTask.save(function(err, data) {
     if (err) {
       res.json({success: false})
