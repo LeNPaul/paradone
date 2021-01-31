@@ -4,9 +4,9 @@ html(lang='en')
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
     meta(name='description' content='')
-    meta(name='author' content='Mark Otto, Jacob Thornton, and Bootstrap contributors')
+    meta(name='author' content='Paul Le')
     meta(name='generator' content='Hugo 0.79.0')
-    title Dashboard Template · Bootstrap v5.0
+    title Dashboard | Productivity System App
     link(rel='canonical' href='https://getbootstrap.com/docs/5.0/examples/dashboard/')
     // Bootstrap core CSS
     link(href='https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1' crossorigin='anonymous')
@@ -35,13 +35,13 @@ html(lang='en')
     link(href='https://getbootstrap.com/docs/5.0/examples/dashboard/dashboard.css' rel='stylesheet')
   body
     header.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow
-      a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') Company name
+      a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') Productivity System App
       button.navbar-toggler.position-absolute.d-md-none.collapsed(type='button' data-bs-toggle='collapse' data-bs-target='#sidebarMenu' aria-controls='sidebarMenu' aria-expanded='false' aria-label='Toggle navigation')
         span.navbar-toggler-icon
       input.form-control.form-control-dark.w-100(type='text' placeholder='Search' aria-label='Search')
       ul.navbar-nav.px-3
         li.nav-item.text-nowrap
-          a.nav-link(href='#') Sign out
+          a.nav-link(href='logout') Logout
     .container-fluid
       .row
         nav#sidebarMenu.col-md-3.col-lg-2.d-md-block.bg-light.sidebar.collapse
@@ -102,114 +102,7 @@ html(lang='en')
               button.btn.btn-sm.btn-outline-secondary.dropdown-toggle(type='button')
                 span(data-feather='calendar')
                 |             This week
-          canvas#myChart.my-4.w-100(width='900' height='380')
-          h2 Section title
-          .table-responsive
-            table.table.table-striped.table-sm
-              thead
-                tr
-                  th #
-                  th Header
-                  th Header
-                  th Header
-                  th Header
-              tbody
-                tr
-                  td 1,001
-                  td Lorem
-                  td ipsum
-                  td dolor
-                  td sit
-                tr
-                  td 1,002
-                  td amet
-                  td consectetur
-                  td adipiscing
-                  td elit
-                tr
-                  td 1,003
-                  td Integer
-                  td nec
-                  td odio
-                  td Praesent
-                tr
-                  td 1,003
-                  td libero
-                  td Sed
-                  td cursus
-                  td ante
-                tr
-                  td 1,004
-                  td dapibus
-                  td diam
-                  td Sed
-                  td nisi
-                tr
-                  td 1,005
-                  td Nulla
-                  td quis
-                  td sem
-                  td at
-                tr
-                  td 1,006
-                  td nibh
-                  td elementum
-                  td imperdiet
-                  td Duis
-                tr
-                  td 1,007
-                  td sagittis
-                  td ipsum
-                  td Praesent
-                  td mauris
-                tr
-                  td 1,008
-                  td Fusce
-                  td nec
-                  td tellus
-                  td sed
-                tr
-                  td 1,009
-                  td augue
-                  td semper
-                  td porta
-                  td Mauris
-                tr
-                  td 1,010
-                  td massa
-                  td Vestibulum
-                  td lacinia
-                  td arcu
-                tr
-                  td 1,011
-                  td eget
-                  td nulla
-                  td Class
-                  td aptent
-                tr
-                  td 1,012
-                  td taciti
-                  td sociosqu
-                  td ad
-                  td litora
-                tr
-                  td 1,013
-                  td torquent
-                  td per
-                  td conubia
-                  td nostra
-                tr
-                  td 1,014
-                  td per
-                  td inceptos
-                  td himenaeos
-                  td Curabitur
-                tr
-                  td 1,015
-                  td sodales
-                  td ligula
-                  td in
-                  td libero
+          // canvas#myChart.my-4.w-100(width='900' height='380')
     script(src='https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js' integrity='sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha' crossorigin='anonymous')
