@@ -5,13 +5,13 @@ var passportLocalMongoose = require('passport-local-mongoose');
 var Task = new Schema({
   username:     String,
   content:      String,
-  id:           String,
+  task_id:      String,
   project_id:   String,
   section_id:   String,
   parent_id:    String,
   label_ids:    Array,
-  priority:     Integer,
-  order:        Integer,
+  priority:     Number,
+  order:        Number,
   due_datetime: Date,
   completed:    Boolean
 });
