@@ -1,7 +1,8 @@
 var app = new Vue({
   el: '#todoApp',
   data: {
-    tasks: null
+    tasks: null,
+    taskText: null
   },
   created () {
     this.loadTasks();
@@ -10,6 +11,13 @@ var app = new Vue({
     loadTasks: function() {
       axios
         .get('/tasks').then(response =>  this.tasks = response.data);
+    },
+    addTask: function() {
+      if (this.taskText != null) {
+        axios
+          .post('/tasks', {username: 'paul', content: this.taskText})
+        this.taskText = null;
+      }
     }
   }
 })
