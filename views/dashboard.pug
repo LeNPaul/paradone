@@ -108,10 +108,9 @@ html(lang='en')
           // canvas#myChart.my-4.w-100(width='900' height='380')
           
           div(id='todoApp')
-            form
-              .form-group
-                textarea(v-model='taskText')#taskText.form-control(rows='1')
-              button.btn.btn-secondary(class='mt-3' type='button', v-on:click='addTask()') Add Task
+            div(class='input-group mb-3')
+              input(type='text' class='form-control' v-model='taskText')#taskText
+              button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
             div(class='card mt-3' v-for='task in tasks') 
               div(class='card-body') {{ task.content }}
           
