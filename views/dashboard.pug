@@ -114,8 +114,9 @@ html(lang='en')
               button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
             div(class='card mt-3' v-for='task in tasks') 
               div(class='card-body') {{ task.content }}
-                button(type='submit' class='btn btn-secondary float-right ml-3' v-on:click='updateVotes(question.question_id, -1), loadQuestions()')
-                  i(class="fas fa-arrow-alt-circle-down") 
+                div(class='d-grid gap-2 d-md-flex justify-content-md-end')
+                  button(type='submit' class='btn btn-secondary' v-on:click='completeTask()')
+                    i(class="fas fa-check-circle") 
           
     script(src='https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')

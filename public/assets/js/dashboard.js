@@ -18,6 +18,9 @@ var app = new Vue({
           .post('/tasks', {username: 'paul', content: this.taskText})
         this.taskText = null;
       }
+    },
+    completeTask: function() {
+      console.log('Hello world!');
     }
   }
 })
