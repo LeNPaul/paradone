@@ -10,6 +10,7 @@ html(lang='en')
     link(rel='canonical' href='https://getbootstrap.com/docs/5.0/examples/dashboard/')
     // Bootstrap core CSS
     link(href='https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1' crossorigin='anonymous')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js')
     //- Vue.js development version, includes helpful console warnings
     script(src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js')
     script(src='https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js')
@@ -113,6 +114,8 @@ html(lang='en')
               button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
             div(class='card mt-3' v-for='task in tasks') 
               div(class='card-body') {{ task.content }}
+                button(type='submit' class='btn btn-secondary float-right ml-3' v-on:click='updateVotes(question.question_id, -1), loadQuestions()')
+                  i(class="fas fa-arrow-alt-circle-down") 
           
     script(src='https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
