@@ -17,6 +17,7 @@ var app = new Vue({
         axios
           .post('/tasks', {username: 'paul', content: this.taskText})
         this.taskText = null
+        this.loadTasks()
       }
     },
     completeTask: function() {
