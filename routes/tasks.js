@@ -53,7 +53,7 @@ router.put('/', function(req, res) {
     Task.findByIdAndUpdate(
       task.id,
       {
-        username:     req.body.username,
+        username:     req.user.username,
         content:      req.body.content,
         project_id:   req.body.project_id,
         section_id:   req.body.section_id,
