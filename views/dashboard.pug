@@ -38,7 +38,7 @@ html(lang='en')
     // Custom styles for this template
     link(href='https://getbootstrap.com/docs/5.0/examples/dashboard/dashboard.css' rel='stylesheet')
   body
-    header.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0.shadow
+    header.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0
       a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') Productivity System App
       button.navbar-toggler.position-absolute.d-md-none.collapsed(type='button' data-bs-toggle='collapse' data-bs-target='#sidebarMenu' aria-controls='sidebarMenu' aria-expanded='false' aria-label='Toggle navigation')
         span.navbar-toggler-icon
@@ -97,26 +97,27 @@ html(lang='en')
                   span(data-feather='file-text')
                   |               Year-end sale
         main.col-md-9.ms-sm-auto.col-lg-10.px-md-4
-          .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
-            h1.h2 Dashboard
-            //- .btn-toolbar.mb-2.mb-md-0
-              .btn-group.me-2
-                button.btn.btn-sm.btn-outline-secondary(type='button') Share
-                button.btn.btn-sm.btn-outline-secondary(type='button') Export
-              button.btn.btn-sm.btn-outline-secondary.dropdown-toggle(type='button')
-                span(data-feather='calendar')
-                |             This week
-          // canvas#myChart.my-4.w-100(width='900' height='380')
-          
-          div(id='todoApp')
-            div(class='input-group mb-3')
-              input(type='text' class='form-control' v-model='taskText' v-on:keyup.enter="addTask()")#taskText
-              button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
-            div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
-              div(class='card-body') {{ task.content }}
-                div(class='d-grid gap-2 d-md-flex justify-content-md-end')
-                  button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
-                    i(class="fas fa-check-circle") 
+          div(class='container mt-5')
+            .d-flex.justify-content-between.flex-wrap.flex-md-nowrap.align-items-center.pt-3.pb-2.mb-3.border-bottom
+              h1.h2 Dashboard
+              //- .btn-toolbar.mb-2.mb-md-0
+                .btn-group.me-2
+                  button.btn.btn-sm.btn-outline-secondary(type='button') Share
+                  button.btn.btn-sm.btn-outline-secondary(type='button') Export
+                button.btn.btn-sm.btn-outline-secondary.dropdown-toggle(type='button')
+                  span(data-feather='calendar')
+                  |             This week
+            // canvas#myChart.my-4.w-100(width='900' height='380')
+            
+            div(id='todoApp')
+              div(class='input-group mb-3')
+                input(type='text' class='form-control' v-model='taskText' v-on:keyup.enter="addTask()")#taskText
+                button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
+              div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
+                div(class='card-body') {{ task.content }}
+                  div(class='d-grid gap-2 d-md-flex justify-content-md-end')
+                    button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
+                      i(class="fas fa-check-circle")
           
     script(src='https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js' integrity='sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
