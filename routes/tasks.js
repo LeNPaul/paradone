@@ -52,18 +52,7 @@ router.put('/', function(req, res) {
   Task.findOne({task_id: req.body.task_id}, function(err, task) {
     Task.findByIdAndUpdate(
       task.id,
-      {
-        username:     req.user.username,
-        content:      req.body.content,
-        project_id:   req.body.project_id,
-        section_id:   req.body.section_id,
-        parent_id:    req.body.parent_id,
-        label_ids:    req.body.label_ids,
-        priority:     req.body.priority,
-        order:        req.body.order,
-        due_datetime: req.body.due_datetime,
-        completed:    req.body.completed
-      },
+      req.body,
       { new: true },
       function(err, update) {
         if (err == null) {

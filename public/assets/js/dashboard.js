@@ -20,9 +20,10 @@ var app = new Vue({
         this.loadTasks()
       }
     },
-    completeTask: function() {
+    completeTask: function(task_id) {
       axios
-        .put('/tasks', {username: 'paul', task_id:'ecf9af29-5ca5-473d-ae0b-599fcd2f18df', completed: true})
+        .put('/tasks', {task_id: task_id, completed: true})
+      this.loadTasks()
     }
   }
 })
