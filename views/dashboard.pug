@@ -110,7 +110,7 @@ html(lang='en')
           
           div(id='todoApp')
             div(class='input-group mb-3')
-              input(type='text' class='form-control' v-model='taskText')#taskText
+              input(type='text' class='form-control' v-model='taskText' v-on:keyup.enter="addTask()")#taskText
               button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
             div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
               div(class='card-body') {{ task.content }}
