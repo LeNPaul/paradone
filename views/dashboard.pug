@@ -115,7 +115,12 @@ html(lang='en')
                 button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
               div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
                 div(class='card-body') {{ task.content }}
-                  div(class='d-grid gap-2 d-md-flex justify-content-md-end')
+                
+                  input(type='text' class='form-control mt-3 mb-3' v-model='editTaskText' v-on:keyup.enter="updateTask(task.task_id)")#editTaskText
+                  
+                  div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
+                    button(type='submit' class='btn btn-secondary' v-on:click='updateTask(task.task_id)')
+                      i(class="fas fa-edit")
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
           

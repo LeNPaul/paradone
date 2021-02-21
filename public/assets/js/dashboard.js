@@ -2,7 +2,8 @@ var app = new Vue({
   el: '#todoApp',
   data: {
     tasks: null,
-    taskText: null
+    taskText: null,
+    editTaskText: null
   },
   created () {
     this.loadTasks()
@@ -19,6 +20,12 @@ var app = new Vue({
         this.taskText = null
         this.loadTasks()
       }
+    },
+    updateTask: function(task_id) {
+      axios
+        .put('/tasks', {task_id: task_id, content: this.editTaskText})
+      this.editTaskText = null
+      this.loadTasks()
     },
     completeTask: function(task_id) {
       axios
