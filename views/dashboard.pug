@@ -6,7 +6,7 @@ html(lang='en')
     meta(name='description' content='')
     meta(name='author' content='Paul Le')
     meta(name='generator' content='Hugo 0.79.0')
-    title Dashboard | Productivity System App
+    title Dashboard | ParaDone
     link(rel='canonical' href='https://getbootstrap.com/docs/5.0/examples/dashboard/')
     // Bootstrap core CSS
     link(href='https://getbootstrap.com/docs/5.0/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl' crossorigin='anonymous')
@@ -39,7 +39,7 @@ html(lang='en')
     link(href='https://getbootstrap.com/docs/5.0/examples/dashboard/dashboard.css' rel='stylesheet')
   body
     header.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0
-      a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') Productivity System App
+      a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') ParaDone
       button.navbar-toggler.position-absolute.d-md-none.collapsed(type='button' data-bs-toggle='collapse' data-bs-target='#sidebarMenu' aria-controls='sidebarMenu' aria-expanded='false' aria-label='Toggle navigation')
         span.navbar-toggler-icon
       //- input.form-control.form-control-dark.w-100(type='text' placeholder='Search' aria-label='Search')
@@ -122,40 +122,9 @@ html(lang='en')
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
 
-              #exampleModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true')
-                .modal-dialog
-                  .modal-content
-                    .modal-header
-                      h5#exampleModalLabel.modal-title Edit Task
-                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
-                    .modal-body
-                      form
-                        .mb-3
-                          input#recipient-name.form-control(type='text')
-                    .modal-footer
-                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Cancel
-                      button.btn.btn-primary(type='button') Save
-
-
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js' integrity='sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha' crossorigin='anonymous')
     script(src='https://getbootstrap.com/docs/5.0/examples/dashboard/dashboard.js')
     script(src='/assets/js/dashboard.js')
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js")
     script(script src="https://getbootstrap.com/docs/5.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous")
-    script
-      | var exampleModal = document.getElementById('exampleModal')
-      | exampleModal.addEventListener('show.bs.modal', function (event) {
-      | // Button that triggered the modal
-      | var button = event.relatedTarget
-      | // Extract info from data-bs-* attributes
-      | var recipient = button.getAttribute('data-bs-content')
-      | // If necessary, you could initiate an AJAX request here
-      | // and then do the updating in a callback.
-      | //
-      | // Update the modal's content.
-      | var modalTitle = exampleModal.querySelector('.modal-title')
-      | var modalBodyInput = exampleModal.querySelector('.modal-body input')
-      | // modalTitle.textContent = recipient
-      | modalBodyInput.value = recipient
-      | })
