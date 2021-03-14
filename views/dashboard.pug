@@ -124,18 +124,18 @@ html(lang='en')
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
               
-              #exampleModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true')
+              #exampleModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
                 .modal-dialog
                   .modal-content
                     .modal-header
                       h5#exampleModalLabel.modal-title Edit Task
-                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close')
+                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null')
                     .modal-body
                       form
                         .mb-3
                           p(contenteditable='true')#editTaskText {{ editTaskText }}
                     .modal-footer
-                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal') Close
+                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null') Close
                       button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
 
 
