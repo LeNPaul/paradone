@@ -3,7 +3,8 @@ var app = new Vue({
   data: {
     tasks: null,
     taskText: null,
-    editTaskText: null
+    editTaskText: null,
+    editTaskId: null
   },
   created () {
     this.loadTasks()
@@ -23,14 +24,19 @@ var app = new Vue({
     },
     updateTask: function(task_id) {
       axios
-        .put('/tasks', {task_id: task_id, content: this.editTaskText})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent})
       this.editTaskText = null
+      this.editTaskId = null
       this.loadTasks()
     },
     completeTask: function(task_id) {
       axios
         .put('/tasks', {task_id: task_id, completed: true})
       this.loadTasks()
+    },
+    toggleTaskModal: function(content, task_id) {
+      this.editTaskText = content
+      this.editTaskId = task_id
     }
   }
 })
