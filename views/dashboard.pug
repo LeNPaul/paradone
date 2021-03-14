@@ -111,9 +111,12 @@ html(lang='en')
             // canvas#myChart.my-4.w-100(width='900' height='380')
             
             div(id='todoApp')
-              div(class='input-group mb-3')
+              // div(class='input-group mb-3')
                 input(type='text' class='form-control' v-model='taskText' v-on:keyup.enter="addTask()")#taskText
                 button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
+              div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
+                button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal') Add Task
+                button.btn.btn-outline-success(type='button') Add Project
               div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
                 div(class='card-body') {{ task.content }}
                   //- input(type='text' class='form-control mt-3 mb-3' v-model='editTaskText' v-on:keyup.enter="updateTask(task.task_id)")#editTaskText
@@ -126,7 +129,7 @@ html(lang='en')
                       i(class="fas fa-check-circle")
               
               #exampleModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
-                .modal-dialog
+                .modal-dialog.modal-dialog-centered
                   .modal-content
                     .modal-header
                       h5#exampleModalLabel.modal-title Edit Task
@@ -140,6 +143,20 @@ html(lang='en')
                     .modal-footer
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null') Close
                       button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
+
+              #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
+                .modal-dialog.modal-dialog-centered
+                  .modal-content
+                    .modal-header
+                      h5#addTaskModalLabel.modal-title Add Task
+                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null')
+                    .modal-body
+                      form
+                        .mb-3
+                          textarea(type='text' class='form-control' v-model='taskText')#taskText
+                    .modal-footer
+                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null') Close
+                      button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
 
 
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
