@@ -37,6 +37,7 @@ html(lang='en')
       }
     // Custom styles for this template
     link(href='https://getbootstrap.com/docs/5.0/examples/dashboard/dashboard.css' rel='stylesheet')
+    link(href='assets/css/dashboard/dashboard.css' rel='stylesheet')
   body
     header.navbar.navbar-dark.sticky-top.bg-dark.flex-md-nowrap.p-0
       a.navbar-brand.col-md-3.col-lg-2.me-0.px-3(href='#') ParaDone
@@ -133,7 +134,9 @@ html(lang='en')
                     .modal-body
                       form
                         .mb-3
-                          p(contenteditable='true')#editTaskText {{ editTaskText }}
+                          div(class='card')
+                            div(class='card-body')
+                              p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
                     .modal-footer
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null') Close
                       button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
