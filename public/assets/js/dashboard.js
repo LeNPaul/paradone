@@ -10,6 +10,7 @@ var app = new Vue({
   },
   created () {
     this.loadTasks()
+    this.loadProjects()
   },
   methods: {
     loadTasks: function() {

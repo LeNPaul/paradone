@@ -127,7 +127,7 @@ html(lang='en')
                       i(class="fas fa-edit")
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
-              
+
               #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
                 .modal-dialog.modal-dialog-centered
                   .modal-content
@@ -154,6 +154,9 @@ html(lang='en')
                       form
                         .mb-3
                           textarea(type='text' class='form-control' v-model='taskText')#taskText
+                      select.form-select(aria-label='Default select example')
+                        option(selected='') Project
+                        option(value='1' v-for='project in projects') {{ project.project_name }}
                     .modal-footer
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null') Close
                       button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
