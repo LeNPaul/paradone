@@ -15,8 +15,8 @@ function uuidv4() {
 router.post('/', function(req, res) {
   var project_id = uuidv4()
   var newProject = new Project({
-    name:     req.body.name,
-    project_id: project_id
+    project_name:     req.body.project_name,
+    project_id:       project_id
   })
   newProject.save(function(err, data) {
     if (err) {

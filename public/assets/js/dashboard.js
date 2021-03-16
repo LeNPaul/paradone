@@ -42,7 +42,7 @@ var app = new Vue({
     addProject: function() {
       if (this.projectText != null) {
         axios
-          .post('/projects', {name: this.projectText})
+          .post('/projects', {project_name: this.projectText})
         this.projectText = null
       }
     }
