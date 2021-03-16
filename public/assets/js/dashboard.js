@@ -6,7 +6,8 @@ var app = new Vue({
     editTaskText: null,
     editTaskId: null,
     projects: null,
-    projectText: null
+    projectText: null,
+    selectedProject: null
   },
   created () {
     this.loadTasks()
@@ -20,7 +21,7 @@ var app = new Vue({
     addTask: function() {
       if (this.taskText != null) {
         axios
-          .post('/tasks', {username: 'paul', content: this.taskText})
+          .post('/tasks', {username: 'paul', content: this.taskText, project_id: this.selectedProject})
         this.taskText = null
         this.loadTasks()
       }

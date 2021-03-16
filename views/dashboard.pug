@@ -149,16 +149,15 @@ html(lang='en')
                   .modal-content
                     .modal-header
                       h5#addTaskModalLabel.modal-title Add Task
-                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null')
+                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null')
                     .modal-body
                       form
                         .mb-3
                           textarea(type='text' class='form-control' v-model='taskText')#taskText
-                      select.form-select(aria-label='Default select example')
-                        option(selected='') Project
-                        option(value='1' v-for='project in projects') {{ project.project_name }}
+                      select.form-select(aria-label='Default select example' v-model="selectedProject")
+                        option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
                     .modal-footer
-                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null') Close
+                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null') Close
                       button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
 
               #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
