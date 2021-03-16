@@ -16,7 +16,7 @@ router.get('/', function(req, res) {
     if (!err) {
       res.json(tasks)
     } else {
-      res.status(500).json([])
+      res.status(500).json({success: false})
     }
   })
 })
@@ -39,7 +39,7 @@ router.post('/', function(req, res) {
   })
   newTask.save(function(err, data) {
     if (err) {
-      res.json({success: false})
+      res.status(500).json({success: false})
     } else {
       res.json({success: true})
     }
@@ -58,7 +58,7 @@ router.put('/', function(req, res) {
         if (err == null) {
           res.json({Success: true})
         } else {
-          res.json({Success: false})
+          res.status(500).json({success: false})
         }
       }
     )

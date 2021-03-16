@@ -10,17 +10,29 @@ function uuidv4() {
   })
 }
 
+/* Get projects for a user */
+router.get('/', function(req, res) {
+  Project.find({username: req.user.username}, function(err, projects) {
+    if (!err) {
+      res.json(projects)
+    } else {
+      res.status(500).json({success: false})
+    }
+  })
+})
+
 /* Create a new project */
 // curl --header "Content-Type: application/json" --data '{"name": "test"}' localhost:8080/projects
 router.post('/', function(req, res) {
   var project_id = uuidv4()
   var newProject = new Project({
-    project_name:     req.body.project_name,
-    project_id:       project_id
+    username:     req.body.username,
+    project_name: req.body.project_name,
+    project_id:   project_id
   })
   newProject.save(function(err, data) {
     if (err) {
-      res.json({success: false})
+      res.status(500).json({success: false})
     } else {
       res.json({success: true})
     }

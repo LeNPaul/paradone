@@ -5,6 +5,7 @@ var app = new Vue({
     taskText: null,
     editTaskText: null,
     editTaskId: null,
+    projects: null,
     projectText: null
   },
   created () {
@@ -13,7 +14,7 @@ var app = new Vue({
   methods: {
     loadTasks: function() {
       axios
-        .get('/tasks').then(response =>  this.tasks = response.data)
+        .get('/tasks').then(response => this.tasks = response.data)
     },
     addTask: function() {
       if (this.taskText != null) {
@@ -39,10 +40,14 @@ var app = new Vue({
       this.editTaskText = content
       this.editTaskId = task_id
     },
+    loadProjects: function() {
+      axios
+        .get('/projects').then(response => this.projects = response.data)
+    },
     addProject: function() {
       if (this.projectText != null) {
         axios
-          .post('/projects', {project_name: this.projectText})
+          .post('/projects', {username: 'paul', project_name: this.projectText})
         this.projectText = null
       }
     }
