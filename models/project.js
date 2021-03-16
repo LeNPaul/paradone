@@ -3,10 +3,11 @@ var Schema = mongoose.Schema;
 var passportLocalMongoose = require('passport-local-mongoose');
 
 var Project = new Schema({
-  name:       String,
-  colour:     String,
-  order:      Number,
-  project_id: String
+  username:     String,
+  project_name: String,
+  project_id:   String,
+  colour:       String,
+  order:        Number
 });
 
 Project.plugin(passportLocalMongoose);

@@ -123,16 +123,16 @@ html(lang='en')
                   div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
                     //- button(type='button' data-bs-toggle='modal' data-bs-target='#exampleModal' v-bind:data-bs-content='task.content' class='btn btn-secondary' v-on:click='updateTask(task.task_id)')
                       i(class="fas fa-edit")
-                    button(type='button' data-bs-toggle='modal' data-bs-target='#exampleModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id)')
+                    button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id)')
                       i(class="fas fa-edit")
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
               
-              #exampleModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
+              #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
                 .modal-dialog.modal-dialog-centered
                   .modal-content
                     .modal-header
-                      h5#exampleModalLabel.modal-title Edit Task
+                      h5#editTaskModalLabel.modal-title Edit Task
                       button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null')
                     .modal-body
                       form
@@ -144,7 +144,7 @@ html(lang='en')
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null') Close
                       button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
 
-              #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
+              #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='addTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
                 .modal-dialog.modal-dialog-centered
                   .modal-content
                     .modal-header
@@ -158,7 +158,7 @@ html(lang='en')
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null') Close
                       button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
 
-              #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
+              #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
                 .modal-dialog.modal-dialog-centered
                   .modal-content
                     .modal-header
