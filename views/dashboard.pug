@@ -116,7 +116,7 @@ html(lang='en')
                 button(class='btn btn-outline-secondary' type='button' v-on:click='addTask()') Add Task
               div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
                 button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal') Add Task
-                button.btn.btn-outline-success(type='button') Add Project
+                button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addProjectModal') Add Project
               div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
                 div(class='card-body') {{ task.content }}
                   //- input(type='text' class='form-control mt-3 mb-3' v-model='editTaskText' v-on:keyup.enter="updateTask(task.task_id)")#editTaskText
@@ -158,6 +158,19 @@ html(lang='en')
                       button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null') Close
                       button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
 
+              #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='exampleModalLabel' aria-hidden='true' data-bs-backdrop='static')
+                .modal-dialog.modal-dialog-centered
+                  .modal-content
+                    .modal-header
+                      h5#addProjectModalLabel.modal-title Add Project
+                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='projectText = null')
+                    .modal-body
+                      form
+                        .mb-3
+                          textarea(type='text' class='form-control' v-model='projectText')#projectText
+                    .modal-footer
+                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
+                      button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
 
     script(src='https://cdn.jsdelivr.net/npm/feather-icons@4.28.0/dist/feather.min.js' integrity='sha384-uO3SXW5IuS1ZpFPKugNNWqTZRRglnUJK6UAZ/gxOX80nxEkN9NcGZTftn6RzhGWE' crossorigin='anonymous')
     script(src='https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js' integrity='sha384-zNy6FEbO50N+Cg5wap8IKA4M/ZnLJgzc6w2NqACZaK0u0FXfOWRRJOnQtpZun8ha' crossorigin='anonymous')

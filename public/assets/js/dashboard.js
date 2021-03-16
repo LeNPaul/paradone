@@ -4,7 +4,8 @@ var app = new Vue({
     tasks: null,
     taskText: null,
     editTaskText: null,
-    editTaskId: null
+    editTaskId: null,
+    projectText: null
   },
   created () {
     this.loadTasks()
@@ -37,6 +38,13 @@ var app = new Vue({
     toggleTaskModal: function(content, task_id) {
       this.editTaskText = content
       this.editTaskId = task_id
+    },
+    addProject: function() {
+      if (this.projectText != null) {
+        axios
+          .post('/projects', {name: this.projectText})
+        this.projectText = null
+      }
     }
   }
 })
