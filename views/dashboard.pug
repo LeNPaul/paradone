@@ -118,11 +118,10 @@ html(lang='en')
                 button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal') Add Task
                 button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addProjectModal') Add Project
               div(class='card mt-3' v-for='task in tasks' v-if='!task.completed') 
-                div(class='card-body') {{ task.content }}
-                  //- input(type='text' class='form-control mt-3 mb-3' v-model='editTaskText' v-on:keyup.enter="updateTask(task.task_id)")#editTaskText
+                div(class='card-body') 
+                  p {{ task.content }}
+                  button(class='btn btn-outline-dark' disabled v-for='project in projects' v-if='project.project_id == task.project_id') {{ project.project_name }}
                   div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
-                    //- button(type='button' data-bs-toggle='modal' data-bs-target='#exampleModal' v-bind:data-bs-content='task.content' class='btn btn-secondary' v-on:click='updateTask(task.task_id)')
-                      i(class="fas fa-edit")
                     button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id)')
                       i(class="fas fa-edit")
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
