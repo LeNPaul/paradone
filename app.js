@@ -52,7 +52,7 @@ passport.serializeUser(Account.serializeUser());
 passport.deserializeUser(Account.deserializeUser());
 
 // mongoose
-mongoose.connect('mongodb://localhost/productivity_system_app', {
+mongoose.connect('mongodb://localhost/paradone', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
