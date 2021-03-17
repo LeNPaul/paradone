@@ -123,7 +123,7 @@ html(lang='en')
                   div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
                     //- button(type='button' data-bs-toggle='modal' data-bs-target='#exampleModal' v-bind:data-bs-content='task.content' class='btn btn-secondary' v-on:click='updateTask(task.task_id)')
                       i(class="fas fa-edit")
-                    button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id)')
+                    button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id)')
                       i(class="fas fa-edit")
                     button(type='submit' class='btn btn-secondary' v-on:click='completeTask(task.task_id)')
                       i(class="fas fa-check-circle")
@@ -133,15 +133,17 @@ html(lang='en')
                   .modal-content
                     .modal-header
                       h5#editTaskModalLabel.modal-title Edit Task
-                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null')
+                      button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null')
                     .modal-body
                       form
                         .mb-3
                           div(class='card')
                             div(class='card-body')
                               p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
+                      select.form-select(aria-label='Default select example' v-model="selectedProject")
+                        option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
                     .modal-footer
-                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null') Close
+                      button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
                       button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
 
               #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='addTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
