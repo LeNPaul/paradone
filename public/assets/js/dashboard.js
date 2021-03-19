@@ -20,10 +20,15 @@ var app = new Vue({
         .get('/tasks').then(response => this.tasks = response.data)
     },
     addTask: function() {
-      console.log(this.dueDate)
+      if(this.dueDate != null) {
+        var datetime = this.dueDate.split('-')
+        var due_datetime = new Date(datetime[0], datetime[1], datetime[2])
+      } else {
+        var due_datetime = null
+      }
       if (this.taskText != null) {
         axios
-          .post('/tasks', {username: 'paul', content: this.taskText, project_id: this.selectedProject})
+          .post('/tasks', {username: 'paul', content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
         this.taskText = null
         this.dueDate = null
         this.loadTasks()
