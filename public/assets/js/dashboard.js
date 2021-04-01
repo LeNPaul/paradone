@@ -22,7 +22,7 @@ var app = new Vue({
     addTask: function() {
       if(this.dueDate != null) {
         var datetime = this.dueDate.split('-')
-        var due_datetime = new Date(datetime[0], datetime[1], datetime[2])
+        var due_datetime = new Date(datetime[0], datetime[1] - 1, datetime[2])
       } else {
         var due_datetime = null
       }
