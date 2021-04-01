@@ -63,5 +63,12 @@ var app = new Vue({
         this.projectText = null
       }
     }
+  },
+  filters: {
+    formatDate: function(value) {
+      if (value) {
+        return value.substring(0,10)
+      }
+    }
   }
 })

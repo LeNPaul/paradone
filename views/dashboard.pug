@@ -121,6 +121,7 @@ html(lang='en')
                 div(class='card-body') 
                   p {{ task.content }}
                   button(class='btn btn-outline-dark' disabled v-for='project in projects' v-if='project.project_id == task.project_id') {{ project.project_name }}
+                  button(class='btn btn-outline-dark ms-3' disabled v-for='project in projects' v-if='project.project_id == task.project_id && task.due_datetime !== null') {{ task.due_datetime | formatDate }}
                   div(class='d-grid gap-2 d-md-flex justify-content-md-end')  
                     button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-secondary' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id)')
                       i(class="fas fa-edit")
