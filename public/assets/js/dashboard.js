@@ -35,8 +35,14 @@ var app = new Vue({
       }
     },
     updateTask: function(task_id) {
+      if(this.dueDate != null) {
+        var datetime = this.dueDate.split('-')
+        var due_datetime = new Date(datetime[0], datetime[1] - 1, datetime[2])
+      } else {
+        var due_datetime = null
+      }
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: datetime})
       this.editTaskText = null
       this.editTaskId = null
       this.selectedProject = null
@@ -47,10 +53,11 @@ var app = new Vue({
         .put('/tasks', {task_id: task_id, completed: true})
       this.loadTasks()
     },
-    toggleTaskModal: function(content, task_id, project_id) {
+    toggleTaskModal: function(content, task_id, project_id, dueDate) {
       this.editTaskText = content
-      this.editTaskId = task_id,
+      this.editTaskId = task_id
       this.selectedProject = project_id
+      this.dueDate = dueDate.substring(0,10)
     },
     loadProjects: function() {
       axios
