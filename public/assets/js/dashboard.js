@@ -1,3 +1,13 @@
+function convertDateTime(string) {
+  if(string != null) {
+    var datetime = string.split('-')
+    var due_datetime = new Date(datetime[0], datetime[1] - 1, datetime[2])
+  } else {
+    var due_datetime = null
+  }
+  return due_datetime
+}
+
 var app = new Vue({
   el: '#todoApp',
   data: {
@@ -20,12 +30,7 @@ var app = new Vue({
         .get('/tasks').then(response => this.tasks = response.data)
     },
     addTask: function() {
-      if(this.dueDate != null) {
-        var datetime = this.dueDate.split('-')
-        var due_datetime = new Date(datetime[0], datetime[1] - 1, datetime[2])
-      } else {
-        var due_datetime = null
-      }
+      var due_datetime = convertDateTime(this.dueDate)
       if (this.taskText != null) {
         axios
           .post('/tasks', {username: 'paul', content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
@@ -35,17 +40,13 @@ var app = new Vue({
       }
     },
     updateTask: function(task_id) {
-      if(this.dueDate != null) {
-        var datetime = this.dueDate.split('-')
-        var due_datetime = new Date(datetime[0], datetime[1] - 1, datetime[2])
-      } else {
-        var due_datetime = null
-      }
+      var due_datetime = convertDateTime(this.dueDate)
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: datetime})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: due_datetime})
       this.editTaskText = null
       this.editTaskId = null
       this.selectedProject = null
+      this.dueDate = null
       this.loadTasks()
     },
     completeTask: function(task_id) {
