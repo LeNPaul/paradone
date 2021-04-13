@@ -6,5 +6,5 @@
 (cd ../.. ; npm install)
 
 # Start app using PM2
-(cd ../.. ; pm2 start bin/www --name PhysicsInMotion)
+(cd ../.. ; pm2 start bin/www --name paradone)
 pm2 save
