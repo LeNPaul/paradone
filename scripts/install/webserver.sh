@@ -17,9 +17,9 @@ sudo snap install --classic certbot
 # sudo certbot certonly --nginx
 
 # Use the server/config/nginx.conf file and create the file with the contents:
-#   /etc/nginx/sites-available/physicsinmotion.ca
+#   /etc/nginx/sites-available/paradone.com
 # Create link from sites-available to sites-enabled:
-#   sudo ln -s /etc/nginx/sites-available/physicsinmotion.ca /etc/nginx/sites-enabled/
+#   sudo ln -s /etc/nginx/sites-available/paradone.com /etc/nginx/sites-enabled/
 
 # Edit the following in the /etc/nginx/nginx.conf file:
 #   ...
