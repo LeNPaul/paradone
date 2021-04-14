@@ -13,13 +13,18 @@ sudo ufw allow 'Nginx HTTP'
 sudo snap install core; sudo snap refresh core
 sudo snap install --classic certbot
 
+# Use the server/config/nginx.conf file and create the file with the contents:
+#   /etc/nginx/sites-available/paradone.com
+
+# Create link from sites-available to sites-enabled:
+#   sudo ln -s /etc/nginx/sites-available/paradone.com /etc/nginx/sites-enabled/
+
+# Comment out the HTTPS parts of the nginx configuration and restart nginx
+
 # Run this command to get the certificates only
 # sudo certbot certonly --nginx
 
-# Use the server/config/nginx.conf file and create the file with the contents:
-#   /etc/nginx/sites-available/paradone.com
-# Create link from sites-available to sites-enabled:
-#   sudo ln -s /etc/nginx/sites-available/paradone.com /etc/nginx/sites-enabled/
+# Uncomment the HTTPS parts of the nginx configuration and restart nginx
 
 # Edit the following in the /etc/nginx/nginx.conf file:
 #   ...
