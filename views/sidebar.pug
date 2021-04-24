@@ -1,0 +1,53 @@
+.col-lg-3.p-3.py-md-5#sidebarApp
+  .p-3.bg-white(style='width: 280px;')
+    a.d-flex.align-items-center.pb-3.mb-3.link-dark.text-decoration-none.border-bottom(href='/')
+      svg.bi.me-2(width='30' height='24')
+        use(xlink:href='#bootstrap')
+      span.fs-5.fw-semibold paradone
+    ul.list-unstyled.ps-0
+      li.mb-1
+        // button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='true')
+          | Home
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='false')
+          | Home
+        //#home-collapse.collapse.show
+        #home-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
+            li
+              a.link-dark.rounded(href='#') Overview
+            li
+              a.link-dark.rounded(href='#') Updates
+            li
+              a.link-dark.rounded(href='#') Reports
+      li.mb-1
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#dashboard-collapse' aria-expanded='false')
+          | Dashboard
+        #dashboard-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
+            li
+              a.link-dark.rounded(href='#') Overview
+            li
+              a.link-dark.rounded(href='#') Weekly
+            li
+              a.link-dark.rounded(href='#') Monthly
+            li
+              a.link-dark.rounded(href='#') Annually
+      li.mb-1
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#orders-collapse' aria-expanded='false')
+          | Projects
+        #orders-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small(v-for='project in projects')
+            li
+              a.link-dark.rounded(v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
+      li.border-top.my-3
+      li.mb-1
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#account-collapse' aria-expanded='false')
+          | Account
+        #account-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
+            li
+              a.link-dark.rounded(href='/profile') Profile
+            li
+              a.link-dark.rounded(href='/settings') Settings
+            li
+              a.link-dark.rounded(href='/logout') Logout

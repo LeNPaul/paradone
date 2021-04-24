@@ -7,7 +7,7 @@ html(lang='en')
     meta(name='author' content='Paul Le')
     title Dashboard | paradone
     // Bootstrap core CSS
-    link(href='assets/libs/bootstrap/bootstrap.min.css' rel='stylesheet')
+    link(href='/assets/libs/bootstrap/bootstrap.min.css' rel='stylesheet')
     script(src='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.0-2/js/all.min.js')
     //- Vue.js development version, includes helpful console warnings
     script(src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js')
@@ -26,119 +26,61 @@ html(lang='en')
       }
       }
     // Custom styles for this template
-    link(href='assets/css/sidebars.css' rel='stylesheet')
+    link(href='/assets/css/sidebars.css' rel='stylesheet')
   body
-    body
-      .col-lg-3.p-3.py-md-5
-        .p-3.bg-white(style='width: 280px;')
-          a.d-flex.align-items-center.pb-3.mb-3.link-dark.text-decoration-none.border-bottom(href='/')
-            svg.bi.me-2(width='30' height='24')
-              use(xlink:href='#bootstrap')
-            span.fs-5.fw-semibold Paradone
-          ul.list-unstyled.ps-0
-            li.mb-1
-              // button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='true')
-                | Home
-              button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='false')
-                | Home
-              //#home-collapse.collapse.show
-              #home-collapse.collapse
-                ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
-                  li
-                    a.link-dark.rounded(href='#') Overview
-                  li
-                    a.link-dark.rounded(href='#') Updates
-                  li
-                    a.link-dark.rounded(href='#') Reports
-            li.mb-1
-              button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#dashboard-collapse' aria-expanded='false')
-                | Dashboard
-              #dashboard-collapse.collapse
-                ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
-                  li
-                    a.link-dark.rounded(href='#') Overview
-                  li
-                    a.link-dark.rounded(href='#') Weekly
-                  li
-                    a.link-dark.rounded(href='#') Monthly
-                  li
-                    a.link-dark.rounded(href='#') Annually
-            li.mb-1
-              button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#orders-collapse' aria-expanded='false')
-                | Orders
-              #orders-collapse.collapse
-                ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
-                  li
-                    a.link-dark.rounded(href='#') New
-                  li
-                    a.link-dark.rounded(href='#') Processed
-                  li
-                    a.link-dark.rounded(href='#') Shipped
-                  li
-                    a.link-dark.rounded(href='#') Returned
-            li.border-top.my-3
-            li.mb-1
-              button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#account-collapse' aria-expanded='false')
-                | Account
-              #account-collapse.collapse
-                ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
-                  li
-                    a.link-dark.rounded(href='/profile') Profile
-                  li
-                    a.link-dark.rounded(href='/settings') Settings
-                  li
-                    a.link-dark.rounded(href='/logout') Logout
-      .col-lg-6.p-3.py-md-5
-        #todoApp.p-3
-          h4.pb-3.mb-3.border-bottom Tasks 
-            button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
-              i.fas.fa-plus
-          div(v-for='task in tasks' v-if='!task.completed') 
-            p.pb-3.border-bottom
-              button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
-                i(class='far fa-circle')
-              | {{ task.content }}
-              button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime)')
-                i.fas.fa-edit
-          
-          #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='addTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
-            .modal-dialog.modal-dialog-centered
-              .modal-content
-                .modal-header
-                  h5#addTaskModalLabel.modal-title Add Task
-                  button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null')
-                .modal-body
-                  form
-                    .mb-3
-                      textarea(type='text' class='form-control' v-model='taskText')#taskText
-                    input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-                    label(class='form-label') Project
-                    select.form-select(aria-label='Default select example' v-model="selectedProject")
-                      option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
-                .modal-footer
-                  button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
-                  button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
-                  
-          #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
-            .modal-dialog.modal-dialog-centered
-              .modal-content
-                .modal-header
-                  h5#editTaskModalLabel.modal-title Edit Task
-                  button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null')
-                .modal-body
-                  form
-                    .mb-3
-                      div(class='card')
-                        div(class='card-body')
-                          p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
+    include sidebar.pug
+    .col-lg-6.p-3.py-md-5#todoApp
+      .p-3
+        h4.pb-3.mb-3.border-bottom Tasks 
+          button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
+            i.fas.fa-plus
+          button.btn.btn-outline-success(type='button' data-bs-toggle='modal' data-bs-target='#addProjectModal') Add Project
+        div(v-for='task in tasks' v-if='!task.completed') 
+          p.pb-3.border-bottom
+            button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
+              i(class='far fa-circle')
+            | {{ task.content }}
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime)')
+              i.fas.fa-edit
+        
+        #addTaskModal.modal.fade(tabindex='-1' aria-labelledby='addTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
+          .modal-dialog.modal-dialog-centered
+            .modal-content
+              .modal-header
+                h5#addTaskModalLabel.modal-title Add Task
+                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null')
+              .modal-body
+                form
+                  .mb-3
+                    textarea(type='text' class='form-control' v-model='taskText')#taskText
                   input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
+                  label(class='form-label') Project
                   select.form-select(aria-label='Default select example' v-model="selectedProject")
                     option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
-                .modal-footer
-                  button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
-                  button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
-                  
-          #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
+              .modal-footer
+                button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
+                button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
+                
+        #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
+          .modal-dialog.modal-dialog-centered
+            .modal-content
+              .modal-header
+                h5#editTaskModalLabel.modal-title Edit Task
+                button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null')
+              .modal-body
+                form
+                  .mb-3
+                    div(class='card')
+                      div(class='card-body')
+                        p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
+                input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
+                select.form-select(aria-label='Default select example' v-model="selectedProject")
+                  option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
+              .modal-footer
+                button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
+                button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
+                
+        #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
             .modal-dialog.modal-dialog-centered
               .modal-content
                 .modal-header
@@ -152,6 +94,7 @@ html(lang='en')
                   button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
                   button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
                   
-      script(src='assets/libs/bootstrap/bootstrap.bundle.min.js')
-      script(src='assets/js/sidebars.js')
-      script(src='/assets/js/dashboard.js')
+    script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
+    script(src='/assets/js/sidebars.js')
+    script(src='/assets/js/sidebarApp.js')
+    script(src='/assets/js/dashboard.js')

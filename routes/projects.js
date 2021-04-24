@@ -39,4 +39,12 @@ router.post('/', function(req, res) {
   })
 })
 
+router.get('/:project', (req, res) => {
+    res.render('projects.pug', {
+      user : req.user,
+      course : req.params.project,
+      title : 'Project'
+     });
+});
+
 module.exports = router
