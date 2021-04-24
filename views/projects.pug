@@ -29,11 +29,13 @@ html(lang='en')
     link(href='/assets/css/sidebars.css' rel='stylesheet')
   body
     include sidebar.pug
-    .col-lg-6.p-3.py-md-5#todoApp
+    .col-lg-6.p-3.py-md-5#projectApp
       .p-3
-        h4.pb-3.mb-3.border-bottom #{ course }
-          
+        h4.pb-3.mb-3.border-bottom #{ project } 
+        div(v-for='task in tasks' v-if='!task.completed') 
+          p.pb-3.border-bottom
+            | {{ task.content }}
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
     script(src='/assets/js/sidebarApp.js')
-    script(src='/assets/js/dashboard.js')
+    script(src='/assets/js/projectsApp.js')
