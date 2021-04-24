@@ -36,6 +36,7 @@ var app = new Vue({
           .post('/tasks', {username: 'paul', content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
         this.taskText = null
         this.dueDate = null
+        this.selectedProject = null
         this.loadTasks()
       }
     },
