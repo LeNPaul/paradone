@@ -26,7 +26,7 @@ router.get('/', function(req, res) {
 router.post('/', function(req, res) {
   var task_id = uuidv4()
   var newTask = new Task({
-    username:     req.body.username,
+    username:     req.user.username,
     content:      req.body.content,
     task_id:      task_id,
     project_id:   req.body.project_id,

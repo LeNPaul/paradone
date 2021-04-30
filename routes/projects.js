@@ -26,7 +26,7 @@ router.get('/', function(req, res) {
 router.post('/', function(req, res) {
   var project_id = uuidv4()
   var newProject = new Project({
-    username:     req.body.username,
+    username:     req.user.username,
     project_name: req.body.project_name,
     project_id:   project_id
   })
