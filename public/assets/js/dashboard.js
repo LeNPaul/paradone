@@ -33,7 +33,7 @@ var app = new Vue({
       var due_datetime = convertDateTime(this.dueDate)
       if (this.taskText != null) {
         axios
-          .post('/tasks', {username: 'paul', content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
+          .post('/tasks', {content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
         this.taskText = null
         this.dueDate = null
         this.selectedProject = null
@@ -68,7 +68,7 @@ var app = new Vue({
     addProject: function() {
       if (this.projectText != null) {
         axios
-          .post('/projects', {username: 'paul', project_name: this.projectText})
+          .post('/projects', {project_name: this.projectText})
         this.projectText = null
       }
     }
