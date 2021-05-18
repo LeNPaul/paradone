@@ -57,8 +57,8 @@ html(lang='en')
                 select.form-select(aria-label='Default select example' v-model="selectedProject")
                   option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
             .modal-footer
-              button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
-              button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
+              button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
+              button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
               
       #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
         .modal-dialog.modal-dialog-centered
@@ -76,8 +76,8 @@ html(lang='en')
               select.form-select(aria-label='Default select example' v-model="selectedProject")
                 option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
             .modal-footer
-              button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
-              button.btn.btn-primary(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
+              button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
+              button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
               
       #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
           .modal-dialog.modal-dialog-centered
@@ -90,8 +90,8 @@ html(lang='en')
                   .mb-3
                     textarea(type='text' class='form-control' v-model='projectText')#projectText
               .modal-footer
-                button.btn.btn-secondary(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
-                button(class='btn btn-primary' type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
+                button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
+                button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
                   
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
