@@ -52,9 +52,9 @@ html(lang='en')
               form
                 .mb-3
                   textarea(type='text' class='form-control' v-model='taskText')#taskText
-                input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-                label(class='form-label') Project
-                select.form-select(aria-label='Default select example' v-model="selectedProject")
+                // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
+                // label(class='form-label') Project
+                // select.form-select(aria-label='Default select example' v-model="selectedProject")
                   option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
             .modal-footer
               button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
@@ -72,8 +72,8 @@ html(lang='en')
                   div(class='card')
                     div(class='card-body')
                       p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
-              input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-              select.form-select(aria-label='Default select example' v-model="selectedProject")
+              // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
+              // select.form-select(aria-label='Default select example' v-model="selectedProject")
                 option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
             .modal-footer
               button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
