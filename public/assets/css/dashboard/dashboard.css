@@ -1,3 +1,7 @@
 [contenteditable] {
   outline: 0px solid transparent;
 }
+
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(data-ph)
+}
