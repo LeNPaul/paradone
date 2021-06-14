@@ -35,8 +35,8 @@ var app = new Vue({
         axios
           .post('/tasks', {content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject})
         this.taskText = null
-        this.dueDate = null
-        this.selectedProject = null
+        // this.dueDate = null
+        // this.selectedProject = null
         this.loadTasks()
       }
     },
@@ -46,8 +46,8 @@ var app = new Vue({
         .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: due_datetime})
       this.editTaskText = null
       this.editTaskId = null
-      this.selectedProject = null
-      this.dueDate = null
+      // this.selectedProject = null
+      // this.dueDate = null
       this.loadTasks()
     },
     completeTask: function(task_id) {
@@ -58,8 +58,8 @@ var app = new Vue({
     toggleTaskModal: function(content, task_id, project_id, dueDate) {
       this.editTaskText = content
       this.editTaskId = task_id
-      this.selectedProject = project_id
-      this.dueDate = dueDate.substring(0,10)
+      // this.selectedProject = project_id
+      // this.dueDate = dueDate.substring(0,10)
     },
     loadProjects: function() {
       axios
