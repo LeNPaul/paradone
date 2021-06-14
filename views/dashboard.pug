@@ -49,7 +49,7 @@ html(lang='en')
               h5#addTaskModalLabel.modal-title Add Task
               button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null')
             .modal-body
-              form
+              form(@submit.prevent)
                 .mb-3
                   input(type='text' class='form-control' placeholder='Add a task' v-model='taskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#taskText
                 // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
