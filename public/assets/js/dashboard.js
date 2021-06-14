@@ -43,7 +43,7 @@ var app = new Vue({
     updateTask: function(task_id) {
       var due_datetime = convertDateTime(this.dueDate)
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: due_datetime})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').value, project_id: this.selectedProject, due_datetime: due_datetime})
       this.editTaskText = null
       this.editTaskId = null
       // this.selectedProject = null

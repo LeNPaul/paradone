@@ -67,11 +67,9 @@ html(lang='en')
               h5#editTaskModalLabel.modal-title Edit Task
               button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, dueDate = null')
             .modal-body
-              form
+              form(@submit.prevent)
                 .mb-3
-                  div(class='card')
-                    div(class='card-body')
-                      p(style='font-size:1.25rem;' contenteditable='true')#editTaskText {{ editTaskText }}
+                  input(type='text' class='form-control' placeholder='Add a task' v-model='editTaskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#editTaskText
               // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
               // select.form-select(aria-label='Default select example' v-model="selectedProject")
                 option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
