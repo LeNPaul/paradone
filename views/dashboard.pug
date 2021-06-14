@@ -51,7 +51,7 @@ html(lang='en')
             .modal-body
               form
                 .mb-3
-                  input(type='text' class='form-control' placeholder='Add a task' v-model='taskText' style="padding-top: 16px; padding-bottom:32px; font-size:1.25rem;")#taskText
+                  input(type='text' class='form-control' placeholder='Add a task' v-model='taskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#taskText
                 // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
                 // label(class='form-label') Project
                 // select.form-select(aria-label='Default select example' v-model="selectedProject")
@@ -71,7 +71,7 @@ html(lang='en')
                 .mb-3
                   div(class='card')
                     div(class='card-body')
-                      p(class='lead' contenteditable='true')#editTaskText {{ editTaskText }}
+                      p(style='font-size:1.25rem;' contenteditable='true')#editTaskText {{ editTaskText }}
               // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
               // select.form-select(aria-label='Default select example' v-model="selectedProject")
                 option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
