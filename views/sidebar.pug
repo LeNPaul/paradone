@@ -33,12 +33,19 @@
             li
               a.link-dark.rounded(href='#') Annually
       li.mb-1
-        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#orders-collapse' aria-expanded='false')
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#projects-collapse' aria-expanded='false')
           | Projects
-        #orders-collapse.collapse
+        #projects-collapse.collapse
           ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small(v-for='project in projects')
             li
               a.link-dark.rounded(v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
+      li.mb-1
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#paradigms-collapse' aria-expanded='false')
+          | Paradigms
+        #paradigms-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
+            li
+              a.link-dark.rounded(href='/eisenhower') Eisenhower Matrix
       li.border-top.my-3
       li.mb-1
         button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#account-collapse' aria-expanded='false')
