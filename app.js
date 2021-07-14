@@ -13,6 +13,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var tasksRouter = require('./routes/tasks');
 var projectsRouter = require('./routes/projects');
+var paradigmsRouter = require('./routes/paradigms');
 
 var app = express();
 
@@ -44,6 +45,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/tasks', tasksRouter);
 app.use('/projects', projectsRouter);
+app.use('/paradigms', paradigmsRouter);
 
 // passport config
 var Account = require('./models/account');
