@@ -5,6 +5,13 @@
         use(xlink:href='#bootstrap')
       span.fs-5.fw-semibold paradone
     ul.list-unstyled.ps-0
+      li.mb-1
+        button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='false')
+          | Dashboard
+        #home-collapse.collapse
+          ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
+            li
+              a.link-dark.rounded(href='/') Home
       // li.mb-1
         // button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#home-collapse' aria-expanded='true')
           | Home
@@ -32,14 +39,14 @@
               a.link-dark.rounded(href='#') Monthly
             li
               a.link-dark.rounded(href='#') Annually
-      li.mb-1
+      // li.mb-1
         button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#projects-collapse' aria-expanded='false')
           | Projects
         #projects-collapse.collapse
           ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small(v-for='project in projects')
             li
               a.link-dark.rounded(v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
-      li.mb-1
+      // li.mb-1
         button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#paradigms-collapse' aria-expanded='false')
           | Paradigms
         #paradigms-collapse.collapse
