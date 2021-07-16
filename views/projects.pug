@@ -37,8 +37,9 @@ html(lang='en')
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
               i(class='far fa-circle')
             | {{ task.content }}
-            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime)')
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority)')
               i.fas.fa-edit
+      include modals.pug   
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
     script(src='/assets/js/sidebarApp.js')

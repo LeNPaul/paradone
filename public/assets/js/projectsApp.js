@@ -16,6 +16,7 @@ var app = new Vue({
     taskText: null,
     editTaskText: null,
     editTaskId: null,
+    priority: null,
     projects: null,
     projectText: null,
     selectedProject: null,
@@ -31,11 +32,19 @@ var app = new Vue({
         .put('/tasks', {task_id: task_id, completed: true})
       this.loadProjectTasks()
     },
-    toggleTaskModal: function(content, task_id, project_id, dueDate) {
+    toggleTaskModal: function(content, task_id, project_id, dueDate, priority) {
       this.editTaskText = content
       this.editTaskId = task_id
+      this.priority = priority
       this.selectedProject = project_id
-      this.dueDate = dueDate.substring(0,10)
+      axios.get('/projects').then(projects => {
+        for (var i = 0; i < projects.data.length; i++) {
+          if (project_id == projects.data[i].project_id) {
+            this.projectText = projects.data[i].project_name
+          }
+        }
+      })
+      // this.dueDate = dueDate.substring(0,10)
     },
     loadProjects: function() {
       axios
@@ -44,12 +53,20 @@ var app = new Vue({
     updateTask: function(task_id) {
       var due_datetime = convertDateTime(this.dueDate)
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').textContent, project_id: this.selectedProject, due_datetime: due_datetime})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').value, project_id: this.selectedProject, due_datetime: due_datetime, priority: this.priority})
       this.editTaskText = null
       this.editTaskId = null
+      this.priority = null
       this.selectedProject = null
-      this.dueDate = null
+      // this.dueDate = null
       this.loadProjectTasks()
+    },
+    setPriority: function(priority) {
+      this.priority = priority
+    },
+    setProject: function(project, project_id) {
+      this.projectText = project
+      this.selectedProject = project_id
     },
     loadProjectTasks: function() {
       var url = window.location.href.split('/projects/')
