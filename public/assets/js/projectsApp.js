@@ -92,6 +92,7 @@ var app = new Vue({
         axios
           .post('/projects', {project_name: this.projectText})
         this.projectText = null
+        location.reload();
       }
     },
     loadProjectTasks: function() {
