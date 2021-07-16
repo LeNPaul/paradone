@@ -3,7 +3,7 @@
     .modal-content
       .modal-header
         h5#addTaskModalLabel.modal-title Add Task
-        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null')
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null')
       .modal-body
         form(@submit.prevent)
           .mb-3
@@ -12,8 +12,20 @@
           // label(class='form-label') Project
           // select.form-select(aria-label='Default select example' v-model="selectedProject")
             option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
+          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+            i.far.fa-flag 
+            |  {{ priority }}
+          ul.dropdown-menu(aria-labelledby='dropdownPriority')
+            li
+              a.dropdown-item(v-on:click='setPriority(1)') Priority 1
+            li
+              a.dropdown-item(v-on:click='setPriority(2)') Priority 2
+            li
+              a.dropdown-item(v-on:click='setPriority(3)') Priority 3
+            li
+              a.dropdown-item(v-on:click='setPriority(4)') Priority 4
       .modal-footer
-        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null') Close
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
         
 #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
@@ -21,16 +33,28 @@
     .modal-content
       .modal-header
         h5#editTaskModalLabel.modal-title Edit Task
-        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, dueDate = null')
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, dueDate = null, priority = null')
       .modal-body
         form(@submit.prevent)
           .mb-3
             input(type='text' class='form-control' placeholder='Add a task' v-model='editTaskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#editTaskText
-        // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-        // select.form-select(aria-label='Default select example' v-model="selectedProject")
-          option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
+          // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
+          // select.form-select(aria-label='Default select example' v-model="selectedProject")
+            option(v-bind:value='project.project_id' v-for='project in projects') {{ project.project_name }}
+          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+            i.far.fa-flag 
+            |  {{ priority }}
+          ul.dropdown-menu(aria-labelledby='dropdownPriority')
+            li
+              a.dropdown-item(v-on:click='setPriority(1)') Priority 1
+            li
+              a.dropdown-item(v-on:click='setPriority(2)') Priority 2
+            li
+              a.dropdown-item(v-on:click='setPriority(3)') Priority 3
+            li
+              a.dropdown-item(v-on:click='setPriority(4)') Priority 4
       .modal-footer
-        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null') Close
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, priority = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
         
 #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
