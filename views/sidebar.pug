@@ -46,7 +46,7 @@
           ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small(v-for='project in projects')
             li
               a.link-dark.rounded(v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
-      // li.mb-1
+      li.mb-1
         button.btn.btn-toggle.align-items-center.rounded.collapsed(data-bs-toggle='collapse' data-bs-target='#paradigms-collapse' aria-expanded='false')
           | Paradigms
         #paradigms-collapse.collapse
