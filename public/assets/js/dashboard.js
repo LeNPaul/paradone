@@ -45,7 +45,7 @@ var app = new Vue({
     updateTask: function(task_id) {
       var due_datetime = convertDateTime(this.dueDate)
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').value, project_id: this.selectedProject, due_datetime: due_datetime})
+        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').value, project_id: this.selectedProject, due_datetime: due_datetime, priority: this.priority})
       this.editTaskText = null
       this.editTaskId = null
       this.priority = null
@@ -58,15 +58,15 @@ var app = new Vue({
         .put('/tasks', {task_id: task_id, completed: true})
       this.loadTasks()
     },
-    toggleTaskModal: function(content, task_id, project_id, dueDate) {
+    toggleTaskModal: function(content, task_id, project_id, dueDate, priority) {
       this.editTaskText = content
       this.editTaskId = task_id
+      this.priority = priority
       // this.selectedProject = project_id
       // this.dueDate = dueDate.substring(0,10)
     },
     setPriority: function(priority) {
       this.priority = priority
-      console.log(this.priority)
     },
     loadProjects: function() {
       axios
