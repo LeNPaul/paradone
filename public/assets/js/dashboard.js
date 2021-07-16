@@ -38,7 +38,8 @@ var app = new Vue({
         this.taskText = null
         this.priority = null
         // this.dueDate = null
-        // this.selectedProject = null
+        this.selectedProject = null
+        this.projectText = null
         this.loadTasks()
       }
     },
@@ -67,6 +68,10 @@ var app = new Vue({
     },
     setPriority: function(priority) {
       this.priority = priority
+    },
+    setProject: function(project, project_id) {
+      this.projectText = project
+      this.selectedProject = project_id
     },
     loadProjects: function() {
       axios
