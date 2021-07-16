@@ -32,6 +32,19 @@ var app = new Vue({
         .put('/tasks', {task_id: task_id, completed: true})
       this.loadProjectTasks()
     },
+    addTask: function() {
+      var due_datetime = convertDateTime(this.dueDate)
+      if (this.taskText != null) {
+        axios
+          .post('/tasks', {content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject, priority: this.priority})
+        this.taskText = null
+        this.priority = null
+        // this.dueDate = null
+        this.selectedProject = null
+        this.projectText = null
+        this.loadProjectTasks()
+      }
+    },
     toggleTaskModal: function(content, task_id, project_id, dueDate, priority) {
       this.editTaskText = content
       this.editTaskId = task_id
