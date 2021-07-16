@@ -50,7 +50,7 @@ var app = new Vue({
       this.editTaskText = null
       this.editTaskId = null
       this.priority = null
-      // this.selectedProject = null
+      this.selectedProject = null
       // this.dueDate = null
       this.loadTasks()
     },
@@ -63,7 +63,14 @@ var app = new Vue({
       this.editTaskText = content
       this.editTaskId = task_id
       this.priority = priority
-      // this.selectedProject = project_id
+      this.selectedProject = project_id
+      axios.get('/projects').then(projects => {
+        for (var i = 0; i < projects.data.length; i++) {
+          if (project_id == projects.data[i].project_id) {
+            this.projectText = projects.data[i].project_name
+          }
+        }
+      })
       // this.dueDate = dueDate.substring(0,10)
     },
     setPriority: function(priority) {
