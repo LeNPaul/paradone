@@ -48,6 +48,13 @@ var app = new Vue({
         this.projectText = null
       }
     },
+    addProject: function() {
+      if (this.projectText != null) {
+        axios
+          .post('/projects', {project_name: this.projectText})
+        this.projectText = null
+      }
+    },
     updateTask: function(task_id) {
       var due_datetime = convertDateTime(this.dueDate)
       axios
@@ -89,13 +96,6 @@ var app = new Vue({
     loadProjects: function() {
       axios
         .get('/projects').then(response => this.projects = response.data)
-    },
-    addProject: function() {
-      if (this.projectText != null) {
-        axios
-          .post('/projects', {project_name: this.projectText})
-        this.projectText = null
-      }
     }
   },
   filters: {

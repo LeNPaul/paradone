@@ -87,6 +87,13 @@ var app = new Vue({
       this.projectText = project
       this.selectedProject = project_id
     },
+    addProject: function() {
+      if (this.projectText != null) {
+        axios
+          .post('/projects', {project_name: this.projectText})
+        this.projectText = null
+      }
+    },
     loadProjectTasks: function() {
       var url = window.location.href.split('/projects/')
       this.projectTasks = []

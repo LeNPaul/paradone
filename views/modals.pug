@@ -77,9 +77,9 @@
           h5#addProjectModalLabel.modal-title Add Project
           button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='projectText = null')
         .modal-body
-          form
+          form(@submit.prevent)
             .mb-3
-              textarea(type='text' class='form-control' v-model='projectText')#projectText
+              input(type='text' class='form-control' placeholder='Add a project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
         .modal-footer
           button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
           button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
