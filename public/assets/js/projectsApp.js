@@ -43,6 +43,11 @@ var app = new Vue({
         this.selectedProject = null
         this.projectText = null
         this.loadProjectTasks()
+      } else {
+        this.priority = null
+        // this.dueDate = null
+        this.selectedProject = null
+        this.projectText = null
       }
     },
     toggleTaskModal: function(content, task_id, project_id, dueDate, priority) {
@@ -71,6 +76,7 @@ var app = new Vue({
       this.editTaskId = null
       this.priority = null
       this.selectedProject = null
+      this.projectText = null
       // this.dueDate = null
       this.loadProjectTasks()
     },

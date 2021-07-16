@@ -41,6 +41,11 @@ var app = new Vue({
         this.selectedProject = null
         this.projectText = null
         this.loadTasks()
+      } else {
+        this.priority = null
+        // this.dueDate = null
+        this.selectedProject = null
+        this.projectText = null
       }
     },
     updateTask: function(task_id) {
@@ -51,6 +56,7 @@ var app = new Vue({
       this.editTaskId = null
       this.priority = null
       this.selectedProject = null
+      this.projectText = null
       // this.dueDate = null
       this.loadTasks()
     },
