@@ -9,4 +9,11 @@ router.get('/eisenhower', (req, res) => {
   })
 });
 
+router.get('/kanban', (req, res) => {
+  res.render('paradigms/kanban.pug', {
+    user : req.user,
+    title : 'Kanban'
+  })
+});
+
 module.exports = router
