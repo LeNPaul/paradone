@@ -16,6 +16,7 @@ var app = new Vue({
     editTaskText: null,
     editTaskId: null,
     priority: null,
+    labels: null,
     projects: null,
     projectText: null,
     selectedProject: null,
@@ -34,7 +35,13 @@ var app = new Vue({
       var due_datetime = convertDateTime(this.dueDate)
       if (this.taskText != null) {
         axios
-          .post('/tasks', {content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject, priority: this.priority})
+          .post('/tasks', {
+            content: this.taskText,
+            due_datetime: due_datetime,
+            project_id: this.selectedProject,
+            priority: this.priority,
+            label: ['done']
+          })
         this.taskText = null
         this.priority = null
         // this.dueDate = null
@@ -95,7 +102,7 @@ var app = new Vue({
       this.selectedProject = project_id
     },
     setLabel: function(label) {
-      console.log(label)
+      this.label = label
     },
     loadProjects: function() {
       axios
