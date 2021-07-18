@@ -94,6 +94,9 @@ var app = new Vue({
       this.projectText = project
       this.selectedProject = project_id
     },
+    setLabel: function(label) {
+      console.log(label)
+    },
     loadProjects: function() {
       axios
         .get('/projects').then(response => this.projects = response.data)

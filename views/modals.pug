@@ -10,7 +10,18 @@
             input(type='text' class='form-control' placeholder='Add a task' v-model='taskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#taskText
           // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
           
-          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+          button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+            i.fas.fa-tags
+            |  {{ priority }}
+          ul.dropdown-menu(aria-labelledby='dropdownLabel')
+            li
+              a.dropdown-item(v-on:click='setLabel("todo")') To Do
+            li
+              a.dropdown-item(v-on:click='setLabel("doing")') Doing
+            li
+              a.dropdown-item(v-on:click='setLabel("done")') Done
+          
+          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.far.fa-flag 
             |  {{ priority }}
           ul.dropdown-menu(aria-labelledby='dropdownPriority')
