@@ -12,7 +12,7 @@
           
           button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tags
-            |  {{ priority }}
+            |  {{ labels }}
           ul.dropdown-menu(aria-labelledby='dropdownLabel')
             li
               a.dropdown-item(v-on:click='setLabel("todo")') To Do
