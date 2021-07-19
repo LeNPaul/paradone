@@ -40,7 +40,7 @@ var app = new Vue({
             due_datetime: due_datetime,
             project_id: this.selectedProject,
             priority: this.priority,
-            label: ['done']
+            label_ids: [this.labels]
           })
         this.taskText = null
         this.priority = null
@@ -102,7 +102,7 @@ var app = new Vue({
       this.selectedProject = project_id
     },
     setLabel: function(label) {
-      this.label = label
+      this.labels = label
     },
     loadProjects: function() {
       axios
