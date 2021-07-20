@@ -121,6 +121,7 @@ var app = new Vue({
         for (var i = 0; i < projects.data.length; i++) {
           if (url[1] == projects.data[i].project_name.toLowerCase()) {
             project_id = projects.data[i].project_id
+            this.projectText = projects.data[i].project_name
           }
         }
         axios.get('/tasks').then(tasks => {

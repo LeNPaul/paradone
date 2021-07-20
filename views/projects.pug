@@ -34,6 +34,8 @@ html(lang='en')
         h4.pb-3.mb-3.border-bottom #{ project }
           button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
             i.fas.fa-plus
+          button.btn.btn-link.link-dark.float-end(type='button' data-bs-toggle='modal' data-bs-target='#editProjectModal')
+            i.fas.fa-ellipsis-v
         div(v-for='task in projectTasks' v-if='!task.completed') 
           p.pb-3.border-bottom
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
