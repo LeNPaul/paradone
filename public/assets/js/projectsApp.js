@@ -17,6 +17,7 @@ var app = new Vue({
     editTaskText: null,
     editTaskId: null,
     priority: null,
+    label_ids: null,
     projects: null,
     projectText: null,
     selectedProject: null,
@@ -36,7 +37,13 @@ var app = new Vue({
       var due_datetime = convertDateTime(this.dueDate)
       if (this.taskText != null) {
         axios
-          .post('/tasks', {content: this.taskText, due_datetime: due_datetime, project_id: this.selectedProject, priority: this.priority})
+          .post('/tasks', {
+            content: this.taskText,
+            due_datetime: due_datetime,
+            project_id: this.selectedProject,
+            priority: this.priority,
+            label_ids: [this.label_ids]
+          })
         this.taskText = null
         this.priority = null
         // this.dueDate = null
@@ -50,11 +57,12 @@ var app = new Vue({
         this.projectText = null
       }
     },
-    toggleTaskModal: function(content, task_id, project_id, dueDate, priority) {
+    toggleTaskModal: function(content, task_id, project_id, dueDate, priority, label_ids) {
       this.editTaskText = content
       this.editTaskId = task_id
       this.priority = priority
       this.selectedProject = project_id
+      this.label_ids = label_ids
       axios.get('/projects').then(projects => {
         for (var i = 0; i < projects.data.length; i++) {
           if (project_id == projects.data[i].project_id) {
@@ -71,7 +79,14 @@ var app = new Vue({
     updateTask: function(task_id) {
       var due_datetime = convertDateTime(this.dueDate)
       axios
-        .put('/tasks', {task_id: this.editTaskId, content: document.getElementById('editTaskText').value, project_id: this.selectedProject, due_datetime: due_datetime, priority: this.priority})
+        .put('/tasks', {
+          task_id: this.editTaskId,
+          content: document.getElementById('editTaskText').value,
+          project_id: this.selectedProject,
+          due_datetime: due_datetime,
+          priority: this.priority,
+          label_ids: this.label_ids
+        })
       this.editTaskText = null
       this.editTaskId = null
       this.priority = null
@@ -86,6 +101,9 @@ var app = new Vue({
     setProject: function(project, project_id) {
       this.projectText = project
       this.selectedProject = project_id
+    },
+    setLabel: function(label_ids) {
+      this.label_ids = [label_ids]
     },
     addProject: function() {
       if (this.projectText != null) {

@@ -40,7 +40,7 @@ html(lang='en')
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
               i(class='far fa-circle')
             | {{ task.content }}
-            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority)')
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority, task.label_ids)')
               i.fas.fa-edit
         h6.pb-3.mb-3.border-bottom Important but Not Urgent
         div(v-for='task in tasks' v-if='task.priority == 2 && !task.completed') 
@@ -48,7 +48,7 @@ html(lang='en')
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
               i(class='far fa-circle')
             | {{ task.content }}
-            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority)')
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority, task.label_ids)')
               i.fas.fa-edit
         h6.pb-3.mb-3.border-bottom Urgent but Not Important
         div(v-for='task in tasks' v-if='task.priority == 3 && !task.completed') 
@@ -56,7 +56,7 @@ html(lang='en')
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
               i(class='far fa-circle')
             | {{ task.content }}
-            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority)')
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority, task.label_ids)')
               i.fas.fa-edit
         h6.pb-3.mb-3.border-bottom Not Urgent and Not Important
         div(v-for='task in tasks' v-if='task.priority == 4 && !task.completed || task.priority == null && !task.completed') 
@@ -64,7 +64,7 @@ html(lang='en')
             button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
               i(class='far fa-circle')
             | {{ task.content }}
-            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority)')
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority, task.label_ids)')
               i.fas.fa-edit
       include ../modals.pug  
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
