@@ -103,7 +103,7 @@ var app = new Vue({
       this.selectedProject = project_id
     },
     setLabel: function(label_ids) {
-      this.label_ids = [label_ids]
+      this.label_ids = label_ids
     },
     addProject: function() {
       if (this.projectText != null) {
