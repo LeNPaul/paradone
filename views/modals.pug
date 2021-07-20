@@ -3,7 +3,7 @@
     .modal-content
       .modal-header
         h5#addTaskModalLabel.modal-title Add Task
-        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null')
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null, label_ids = null')
       .modal-body
         form(@submit.prevent)
           .mb-3
@@ -12,7 +12,7 @@
           
           button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tags
-            |  {{ labels }}
+            |  {{ label_ids }}
           ul.dropdown-menu(aria-labelledby='dropdownLabel')
             li
               a.dropdown-item(v-on:click='setLabel("todo")') To Do
@@ -42,7 +42,7 @@
               a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
               
       .modal-footer
-        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null') Close
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
         
 #editTaskModal.modal.fade(tabindex='-1' aria-labelledby='editTaskModalLabel' aria-hidden='true' data-bs-backdrop='static')
@@ -50,14 +50,25 @@
     .modal-content
       .modal-header
         h5#editTaskModalLabel.modal-title Edit Task
-        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null')
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null, label_ids = null')
       .modal-body
         form(@submit.prevent)
           .mb-3
             input(type='text' class='form-control' placeholder='Add a task' v-model='editTaskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#editTaskText
           // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
 
-          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+          button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+            i.fas.fa-tags
+            |  {{ label_ids }}
+          ul.dropdown-menu(aria-labelledby='dropdownLabel')
+            li
+              a.dropdown-item(v-on:click='setLabel("todo")') To Do
+            li
+              a.dropdown-item(v-on:click='setLabel("doing")') Doing
+            li
+              a.dropdown-item(v-on:click='setLabel("done")') Done
+
+          button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.far.fa-flag 
             |  {{ priority }}
           ul.dropdown-menu(aria-labelledby='dropdownPriority')
@@ -78,7 +89,7 @@
               a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
               
       .modal-footer
-        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, priority = null, projectText = null, selectedProject = null') Close
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
         
 #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
