@@ -9,7 +9,6 @@
           .mb-3
             input(type='text' class='form-control' placeholder='Add a task' v-model='taskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#taskText
           // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-          
           button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tags
             |  {{ label_ids }}
@@ -20,7 +19,6 @@
               a.dropdown-item(v-on:click='setLabel("doing")') Doing
             li
               a.dropdown-item(v-on:click='setLabel("done")') Done
-          
           button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.far.fa-flag 
             |  {{ priority }}
@@ -33,14 +31,12 @@
               a.dropdown-item(v-on:click='setPriority(3)') Priority 3
             li
               a.dropdown-item(v-on:click='setPriority(4)') Priority 4
-              
           button#dropdownProject.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tasks 
             |  {{ projectText }}
           ul.dropdown-menu(aria-labelledby='dropdownProject')
             li(v-for='project in projects')
               a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
-              
       .modal-footer
         button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
@@ -56,7 +52,6 @@
           .mb-3
             input(type='text' class='form-control' placeholder='Add a task' v-model='editTaskText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#editTaskText
           // input(class='form-control mb-3' placeholder="YYYY-MM-DD" v-model='dueDate')
-
           button#dropdownLabel.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tags
             |  {{ label_ids }}
@@ -67,7 +62,6 @@
               a.dropdown-item(v-on:click='setLabel("doing")') Doing
             li
               a.dropdown-item(v-on:click='setLabel("done")') Done
-
           button#dropdownPriority.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.far.fa-flag 
             |  {{ priority }}
@@ -80,14 +74,12 @@
               a.dropdown-item(v-on:click='setPriority(3)') Priority 3
             li
               a.dropdown-item(v-on:click='setPriority(4)') Priority 4
-          
           button#dropdownProject.btn.btn-outline-dark.btn-sm.float-end.me-2(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-tasks 
             |  {{ projectText }}
           ul.dropdown-menu(aria-labelledby='dropdownProject')
             li(v-for='project in projects')
-              a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
-              
+              a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}    
       .modal-footer
         button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
@@ -115,7 +107,12 @@
       .modal-body
         form(@submit.prevent)
           .mb-3
-            input(type='text' class='form-control' placeholder='Update project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
+            input(type='text' class='form-control' placeholder='Update project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText              
+          button#dropdownDelete.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
+            i.fas.fa-trash
+          ul.dropdown-menu(aria-labelledby='dropdownDelete')
+            li
+              a.dropdown-item(v-on:click='deleteProject(true)') Delete project
       .modal-footer
         button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='reloadPage()') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateProject()' aria-label='Close') Save

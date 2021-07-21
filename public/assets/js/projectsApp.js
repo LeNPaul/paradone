@@ -122,6 +122,16 @@ var app = new Vue({
       window.location.href = '/projects/' + this.projectText
       this.loadProjectTasks()
     },
+    deleteProject: function(is_archived) {
+      console.log(is_archived, this.selectedProject);
+      axios
+        .put('/projects', {
+          project_id: this.selectedProject,
+          archived: is_archived
+        })
+      window.location.href = '/'
+      this.loadProjectTasks()
+    },
     reloadPage: function() {
       location.reload();
     },
