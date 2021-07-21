@@ -19,6 +19,7 @@ var app = new Vue({
     label_ids: null,
     projects: null,
     projectText: null,
+    editProjectText: null,
     selectedProject: null,
     dueDate: null
   },
