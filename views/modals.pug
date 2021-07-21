@@ -36,7 +36,7 @@
             |  {{ projectText }}
           ul.dropdown-menu(aria-labelledby='dropdownProject')
             li(v-for='project in projects')
-              a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
+              a.dropdown-item(v-if='!project.archived' v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}
       .modal-footer
         button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='taskText = null, selectedProject = null, dueDate = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addTask()' aria-label='Close') Save
@@ -79,7 +79,7 @@
             |  {{ projectText }}
           ul.dropdown-menu(aria-labelledby='dropdownProject')
             li(v-for='project in projects')
-              a.dropdown-item(v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}    
+              a.dropdown-item(v-if='!project.archived' v-on:click='setProject(project.project_name, project.project_id)') {{ project.project_name }}    
       .modal-footer
         button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='editTaskText = null, editTaskId = null, selectedProject = null, priority = null, projectText = null, selectedProject = null, label_ids = null') Close
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save

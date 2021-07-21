@@ -45,7 +45,7 @@
         #projects-collapse.collapse
           ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small(v-for='project in projects')
             li
-              a.link-dark.rounded(v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
+              a.link-dark.rounded(v-if='!project.archived' v-bind:href="'/projects/' + project.project_name | lowercase") {{ project.project_name }}
           ul.btn-toggle-nav.list-unstyled.fw-normal.pb-1.small
             li
               a(data-bs-toggle='modal' data-bs-target='#addProjectModal')
