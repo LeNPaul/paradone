@@ -7,7 +7,8 @@ var Project = new Schema({
   project_name: String,
   project_id:   String,
   colour:       String,
-  order:        Number
+  order:        Number,
+  archived:     Boolean
 });
 
 Project.plugin(passportLocalMongoose);
