@@ -39,6 +39,25 @@ router.post('/', function(req, res) {
   })
 })
 
+/* Update a project */
+// curl -X PUT -H "Content-Type: application/json" -d '{"project_id": "", "project_name": "renamed"}' localhost:8080/projects
+router.put('/', function(req, res) {
+  Project.findOne({project_id: req.body.project_id}, function(err, project) {
+    Project.findByIdAndUpdate(
+      project.id,
+      req.body,
+      { new: true },
+      function(err, update) {
+        if (err == null) {
+          res.json({Success: true})
+        } else {
+          res.status(500).json({success: false})
+        }
+      }
+    )
+  })
+})
+
 router.get('/:project', (req, res) => {
     res.render('projects.pug', {
       user : req.user,
