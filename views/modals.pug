@@ -93,29 +93,29 @@
         button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateTask()' aria-label='Close') Save
         
 #addProjectModal.modal.fade(tabindex='-1' aria-labelledby='addProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
-    .modal-dialog.modal-dialog-centered
-      .modal-content
-        .modal-header
-          h5#addProjectModalLabel.modal-title Add Project
-          button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='projectText = null')
-        .modal-body
-          form(@submit.prevent)
-            .mb-3
-              input(type='text' class='form-control' placeholder='Add a project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
-        .modal-footer
-          button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
-          button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
+  .modal-dialog.modal-dialog-centered
+    .modal-content
+      .modal-header
+        h5#addProjectModalLabel.modal-title Add Project
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='projectText = null')
+      .modal-body
+        form(@submit.prevent)
+          .mb-3
+            input(type='text' class='form-control' placeholder='Add a project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
+      .modal-footer
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
+        button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
 
 #editProjectModal.modal.fade(tabindex='-1' aria-labelledby='editProjectModalLabel' aria-hidden='true' data-bs-backdrop='static')
-    .modal-dialog.modal-dialog-centered
-      .modal-content
-        .modal-header
-          h5#editProjectModalLabel.modal-title Edit Project
-          button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='projectText = null')
-        .modal-body
-          form(@submit.prevent)
-            .mb-3
-              input(type='text' class='form-control' placeholder='Add a project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
-        .modal-footer
-          button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='projectText = null') Close
-          button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='addProject()' aria-label='Close') Save
+  .modal-dialog.modal-dialog-centered
+    .modal-content
+      .modal-header
+        h5#editProjectModalLabel.modal-title Edit Project
+        button.btn-close(type='button' data-bs-dismiss='modal' aria-label='Close' v-on:click='reloadPage()')
+      .modal-body
+        form(@submit.prevent)
+          .mb-3
+            input(type='text' class='form-control' placeholder='Update project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText
+      .modal-footer
+        button.btn.btn-outline-dark(type='button' data-bs-dismiss='modal' v-on:click='reloadPage()') Close
+        button.btn.btn-dark(type='button' data-bs-dismiss='modal' v-on:click='updateProject()' aria-label='Close') Save

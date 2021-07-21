@@ -113,6 +113,18 @@ var app = new Vue({
         location.reload();
       }
     },
+    updateProject: function() {
+      axios
+        .put('/projects', {
+          project_id: this.selectedProject,
+          project_name: this.projectText
+        })
+      window.location.href = '/projects/' + this.projectText
+      this.loadProjectTasks()
+    },
+    reloadPage: function() {
+      location.reload();
+    },
     loadProjectTasks: function() {
       var url = window.location.href.split('/projects/')
       this.projectTasks = []
@@ -122,6 +134,7 @@ var app = new Vue({
           if (url[1] == projects.data[i].project_name.toLowerCase()) {
             project_id = projects.data[i].project_id
             this.projectText = projects.data[i].project_name
+            this.selectedProject = projects.data[i].project_id
           }
         }
         axios.get('/tasks').then(tasks => {
