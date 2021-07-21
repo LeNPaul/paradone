@@ -20,6 +20,7 @@ var app = new Vue({
     label_ids: null,
     projects: null,
     projectText: null,
+    editProjectText: null,
     selectedProject: null,
     dueDate: null
   },
@@ -117,7 +118,7 @@ var app = new Vue({
       axios
         .put('/projects', {
           project_id: this.selectedProject,
-          project_name: this.projectText
+          project_name: this.editProjectText
         })
       window.location.href = '/projects/' + this.projectText
       this.loadProjectTasks()
@@ -143,7 +144,7 @@ var app = new Vue({
         for (var i = 0; i < projects.data.length; i++) {
           if (url[1] == projects.data[i].project_name.toLowerCase()) {
             project_id = projects.data[i].project_id
-            this.projectText = projects.data[i].project_name
+            this.editProjectText = projects.data[i].project_name
             this.selectedProject = projects.data[i].project_id
           }
         }

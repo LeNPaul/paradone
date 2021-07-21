@@ -107,7 +107,7 @@
       .modal-body
         form(@submit.prevent)
           .mb-3
-            input(type='text' class='form-control' placeholder='Update project' v-model='projectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#projectText              
+            input(type='text' class='form-control' placeholder='Update project' v-model='editProjectText' style="padding-top: 16px; padding-bottom:32px; padding-left: 16px; font-size:1.25rem;")#editProjectText
           button#dropdownDelete.btn.btn-outline-dark.btn-sm.float-end(type='button' data-bs-toggle='dropdown' aria-expanded='false')
             i.fas.fa-trash
           ul.dropdown-menu(aria-labelledby='dropdownDelete')
