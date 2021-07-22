@@ -16,4 +16,12 @@ router.get('/kanban', (req, res) => {
   })
 });
 
+router.get('/pomodoro', (req, res) => {
+  res.render('paradigms/pomodoro.pug', {
+    user : req.user,
+    title : 'Pomodoro'
+  })
+});
+
+
 module.exports = router
