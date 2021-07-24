@@ -50,6 +50,7 @@ var app = new Vue({
         // this.dueDate = null
         this.selectedProject = null
         this.projectText = null
+        this.label_ids = null
         this.loadProjectTasks()
       } else {
         this.priority = null
