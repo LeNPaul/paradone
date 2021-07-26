@@ -29,7 +29,7 @@ html(lang='en')
     link(href='/assets/css/sidebars.css' rel='stylesheet')
   body
     include sidebar.pug
-    .col-lg-6.p-3.py-md-5#projectApp
+    .col-lg-6.p-3.py-md-5#todoApp
       .p-3
         h4.pb-3.mb-3.border-bottom #{ project }
           button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
@@ -47,4 +47,4 @@ html(lang='en')
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
     script(src='/assets/js/sidebarApp.js')
-    script(src='/assets/js/projectsApp.js')
+    script(src='/assets/js/dashboardApp.js')
