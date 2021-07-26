@@ -11,6 +11,7 @@ function convertDateTime(string) {
 var app = new Vue({
   el: '#todoApp',
   data: {
+    projectTasks: [],
     tasks: null,
     taskText: null,
     editTaskText: null,
@@ -29,8 +30,29 @@ var app = new Vue({
   },
   methods: {
     loadTasks: function() {
-      axios
-        .get('/tasks').then(response => this.tasks = response.data)
+      var url = window.location.href.split('/projects/')
+      if(url.length == 1) {
+        axios
+          .get('/tasks').then(response => this.tasks = response.data)
+      } else if (url.length == 2) {
+        var project_id
+        axios.get('/projects').then(projects => {
+          for (var i = 0; i < projects.data.length; i++) {
+            if (url[1] == projects.data[i].project_name.toLowerCase()) {
+              project_id = projects.data[i].project_id
+              this.editProjectText = projects.data[i].project_name
+              this.selectedProject = projects.data[i].project_id
+            }
+          }
+          axios.get('/tasks').then(tasks => {
+            for (var j = 0; j < tasks.data.length; j++) {
+              if (tasks.data[j].project_id == project_id) {
+                this.projectTasks.push(tasks.data[j])
+              }
+            }
+          })
+        })
+      }
     },
     addTask: function() {
       var due_datetime = convertDateTime(this.dueDate)
@@ -117,6 +139,28 @@ var app = new Vue({
     loadProjects: function() {
       axios
         .get('/projects').then(response => this.projects = response.data)
+    },
+    updateProject: function() {
+      axios
+        .put('/projects', {
+          project_id: this.selectedProject,
+          project_name: this.editProjectText
+        })
+      window.location.href = '/projects/' + this.projectText
+      this.loadProjectTasks()
+    },
+    deleteProject: function(is_archived) {
+      console.log(is_archived, this.selectedProject);
+      axios
+        .put('/projects', {
+          project_id: this.selectedProject,
+          archived: is_archived
+        })
+      window.location.href = '/'
+      this.loadProjectTasks()
+    },
+    reloadPage: function() {
+      location.reload();
     }
   },
   filters: {
