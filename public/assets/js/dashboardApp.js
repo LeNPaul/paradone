@@ -45,6 +45,7 @@ var app = new Vue({
             }
           }
           axios.get('/tasks').then(tasks => {
+            this.projectTasks = []
             for (var j = 0; j < tasks.data.length; j++) {
               if (tasks.data[j].project_id == project_id) {
                 this.projectTasks.push(tasks.data[j])
@@ -147,7 +148,7 @@ var app = new Vue({
           project_name: this.editProjectText
         })
       window.location.href = '/projects/' + this.projectText
-      this.loadProjectTasks()
+      this.loadTasks()
     },
     deleteProject: function(is_archived) {
       console.log(is_archived, this.selectedProject);
@@ -157,7 +158,7 @@ var app = new Vue({
           archived: is_archived
         })
       window.location.href = '/'
-      this.loadProjectTasks()
+      this.loadTasks()
     },
     reloadPage: function() {
       location.reload();
