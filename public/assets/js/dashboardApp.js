@@ -147,7 +147,7 @@ var app = new Vue({
           project_id: this.selectedProject,
           project_name: this.editProjectText
         })
-      window.location.href = '/projects/' + this.projectText
+      window.location.href = '/projects/' + this.editProjectText
       this.loadTasks()
     },
     deleteProject: function(is_archived) {
