@@ -40,6 +40,7 @@ var app = new Vue({
           for (var i = 0; i < projects.data.length; i++) {
             if (url[1] == projects.data[i].project_name.toLowerCase()) {
               project_id = projects.data[i].project_id
+              this.projectText = projects.data[i].project_name
               this.editProjectText = projects.data[i].project_name
               this.selectedProject = projects.data[i].project_id
             }
@@ -148,7 +149,6 @@ var app = new Vue({
           project_name: this.editProjectText
         })
       window.location.href = '/projects/' + this.editProjectText
-      this.loadTasks()
     },
     deleteProject: function(is_archived) {
       console.log(is_archived, this.selectedProject);
@@ -158,7 +158,6 @@ var app = new Vue({
           archived: is_archived
         })
       window.location.href = '/'
-      this.loadTasks()
     },
     reloadPage: function() {
       location.reload();
