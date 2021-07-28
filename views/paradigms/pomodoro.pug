@@ -35,14 +35,22 @@ html(lang='en')
           button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
             i.fas.fa-plus
         // https://codepen.io/Chuloo/pen/xWVpqq
-        div.mx-auto.text-center
+        div.mx-auto.text-center.border-bottom.mt-5.mb-3
           h1.display-1 
             span {{ minutes }}
             span :
             span {{ seconds }}
-          button.btn.btn-outline-dark.me-2(type='button' v-if='!timer' v-on:click='startTimer') Start
-          button.btn.btn-outline-dark.me-2(type='button' v-if='timer' v-on:click='stopTimer') Pause
-          button.btn.btn-outline-dark(type='button' v-if='resetButton' v-on:click='resetTimer') Reset 
+          div.mb-5
+            button.btn.btn-outline-dark.me-2(type='button' v-if='!timer' v-on:click='startTimer') Start
+            button.btn.btn-outline-dark.me-2(type='button' v-if='timer' v-on:click='stopTimer') Pause
+            button.btn.btn-outline-dark(type='button' v-if='resetButton' v-on:click='resetTimer') Reset 
+        div(v-for='task in tasks' v-if='!task.completed') 
+          p.pb-3.border-bottom
+            button(type='submit' class='btn btn-link link-dark' v-on:click='completeTask(task.task_id)')
+              i(class='far fa-circle')
+            | {{ task.content }}
+            button(type='button' data-bs-toggle='modal' data-bs-target='#editTaskModal' class='btn btn-link link-dark float-end' v-on:click='toggleTaskModal(task.content, task.task_id, task.project_id, task.due_datetime, task.priority, task.label_ids)')
+              i.fas.fa-edit
       include ../modals.pug  
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
