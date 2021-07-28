@@ -188,6 +188,10 @@ var app = new Vue({
       if(this.totalTime >= 1){
         this.totalTime--;
       } else{
+        // https://soundbible.com/1630-Computer-Magic.html
+        var sound = '/assets/pomodoro.mp3'
+        var audio = new Audio(sound);
+        audio.play();
         this.totalTime = 0;
         this.resetTimer()
       }
