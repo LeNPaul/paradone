@@ -22,7 +22,12 @@ var app = new Vue({
     projectText: null,
     editProjectText: null,
     selectedProject: null,
-    dueDate: null
+    dueDate: null,
+    // Pomodoro
+    timer: null,
+    totalTime: (25 * 60),
+    resetButton: false,
+    title: "Let the countdown begin!!"
   },
   created () {
     this.loadTasks()
@@ -160,6 +165,36 @@ var app = new Vue({
     },
     reloadPage: function() {
       location.reload();
+    },
+    // Pomodoro
+    startTimer: function() {
+      this.timer = setInterval(() => this.countdown(), 1000);
+      this.resetButton = true;
+      this.title = "Greatness is within sight!!"
+    },
+    stopTimer: function() {
+      clearInterval(this.timer);
+      this.timer = null;
+      this.resetButton = true;
+      this.title = "Never quit, keep going!!"
+    },
+    resetTimer: function() {
+      this.totalTime = (25 * 60);
+      clearInterval(this.timer);
+      this.timer = null;
+      this.resetButton = false;
+      this.title = "Let the countdown begin!!"
+    },
+    padTime: function(time) {
+      return (time < 10 ? '0' : '') + time;
+    },
+    countdown: function() {
+      if(this.totalTime >= 1){
+        this.totalTime--;
+      } else{
+        this.totalTime = 0;
+        this.resetTimer()
+      }
     }
   },
   filters: {
