@@ -34,13 +34,14 @@ html(lang='en')
         h4.pb-3.mb-3.border-bottom Pomodoro
           button.btn.btn-link.link-dark(type='button' data-bs-toggle='modal' data-bs-target='#addTaskModal')
             i.fas.fa-plus
-        p.fs-1 {{ minutes }}:{{ seconds }}
-        button.btn.btn-outline-dark(type='button' v-on:click="startTimer")
-          i.far.fa-play-circle
-        button.btn.btn-outline-dark(type='button' v-on:click="stopTimer")
-          i.far.fa-pause-circle
-        button.btn.btn-outline-dark(type='button' v-on:click="resetTimer")
-          i.fas.fa-undo
+        div.mx-auto.text-center
+          h1.display-1 {{ minutes }}:{{ seconds }}
+          button.btn.btn-outline-dark.me-2(type='button' v-if='!timer' v-on:click='startTimer') Start
+            // i.far.fa-play-circle
+          button.btn.btn-outline-dark.me-2(type='button' v-if='timer' v-on:click='stopTimer') Pause
+            // i.far.fa-pause-circle
+          button.btn.btn-outline-dark(type='button' v-if='resetButton' v-on:click='resetTimer') Reset
+            // i.fas.fa-undo    
       include ../modals.pug  
     script(src='/assets/libs/bootstrap/bootstrap.bundle.min.js')
     script(src='/assets/js/sidebars.js')
