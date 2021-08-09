@@ -1,9 +1,6 @@
 <template>
   <div class="hello">
     <h1>{{ msg }}</h1>
-    <p>
-      Placeholder text.
-    </p>
   </div>
 </template>
 
