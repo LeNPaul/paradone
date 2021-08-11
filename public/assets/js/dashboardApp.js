@@ -26,7 +26,9 @@ var app = new Vue({
     // Pomodoro
     timer: null,
     totalTime: (25 * 60),
-    resetButton: false
+    resetButton: false,
+
+    start: null
   },
   created () {
     this.loadTasks()
@@ -167,6 +169,7 @@ var app = new Vue({
     },
     // Pomodoro
     startTimer: function() {
+      this.start = new Date();
       this.timer = setInterval(() => this.countdown(), 1000);
       this.resetButton = true;
     },
@@ -186,11 +189,10 @@ var app = new Vue({
     },
     countdown: function() {
       if(this.totalTime >= 1){
-        this.totalTime--;
+        this.totalTime = (25 * 60) - Math.floor(((new Date() - this.start) / 1000));
       } else{
         // https://soundbible.com/1630-Computer-Magic.html
-        var sound = '/assets/pomodoro.mp3'
-        var audio = new Audio(sound);
+        var audio = new Audio('/assets/pomodoro.mp3');
         audio.play();
         this.totalTime = 0;
         this.resetTimer()
