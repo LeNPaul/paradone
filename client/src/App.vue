@@ -1,14 +1,19 @@
 <template>
-  <todo-list msg="Welcome to Your Vue.js App"/>
+  <div>
+    <sidebar/>
+    <todo-list/>
+  </div>
 </template>
 
 <script>
 import TodoList from './components/TodoList.vue'
+import Sidebar from './components/Sidebar.vue'
 
 export default {
   name: 'App',
   components: {
-    TodoList
+    TodoList,
+    Sidebar
   }
 }
 </script>
