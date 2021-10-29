@@ -1,9 +1,7 @@
 <template>
   <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
-    <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
-      <span class="fs-4">{{ title }}</span>
-    </a>
-    <Button v-show="homePage" @btn-click="$emit('toggle-add-task')" :text="showAddTask ? 'Close' : 'Add Task'" :color="showAddTask ? 'red' : 'green'"/>
+    <span class="fs-4">{{ title }}</span>
+    <Button v-show="homePage" @btn-click="$emit('toggle-add-task')"/>
   </header>
 </template>
 
@@ -32,10 +30,4 @@ export default {
 </script>
 
 <style scoped>
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
 </style>

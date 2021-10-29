@@ -1,5 +1,5 @@
 <template>
-  <div class="col-lg-8 mx-auto p-3 py-md-5">
+  <div class="col-lg-6 mx-auto p-3 py-md-5">
     <Header @toggle-add-task="toggleAddTask" title="Tasks" :showAddTask="showAddTask"/>
     <router-view :showAddTask="showAddTask"></router-view>
     <Footer/>
