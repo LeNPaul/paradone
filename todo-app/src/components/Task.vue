@@ -1,10 +1,8 @@
 <template>
-  <div @dblclick="$emit('toggle-reminder', task.id)" :class="[task.reminder ? 'reminder' : '', 'task']">
-    <h3>
-      {{ task.text }}
-      <i @click="$emit('delete-task', task.id)" class="fas fa-times"></i>
-    </h3>
-  </div>
+  <p class="pb-3 border-bottom">
+    <button class="btn btn-link link-dark" type="submit" v-on:click="completeTask(task.task_id)"><i @click="$emit('delete-task', task.id)" class="far fa-circle"></i></button>
+    {{ task.text }}
+  </p>
 </template>
 
 <script>
@@ -17,18 +15,4 @@ export default {
 </script>
 
 <style scope>
-.task {
-  background: #f4f4f4;
-  margin: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-}
-.task.reminder {
-  border-left: 5px solid green;
-}
-.task h3 {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 </style>

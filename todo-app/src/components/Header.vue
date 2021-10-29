@@ -1,5 +1,5 @@
 <template>
-  <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+  <header class="d-flex align-items-center pb-3 mb-3 border-bottom">
     <span class="fs-4">{{ title }}</span>
     <Button v-show="homePage" @btn-click="$emit('toggle-add-task')"/>
   </header>
