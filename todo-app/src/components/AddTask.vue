@@ -54,17 +54,15 @@
         this.label = ''
         this.priority = ''
         this.project = ''
+      },
+      async fetchProjects() {
+        const res = await fetch('api/projects')
+        const data = await res.json()
+        return data
       }
     },
-    created() {
-      this.projects = [
-        {
-          name: 'personal'
-        },
-        {
-          name: 'work'
-        }
-      ]
+    async created() {
+      this.projects = await this.fetchProjects()
       this.labels = [
         {
           label_id: 'todo',

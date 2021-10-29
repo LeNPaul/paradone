@@ -11,6 +11,32 @@
           <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
         </li>
       </ul>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li :key='project.name' v-for="project in projects" class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.name }}</span></router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
+
+<script>
+  export default {
+    name: 'Sidebar',
+    data() {
+      return {
+        projects: []
+      }
+    },
+    methods: {
+      async fetchProjects() {
+        const res = await fetch('api/projects')
+        const data = await res.json()
+        return data
+      }
+    },
+    async created() {
+      this.projects = await this.fetchProjects()
+    }
+  }
+</script>

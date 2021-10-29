@@ -12,5 +12,16 @@
       "priority": "4",
       "id": 2
     }
+  ],
+  "projects": [
+    {
+      "name": "work"
+    },
+    {
+      "name": "personal"
+    },
+    {
+      "name": "travel"
+    }
   ]
 }
