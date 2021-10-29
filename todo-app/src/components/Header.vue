@@ -1,6 +1,8 @@
 <template>
-  <header>
-    <h1>{{ title }}</h1>
+  <header class="d-flex align-items-center pb-3 mb-5 border-bottom">
+    <a href="/" class="d-flex align-items-center text-dark text-decoration-none">
+      <span class="fs-4">{{ title }}</span>
+    </a>
     <Button v-show="homePage" @btn-click="$emit('toggle-add-task')" :text="showAddTask ? 'Close' : 'Add Task'" :color="showAddTask ? 'red' : 'green'"/>
   </header>
 </template>
