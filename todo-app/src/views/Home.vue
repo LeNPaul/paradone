@@ -1,4 +1,5 @@
 <template>
+  <Header @toggle-add-task="toggleAddTask" title="Tasks" :showAddTask="showAddTask"/>
   <AddTask v-show="showAddTask" @add-task="addTask" />
   <Tasks
     @toggle-reminder="toggleReminder"
@@ -8,23 +9,29 @@
 </template>
 
 <script>
+import Header from '../components/Header'
 import Tasks from '../components/Tasks'
 import AddTask from '../components/AddTask'
 export default {
   name: 'Home',
   props: {
-    showAddTask: Boolean,
+
   },
   components: {
+    Header,
     Tasks,
     AddTask,
   },
   data() {
     return {
       tasks: [],
+      showAddTask: false
     }
   },
   methods: {
+    toggleAddTask() {
+      this.showAddTask = !this.showAddTask
+    },
     async addTask(task) {
       const res = await fetch('api/tasks', {
         method: 'POST',

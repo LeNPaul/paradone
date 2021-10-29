@@ -8,9 +8,7 @@
                   <i class="fas fa-bars" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
               </button>
               <div class="col-lg-6 mx-auto p-3 py-md-5">
-                <Header @toggle-add-task="toggleAddTask" title="Tasks" :showAddTask="showAddTask"/>
-                <router-view :showAddTask="showAddTask"></router-view>
-                <Footer/>
+                <router-view></router-view>
               </div>
           </div>
       </div>
@@ -19,25 +17,11 @@
 
 <script>
 import Sidebar from './components/Sidebar'
-import Header from './components/Header'
-import Footer from './components/Footer'
 
 export default {
   name: 'App',
   components: {
     Sidebar,
-    Header,
-    Footer
-  },
-  data() {
-    return {
-      showAddTask: false
-    }
-  },
-  methods: {
-    toggleAddTask() {
-      this.showAddTask = !this.showAddTask
-    }
   },
 }
 
