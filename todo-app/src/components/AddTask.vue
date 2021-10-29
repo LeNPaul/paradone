@@ -1,10 +1,26 @@
 <template>
-  <form @submit="onSubmit" class="add-form">
-    <div class="form-control">
-      <label>Task</label>
-      <input type="text" v-model="content" name="content" placeholder="Add Task" />
+  <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
+    <div class="mb-3">
+      <input type="text" v-model="content" name="content" placeholder="Task content" class="form-control">
     </div>
-    <input type="submit" value="Save Task" class="btn btn-block" />
+    <button type="submit" class="btn btn-dark">Save</button>
+
+    <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i> {{ label }} </button>
+    <ul class="dropdown-menu">
+        <li :key='label.label_id' v-for="label in labels" @click="this.label=label.name"><a class="dropdown-item">{{ label.name }}</a></li>
+    </ul>
+    <button class="btn btn-outline-dark btn-sm float-end me-2" type="button" data-bs-toggle="dropdown"><i class="far fa-flag"> </i> {{ priority }} </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item" @click="this.priority='1'">Priority 1</a></li>
+        <li><a class="dropdown-item" @click="this.priority='2'">Priority 2</a></li>
+        <li><a class="dropdown-item" @click="this.priority='3'">Priority 3</a></li>
+        <li><a class="dropdown-item" @click="this.priority='4'">Priority 4</a></li>
+    </ul>
+    <button class="btn btn-outline-dark btn-sm float-end me-2" type="button" data-bs-toggle="dropdown"><i class="fas fa-tasks"> </i> {{ project }} </button>
+    <ul class="dropdown-menu">
+        <li :key='project.name' v-for="project in projects" @click="this.project=project.name"><a class="dropdown-item">{{ project.name }}</a></li>
+    </ul>
+
   </form>
 </template>
 
@@ -14,6 +30,11 @@
     data() {
       return {
         content: '',
+        label: '',
+        labels: [],
+        priority: '',
+        project: '',
+        projects: []
       }
     },
     methods: {
@@ -25,10 +46,39 @@
         }
         const newTask = {
           content: this.content,
+          label: this.label,
+          priority: this.priority
         }
         this.$emit('add-task', newTask)
         this.content = ''
+        this.label = ''
+        this.priority = ''
+        this.project = ''
       }
+    },
+    created() {
+      this.projects = [
+        {
+          name: 'personal'
+        },
+        {
+          name: 'work'
+        }
+      ]
+      this.labels = [
+        {
+          label_id: 'todo',
+          name: 'To Do'
+        },
+        {
+          label_id: 'doing',
+          name: 'Doing'
+        },
+        {
+          label_id: 'done',
+          name: 'Done'
+        }
+      ]
     }
   }
 </script>
