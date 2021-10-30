@@ -4,7 +4,6 @@
       <input type="text" v-model="content" name="content" placeholder="Task content" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
-
     <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i> {{ label }} </button>
     <ul class="dropdown-menu">
         <li :key='label.label_id' v-for="label in labels" @click="this.label=label.name"><a class="dropdown-item">{{ label.name }}</a></li>
@@ -20,7 +19,6 @@
     <ul class="dropdown-menu">
         <li :key='project.name' v-for="project in projects" @click="this.project=project.name"><a class="dropdown-item">{{ project.name }}</a></li>
     </ul>
-
   </form>
 </template>
 
@@ -47,7 +45,8 @@
         const newTask = {
           content: this.content,
           label: this.label,
-          priority: this.priority
+          priority: this.priority,
+          project: this.project
         }
         this.$emit('add-task', newTask)
         this.content = ''
