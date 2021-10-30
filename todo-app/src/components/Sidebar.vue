@@ -13,7 +13,7 @@
       </ul>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li :key='project.name' v-for="project in projects" class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.name }}</span></router-link>
+          <router-link :to="{ name: 'Project', params: { project: project.name } }" class="nav-link text-truncate link-dark"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.name }}</span></router-link>
         </li>
       </ul>
     </div>
