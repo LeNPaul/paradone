@@ -6,7 +6,7 @@
 import Workspace from '../components/Workspace'
 
 export default {
-  name: 'Project',
+  name: 'Home',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     Workspace

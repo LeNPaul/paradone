@@ -51,7 +51,11 @@ export default {
         : alert('Error deleting task')
     },
     async fetchTasks() {
-      const res = await fetch('/api/tasks')
+      var filter = ''
+      if(this.$route.params.project) {
+        filter = '?project=' + this.$route.params.project
+      }
+      const res = await fetch('/api/tasks' + filter)
       const data = await res.json()
       return data
     },
