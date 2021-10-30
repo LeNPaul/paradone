@@ -23,6 +23,11 @@
           <router-link class="nav-link text-truncate link-dark" to="/paradigm/eisenhower"><i class="fas fa-th-large"></i><span class="ms-1 d-none d-sm-inline">Eisenhower Matrix</span></router-link>
         </li>
       </ul>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/kanban"><i class="fas fa-columns"></i><span class="ms-1 d-none d-sm-inline">Kanban</span></router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
