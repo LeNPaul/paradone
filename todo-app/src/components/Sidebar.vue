@@ -21,22 +21,22 @@
 </template>
 
 <script>
-  export default {
-    name: 'Sidebar',
-    data() {
-      return {
-        projects: []
-      }
-    },
-    methods: {
-      async fetchProjects() {
-        const res = await fetch('api/projects')
-        const data = await res.json()
-        return data
-      }
-    },
-    async created() {
-      this.projects = await this.fetchProjects()
+export default {
+  name: 'Sidebar',
+  data() {
+    return {
+      projects: []
     }
+  },
+  methods: {
+    async fetchProjects() {
+      const res = await fetch('/api/projects')
+      const data = await res.json()
+      return data
+    }
+  },
+  async created() {
+    this.projects = await this.fetchProjects()
   }
+}
 </script>
