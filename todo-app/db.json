@@ -1,16 +1,32 @@
 {
   "tasks": [
     {
-      "content": "This is personal very important todo",
-      "label": "todo",
+      "content": "personal",
+      "label": "To Do",
       "priority": "1",
+      "project": "personal",
       "id": 1
     },
     {
-      "content": "This is work not important done",
+      "content": "work",
       "label": "Done",
       "priority": "4",
+      "project": "work",
       "id": 2
+    },
+    {
+      "content": "hello world",
+      "label": "Done",
+      "priority": "1",
+      "project": "travel",
+      "id": 3
+    },
+    {
+      "content": "yolo",
+      "label": "",
+      "priority": "",
+      "project": "",
+      "id": 4
     }
   ],
   "projects": [
