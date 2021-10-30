@@ -3,6 +3,7 @@ import Home from '../views/Home'
 import Project from '../views/Project'
 import Eisenhower from '../views/Eisenhower'
 import Kanban from '../views/Kanban'
+import Pomodoro from '../views/Pomodoro'
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/paradigm/kanban',
     name: 'Kanban',
     component: Kanban,
+  },
+  {
+    path: '/paradigm/pomodoro',
+    name: 'Pomodoro',
+    component: Pomodoro,
   },
 ]
 

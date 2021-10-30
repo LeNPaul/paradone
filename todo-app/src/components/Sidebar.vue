@@ -28,6 +28,11 @@
           <router-link class="nav-link text-truncate link-dark" to="/paradigm/kanban"><i class="fas fa-columns"></i><span class="ms-1 d-none d-sm-inline">Kanban</span></router-link>
         </li>
       </ul>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/pomodoro"><i class="fas fa-clock"></i><span class="ms-1 d-none d-sm-inline">Pomodoro</span></router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
