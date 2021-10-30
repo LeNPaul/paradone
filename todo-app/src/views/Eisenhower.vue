@@ -1,11 +1,72 @@
 <template>
-  <h3>Eisenhower Matrix</h3>
+  <Header @toggle-add-task="toggleAddTask" title="Eisenhower Matrix" :showAddTask="showAddTask"/>
+  <AddTask v-show="showAddTask" @add-task="addTask" />
+  <EisenhowerMatrix
+    @delete-task="deleteTask"
+    :tasks="tasks"
+  />
 </template>
 
 <script>
-
+import Header from '../components/Header'
+import EisenhowerMatrix from '../components/EisenhowerMatrix'
+import AddTask from '../components/AddTask'
 export default {
-  name: 'Eisenhower',
-  inheritAttrs: false, // disable 'non-props' warning
-};
+  name: 'Dashboard',
+  props: {
+
+  },
+  components: {
+    Header,
+    EisenhowerMatrix,
+    AddTask,
+  },
+  data() {
+    return {
+      tasks: [],
+      showAddTask: false
+    }
+  },
+  methods: {
+    toggleAddTask() {
+      this.showAddTask = !this.showAddTask
+    },
+    async addTask(task) {
+      const res = await fetch('/api/tasks', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(task),
+      })
+      const data = await res.json()
+      this.tasks = [...this.tasks, data]
+    },
+    async deleteTask(id) {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'DELETE',
+      })
+      res.status === 200
+        ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+        : alert('Error deleting task')
+    },
+    async fetchTasks() {
+      var filter = ''
+      if(this.$route.params.project) {
+        filter = '?project=' + this.$route.params.project
+      }
+      const res = await fetch('/api/tasks' + filter)
+      const data = await res.json()
+      return data
+    },
+    async fetchTask(id) {
+      const res = await fetch(`/api/tasks/${id}`)
+      const data = await res.json()
+      return data
+    },
+  },
+  async created() {
+    this.tasks = await this.fetchTasks()
+  },
+}
 </script>

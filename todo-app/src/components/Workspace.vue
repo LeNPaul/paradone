@@ -1,5 +1,5 @@
 <template>
-  <Header @toggle-add-task="toggleAddTask" title="Tasks" :showAddTask="showAddTask"/>
+  <Header @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
   <AddTask v-show="showAddTask" @add-task="addTask" />
   <Tasks
     @delete-task="deleteTask"
