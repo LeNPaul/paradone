@@ -11,9 +11,16 @@
           <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
         </li>
       </ul>
+      <hr>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li :key='project.name' v-for="project in projects" class="nav-item">
           <router-link :to="{ name: 'Project', params: { project: project.name } }" class="nav-link text-truncate link-dark"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.name }}</span></router-link>
+        </li>
+      </ul>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/eisenhower"><i class="fas fa-th-large"></i><span class="ms-1 d-none d-sm-inline">Eisenhower Matrix</span></router-link>
         </li>
       </ul>
     </div>
