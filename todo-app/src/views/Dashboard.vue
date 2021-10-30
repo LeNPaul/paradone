@@ -32,7 +32,7 @@ export default {
       this.showAddTask = !this.showAddTask
     },
     async addTask(task) {
-      const res = await fetch('api/tasks', {
+      const res = await fetch('/api/tasks', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
@@ -43,7 +43,7 @@ export default {
       this.tasks = [...this.tasks, data]
     },
     async deleteTask(id) {
-      const res = await fetch(`api/tasks/${id}`, {
+      const res = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',
       })
       res.status === 200
@@ -51,12 +51,12 @@ export default {
         : alert('Error deleting task')
     },
     async fetchTasks() {
-      const res = await fetch('api/tasks')
+      const res = await fetch('/api/tasks')
       const data = await res.json()
       return data
     },
     async fetchTask(id) {
-      const res = await fetch(`api/tasks/${id}`)
+      const res = await fetch(`/api/tasks/${id}`)
       const data = await res.json()
       return data
     },
