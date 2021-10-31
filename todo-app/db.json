@@ -1,32 +1,25 @@
 {
   "tasks": [
     {
-      "content": "personal",
+      "content": "Add ability to add new project",
       "label": "To Do",
       "priority": "1",
       "project": "personal",
       "id": 1
     },
     {
-      "content": "work",
-      "label": "Done",
-      "priority": "4",
-      "project": "work",
+      "content": "Add ability to edit task",
+      "label": "Doing",
+      "priority": "1",
+      "project": "personal",
       "id": 2
     },
     {
-      "content": "hello world",
-      "label": "Done",
-      "priority": "1",
-      "project": "travel",
+      "content": "Gather notes from last meeting",
+      "label": "To Do",
+      "priority": "2",
+      "project": "work",
       "id": 3
-    },
-    {
-      "content": "yolo",
-      "label": "",
-      "priority": "",
-      "project": "",
-      "id": 4
     }
   ],
   "projects": [
@@ -38,6 +31,20 @@
     },
     {
       "name": "travel"
+    }
+  ],
+  "labels": [
+    {
+      "label_id": "todo",
+      "name": "To Do"
+    },
+    {
+      "label_id": "doing",
+      "name": "Doing"
+    },
+    {
+      "label_id": "done",
+      "name": "Done"
     }
   ]
 }

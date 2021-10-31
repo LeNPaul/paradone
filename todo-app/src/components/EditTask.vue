@@ -72,6 +72,11 @@
         const res = await fetch('/api/projects')
         const data = await res.json()
         return data
+      },
+      async fetchLabels() {
+        const res = await fetch('/api/labels')
+        const data = await res.json()
+        return data
       }
     },
     async created() {
@@ -80,20 +85,7 @@
       this.priority = this.$props.task.priority
       this.project = this.$props.task.project
       this.projects = await this.fetchProjects()
-      this.labels = [
-        {
-          label_id: 'todo',
-          name: 'To Do'
-        },
-        {
-          label_id: 'doing',
-          name: 'Doing'
-        },
-        {
-          label_id: 'done',
-          name: 'Done'
-        }
-      ]
+      this.labels = await this.fetchLabels()
     }
   }
 </script>
