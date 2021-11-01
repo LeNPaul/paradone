@@ -1,6 +1,7 @@
 <template>
-  <Header @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
+  <Header @toggle-add-task="toggleAddTask" @toggle-add-project="toggleAddProject" :title="this.$route.params.project" :showAddTask="showAddTask"/>
   <AddTask v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
+  <AddProject v-show="showAddProject" @close-add-project="toggleAddProject"/>
   <Tasks
     @delete-task="deleteTask"
     @update-task="updateTask"
@@ -12,6 +13,7 @@
 import Header from '../components/Header'
 import Tasks from '../components/Tasks'
 import AddTask from '../components/AddTask'
+import AddProject from '../components/AddProject'
 export default {
   name: 'Dashboard',
   props: {
@@ -21,16 +23,21 @@ export default {
     Header,
     Tasks,
     AddTask,
+    AddProject
   },
   data() {
     return {
       tasks: [],
-      showAddTask: false
+      showAddTask: false,
+      showAddProject: false
     }
   },
   methods: {
     toggleAddTask() {
       this.showAddTask = !this.showAddTask
+    },
+    toggleAddProject() {
+      this.showAddProject = !this.showAddProject
     },
     async addTask(task) {
       const res = await fetch('/api/tasks', {
