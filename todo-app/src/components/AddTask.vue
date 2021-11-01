@@ -53,6 +53,7 @@
         this.label = ''
         this.priority = ''
         this.project = ''
+        this.$emit('close-add-task')
       },
       async fetchProjects() {
         const res = await fetch('/api/projects')
