@@ -61,6 +61,8 @@
           body: JSON.stringify(updTask),
         })
         const data = await res.json()
+        this.$emit('update-task')
+        this.$emit('close-edit-task')
         return data
       },
       async fetchTask(id) {

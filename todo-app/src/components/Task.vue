@@ -3,7 +3,7 @@
     <button class="btn btn-link link-dark" type="submit"><i @click="$emit('delete-task', task.id)" class="far fa-circle"></i></button>
     {{ task.content }}
     <button class="btn btn-link link-dark float-end" type="submit"><i @click="toggleEditTask()" class="fas fa-edit"></i></button>
-    <EditTask v-show="showEditTask" :task="task"/>
+    <EditTask @update-task="$emit('update-task')" @close-edit-task="toggleEditTask()" v-show="showEditTask" :task="task"/>
   </p>
 </template>
 
@@ -18,6 +18,7 @@ export default {
   components: {
     EditTask
   },
+  emits: ['update-task', 'close-edit-task'],
   data() {
     return {
       showEditTask: false
