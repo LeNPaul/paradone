@@ -18,7 +18,7 @@ export default {
   components: {
     EditTask
   },
-  emits: ['update-task', 'close-edit-task'],
+  emits: ['update-task', 'delete-task', 'close-edit-task'],
   data() {
     return {
       showEditTask: false
