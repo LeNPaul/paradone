@@ -1,5 +1,5 @@
 <template>
-  <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
+  <form @submit="onSubmit" class="form-control add-form p-3 border-0">
     <div class="mb-3">
       <input type="text" v-model="name" name="name" placeholder="Project name" class="form-control">
     </div>
@@ -28,6 +28,7 @@
         this.addProject(newProject)
         this.name = ''
         this.$emit('close-add-project')
+        this.$emit('update-projects')
       },
       async addProject(project) {
         const res = await fetch('/api/projects', {
