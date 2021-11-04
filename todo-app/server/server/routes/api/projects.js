@@ -3,6 +3,8 @@ const mongodb = require('mongodb');
 
 const router = express.Router();
 
+// curl -d '{"projectName": "work"}' -H 'Content-Type: application/json' http://127.0.0.1:5050/api/projects
+
 // Get Projects
 router.get('/', async (req, res) => {
   const projects = await loadProjectsCollection();
