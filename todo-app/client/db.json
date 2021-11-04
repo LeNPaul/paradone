@@ -1,0 +1,31 @@
+{
+  "tasks": [],
+  "projects": [
+    {
+      "name": "personal",
+      "id": 1
+    },
+    {
+      "name": "work",
+      "id": 2
+    },
+    {
+      "name": "paradone",
+      "id": 3
+    }
+  ],
+  "labels": [
+    {
+      "label_id": "todo",
+      "name": "To Do"
+    },
+    {
+      "label_id": "doing",
+      "name": "Doing"
+    },
+    {
+      "label_id": "done",
+      "name": "Done"
+    }
+  ]
+}
