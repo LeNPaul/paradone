@@ -11,9 +11,11 @@ app.use(cors());
 // Routes
 const tasks = require('./routes/api/tasks');
 const projects = require('./routes/api/projects');
+const labels = require('./routes/api/labels');
 
 app.use('/api/tasks', tasks);
 app.use('/api/projects', projects);
+app.use('/api/labels', labels);
 
 const port = process.env.PORT || 5000;
 
