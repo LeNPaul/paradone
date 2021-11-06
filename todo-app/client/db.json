@@ -1,5 +1,13 @@
 {
-  "tasks": [],
+  "tasks": [
+    {
+      "content": "Add some code for the backend",
+      "label": "",
+      "priority": "",
+      "project": "",
+      "id": 1
+    }
+  ],
   "projects": [
     {
       "name": "personal",
