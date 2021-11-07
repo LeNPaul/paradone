@@ -3,7 +3,7 @@ const mongodb = require('mongodb');
 
 const router = express.Router();
 
-// curl -d '{"projectName": "work"}' -H 'Content-Type: application/json' http://127.0.0.1:5050/api/projects
+// curl -d '{"name": "personal"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/projects
 
 // Get Projects
 router.get('/', async (req, res) => {
@@ -15,12 +15,7 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const projects = await loadProjectsCollection();
   await projects.insertOne({
-    userName:    req.body.userName,
-    projectName: req.body.projectName,
-    projectId:   req.body.projectId,
-    colour:      req.body.colour,
-    order:       req.body.order,
-    archived:    req.body.archived
+    name:  req.body.name
   });
   res.status(201).send();
 });
