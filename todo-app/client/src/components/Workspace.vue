@@ -52,7 +52,7 @@ export default {
         : alert('Error deleting task')
     },
     async fetchTasks() {
-      var filter = ''
+      let filter = ''
       if(this.$route.params.project) {
         filter = '?project=' + this.$route.params.project
       }

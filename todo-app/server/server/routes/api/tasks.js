@@ -7,8 +7,12 @@ const router = express.Router();
 
 // Get Tasks
 router.get('/', async (req, res) => {
+  let filter = {}
+  if(req.query.project) {
+    filter = {project: req.query.project}
+  }
   const tasks = await loadTasksCollection();
-  res.send(await tasks.find({}).toArray());
+  res.send(await tasks.find(filter).toArray());
 });
 
 // Add Task
