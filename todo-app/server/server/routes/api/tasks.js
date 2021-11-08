@@ -3,7 +3,7 @@ const mongodb = require('mongodb');
 
 const router = express.Router();
 
-// curl -d '{"content": "hello world!", "label": "Doing", "priority": "1", "project": "personal"}' -H 'Content-Type: application/json' http://127.0.0.1:5050/api/tasks
+// curl -d '{"content": "hello world!", "label": "Doing", "priority": "1", "project": "personal"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/tasks
 
 // Get Tasks
 router.get('/', async (req, res) => {

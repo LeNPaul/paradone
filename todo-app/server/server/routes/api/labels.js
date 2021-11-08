@@ -3,7 +3,7 @@ const mongodb = require('mongodb');
 
 const router = express.Router();
 
-// curl -d '{"content": "hello world!"}' -H 'Content-Type: application/json' http://127.0.0.1:5050/api/labels
+// curl -d '{"label_id": "done", "name": "Done"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/labels
 
 // Get Labels
 router.get('/', async (req, res) => {
@@ -15,17 +15,8 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const labels = await loadLabelsCollection();
   await labels.insertOne({
-    userName:    req.body.userName,
-    content:     req.body.content,
-    taskId:      req.body.taskId,
-    projectId:   req.body.projectId,
-    sectionId:   req.body.sectionId,
-    parentId:    req.body.parentId,
-    labelIds:    req.body.labelIds,
-    priority:    req.body.priority,
-    order:       req.body.order,
-    dueDateTime: req.body.dueDateTime,
-    completed:   req.body.completed
+    label_id: req.body.label_id,
+    name:     req.body.name
   });
   res.status(201).send();
 });
