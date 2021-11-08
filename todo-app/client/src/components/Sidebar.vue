@@ -63,7 +63,6 @@ export default {
       this.showAddProject = !this.showAddProject
     },
     async updateProjects() {
-      console.log('asdf');
       this.projects = await this.fetchProjects()
     }
   },

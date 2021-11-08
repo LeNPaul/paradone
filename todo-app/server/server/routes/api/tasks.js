@@ -18,13 +18,15 @@ router.get('/', async (req, res) => {
 // Add Task
 router.post('/', async (req, res) => {
   const tasks = await loadTasksCollection();
-  await tasks.insertOne({
+  const task = {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
     project:  req.body.project
-  });
-  res.status(201).send();
+  }
+  const insertedTask = await tasks.insertOne(task);
+  task._id = insertedTask.insertedId;
+  res.status(201).send(task);
 });
 
 // Delete Task
