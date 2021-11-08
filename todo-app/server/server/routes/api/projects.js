@@ -14,10 +14,12 @@ router.get('/', async (req, res) => {
 // Add Project
 router.post('/', async (req, res) => {
   const projects = await loadProjectsCollection();
-  await projects.insertOne({
+  const project = {
     name:  req.body.name
-  });
-  res.status(201).send();
+  }
+  const insertedProject = await projects.insertOne(project);
+  project._id = insertedProject.insertedId;
+  res.status(201).send(project);
 });
 
 // Delete Project
