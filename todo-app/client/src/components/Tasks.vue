@@ -1,6 +1,6 @@
 <template>
-  <div :key="task.id" v-for="task in tasks">
-    <Task @update-task="$emit('update-task')" @delete-task="$emit('delete-task', task.id)" :task="task"/>
+  <div :key="task._id" v-for="task in tasks">
+    <Task @update-task="$emit('update-task')" @delete-task="$emit('delete-task', task._id)" :task="task"/>
   </div>
 </template>
 

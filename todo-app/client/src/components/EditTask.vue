@@ -45,7 +45,7 @@
           alert('Please add a task')
           return
         }
-        const taskToUpdate = await this.fetchTask(this.$props.task.id)
+        const taskToUpdate = await this.fetchTask(this.$props.task._id)
         const updTask = {
           ...taskToUpdate,
           content: this.content,
@@ -53,7 +53,7 @@
           priority: this.priority,
           project: this.project
         }
-        const res = await fetch(`/api/tasks/${this.$props.task.id}`, {
+        const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
           method: 'PUT',
           headers: {
             'Content-type': 'application/json',
