@@ -47,7 +47,7 @@ export default {
         method: 'DELETE',
       })
       res.status === 200
-        ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+        ? (this.tasks = this.tasks.filter((task) => task._id !== id))
         : alert('Error deleting task')
     },
     async fetchTasks() {
