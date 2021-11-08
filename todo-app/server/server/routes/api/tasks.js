@@ -15,6 +15,13 @@ router.get('/', async (req, res) => {
   res.send(await tasks.find(filter).toArray());
 });
 
+// Get Task
+router.get('/:id', async (req, res) => {
+  const tasks = await loadTasksCollection();
+  const task = await tasks.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+  res.status(200).send(task);
+});
+
 // Add Task
 router.post('/', async (req, res) => {
   const tasks = await loadTasksCollection();
@@ -27,6 +34,23 @@ router.post('/', async (req, res) => {
   const insertedTask = await tasks.insertOne(task);
   task._id = insertedTask.insertedId;
   res.status(201).send(task);
+});
+
+// Update Task
+router.put('/:id', async (req, res) => {
+  const tasks = await loadTasksCollection();
+  const task = {
+    content:  req.body.content,
+    label:    req.body.label,
+    priority: req.body.priority,
+    project:  req.body.project
+  }
+  const updatedTask = await tasks.findOneAndUpdate(
+    { _id: new mongodb.ObjectID(req.params.id) },
+    { $set: task }
+  );
+  task._id = updatedTask.insertedId;
+  res.status(200).send(task);
 });
 
 // Delete Task
