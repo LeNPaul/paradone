@@ -3,6 +3,7 @@
   <AddTask v-show="showAddTask" @add-task="addTask" />
   <EisenhowerMatrix
     @delete-task="deleteTask"
+    @update-task="updateTask"
     :tasks="tasks"
   />
 </template>
@@ -64,6 +65,9 @@ export default {
       const data = await res.json()
       return data
     },
+    async updateTask() {
+      this.tasks = await this.fetchTasks()
+    }
   },
   async created() {
     this.tasks = await this.fetchTasks()
