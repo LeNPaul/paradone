@@ -3,6 +3,7 @@
   <AddTask v-show="showAddTask" @add-task="addTask" />
   <KanbanBoard
     @delete-task="deleteTask"
+    @update-task="updateTask"
     :tasks="tasks"
   />
 </template>
@@ -47,7 +48,7 @@ export default {
         method: 'DELETE',
       })
       res.status === 200
-        ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+        ? (this.tasks = this.tasks.filter((task) => task._id !== id))
         : alert('Error deleting task')
     },
     async fetchTasks() {
@@ -64,6 +65,9 @@ export default {
       const data = await res.json()
       return data
     },
+    async updateTask() {
+      this.tasks = await this.fetchTasks()
+    }
   },
   async created() {
     this.tasks = await this.fetchTasks()
