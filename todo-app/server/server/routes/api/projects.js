@@ -39,7 +39,7 @@ router.put('/:id', async (req, res) => {
 // Delete Project
 router.delete('/:id', async (req, res) => {
   const projects = await loadProjectsCollection();
-  await projects.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+  await projects.deleteOne({ name: req.params.id });
   res.status(200).send({});
 });
 
