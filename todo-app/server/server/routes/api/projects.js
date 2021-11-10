@@ -33,7 +33,6 @@ router.put('/:id', async (req, res) => {
     { $set: project }
   );
   project._id = updatedProject.insertedId;
-  console.log(updatedProject)
   res.status(200).send(project);
 });
 

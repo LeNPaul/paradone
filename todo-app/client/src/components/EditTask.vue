@@ -24,7 +24,7 @@
 
 <script>
   export default {
-    name: 'AddTask',
+    name: 'EditTask',
     data() {
       return {
         content: '',
