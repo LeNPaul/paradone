@@ -4,7 +4,7 @@
       <input type="text" name="name" v-model="name" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
-    <button class="btn btn-outline-dark btn-sm float-end" type="button"><i class="fas fa-trash"></i></button>
+    <button @click="deleteProject(name)" class="btn btn-outline-dark btn-sm float-end" type="button"><i class="fas fa-trash"></i></button>
   </form>
 </template>
 
@@ -39,6 +39,16 @@
         const data = await res.json()
         this.$router.push(this.name)
         return data
+      },
+      async deleteProject(id) {
+        if(confirm('Are you sure?')) {
+          const res = await fetch(`/api/projects/${id}`, {
+            method: 'DELETE',
+          })
+          res.status === 200
+            ? this.$router.push('/')
+            : alert('Error deleting task')
+        }
       }
     },
     created() {
