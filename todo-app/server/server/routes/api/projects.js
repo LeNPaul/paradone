@@ -22,6 +22,21 @@ router.post('/', async (req, res) => {
   res.status(201).send(project);
 });
 
+// Update Project
+router.put('/:id', async (req, res) => {
+  const projects = await loadProjectsCollection();
+  const project = {
+    name: req.body.name
+  }
+  const updatedProject = await projects.findOneAndUpdate(
+    { name: req.params.id },
+    { $set: project }
+  );
+  project._id = updatedProject.insertedId;
+  console.log(updatedProject)
+  res.status(200).send(project);
+});
+
 // Delete Project
 router.delete('/:id', async (req, res) => {
   const projects = await loadProjectsCollection();
