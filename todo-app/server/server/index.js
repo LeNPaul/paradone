@@ -14,10 +14,12 @@ app.use(morgan('dev'));
 const tasks = require('./routes/api/tasks');
 const projects = require('./routes/api/projects');
 const labels = require('./routes/api/labels');
+const auth = require('./routes/api/auth');
 
 app.use('/api/tasks', tasks);
 app.use('/api/projects', projects);
 app.use('/api/labels', labels);
+app.use('/api/auth', auth);
 
 const port = process.env.PORT || 5000;
 
