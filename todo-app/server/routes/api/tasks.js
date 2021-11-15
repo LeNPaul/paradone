@@ -1,71 +1,68 @@
 const express = require('express');
+const router = express.Router();
 const mongodb = require('mongodb');
 
-const router = express.Router();
+// Task model
+const Task = require('../../models/Task');
 
-// curl -d '{"content": "hello world!", "label": "Doing", "priority": "1", "project": "personal"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/tasks
-
-// Get Tasks
+// @route  GET api/tasks
+// @desc   Get user tasks and filter by project if param exists
+// @access Private
 router.get('/', async (req, res) => {
   let filter = {}
   if(req.query.project) {
     filter = {project: req.query.project}
   }
-  const tasks = await loadTasksCollection();
-  res.send(await tasks.find(filter).toArray());
+  res.send(await Task.find(filter));
 });
 
-// Get Task
+// @route  GET api/tasks/:id
+// @desc   Get a user task by id
+// @access Private
 router.get('/:id', async (req, res) => {
-  const tasks = await loadTasksCollection();
-  const task = await tasks.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+  const task = await Task.findOne({ _id: new mongodb.ObjectID(req.params.id) });
   res.status(200).send(task);
 });
 
-// Add Task
+// @route  POST api/tasks
+// @desc   Create a new task
+// @access Private
 router.post('/', async (req, res) => {
-  const tasks = await loadTasksCollection();
   const task = {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
     project:  req.body.project
   }
-  const insertedTask = await tasks.insertOne(task);
-  task._id = insertedTask.insertedId;
+  const insertedTask = await Task.create(task);
+  task._id = insertedTask._id;
   res.status(201).send(task);
 });
 
-// Update Task
+// @route  PUT api/tasks/:id
+// @desc   Update an existing task
+// @access Private
 router.put('/:id', async (req, res) => {
-  const tasks = await loadTasksCollection();
   const task = {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
     project:  req.body.project
   }
-  const updatedTask = await tasks.findOneAndUpdate(
+  const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
     { $set: task }
   );
-  task._id = updatedTask.insertedId;
+  task._id = updatedTask._id;
   res.status(200).send(task);
 });
 
-// Delete Task
+// @route  DELETE api/tasks/:id
+// @desc   Delete an existing task
+// @access Private
 router.delete('/:id', async (req, res) => {
-  const tasks = await loadTasksCollection();
-  await tasks.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+  await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
   res.status(200).send({});
 });
-
-async function loadTasksCollection() {
-  const client = await mongodb.MongoClient.connect(
-    'mongodb://localhost', {
-    useNewUrlParser: true
-  });
-  return client.db('todo-app-backend').collection('tasks');
-}
 
 module.exports = router;
