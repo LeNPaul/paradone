@@ -1,39 +1,34 @@
 const express = require('express');
+const router = express.Router();
 const mongodb = require('mongodb');
 
-const router = express.Router();
+// Label model
+const Label = require('../../models/Label');
 
-// curl -d '{"label_id": "done", "name": "Done"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/labels
-
-// Get Labels
+// @route  GET api/labels
+// @desc   Get user labels
+// @access Private
 router.get('/', async (req, res) => {
-  const labels = await loadLabelsCollection();
-  res.send(await labels.find({}).toArray());
+  res.send(await Label.find({}));
 });
 
-// Add Label
+// @route  POST api/labels
+// @desc   Create a new label
+// @access Private
 router.post('/', async (req, res) => {
-  const labels = await loadLabelsCollection();
-  await labels.insertOne({
+  await Label.create({
     label_id: req.body.label_id,
     name:     req.body.name
   });
   res.status(201).send();
 });
 
-// Delete Task
+// @route  DELETE api/labels/:id
+// @desc   Delete an existing label
+// @access Private
 router.delete('/:id', async (req, res) => {
-  const labels = await loadLabelsCollection();
-  await labels.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+  await Label.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
   res.status(200).send({});
 });
-
-async function loadLabelsCollection() {
-  const client = await mongodb.MongoClient.connect(
-    'mongodb://localhost', {
-    useNewUrlParser: true
-  });
-  return client.db('todo-app-backend').collection('labels');
-}
 
 module.exports = router;
