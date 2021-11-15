@@ -1,54 +1,50 @@
 const express = require('express');
+const router = express.Router();
 const mongodb = require('mongodb');
 
-const router = express.Router();
+// Project model
+const Project = require('../../models/Project');
 
-// curl -d '{"name": "personal"}' -H 'Content-Type: application/json' http://127.0.0.1:5000/api/projects
-
-// Get Projects
+// @route  GET api/projects
+// @desc   Get user projects
+// @access Private
 router.get('/', async (req, res) => {
-  const projects = await loadProjectsCollection();
-  res.send(await projects.find({}).toArray());
+  res.send(await Project.find({}));
 });
 
-// Add Project
+// @route  POST api/projects
+// @desc   Create a new project
+// @access Private
 router.post('/', async (req, res) => {
-  const projects = await loadProjectsCollection();
   const project = {
     name:  req.body.name
   }
-  const insertedProject = await projects.insertOne(project);
-  project._id = insertedProject.insertedId;
+  const insertedProject = await Project.create(project);
+  project._id = insertedProject._id;
   res.status(201).send(project);
 });
 
-// Update Project
+// @route  PUT api/projects/:id
+// @desc   Update an existing project
+// @access Private
 router.put('/:id', async (req, res) => {
-  const projects = await loadProjectsCollection();
   const project = {
     name: req.body.name
   }
-  const updatedProject = await projects.findOneAndUpdate(
+  const updatedProject = await Project.findOneAndUpdate(
     { name: req.params.id },
     { $set: project }
   );
-  project._id = updatedProject.insertedId;
+  project._id = updatedProject._id;
   res.status(200).send(project);
 });
 
-// Delete Project
+// @route  DELETE api/projects/:id
+// @desc   Delete an existing project
+// @access Private
 router.delete('/:id', async (req, res) => {
-  const projects = await loadProjectsCollection();
-  await projects.deleteOne({ name: req.params.id });
+  await Project.deleteOne({ name: req.params.id });
   res.status(200).send({});
 });
-
-async function loadProjectsCollection() {
-  const client = await mongodb.MongoClient.connect(
-    'mongodb://localhost', {
-    useNewUrlParser: true
-  });
-  return client.db('todo-app-backend').collection('projects');
-}
 
 module.exports = router;
