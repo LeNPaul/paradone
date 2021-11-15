@@ -1,47 +1,55 @@
 const express = require('express');
+const router = express.Router();
+const bcrypt = require('bcryptjs');
+const config = require('config');
 const jwt = require('jsonwebtoken');
 
-const router = express.Router();
+// User Model
+const User = require('../../models/User');
 
-router.post('/', verifyToken, (req, res) => {
-  jwt.verify(req.token, 'secretkey', (err, authData) => {
-    if(err) {
-      res.sendStatus(403);
-    } else {
-      res.json({
-        message: 'Post created',
-        authData: authData
-      })
-    }
-  })
-})
+// @route  POST api/auth
+// @desc   Auth user
+// @access Public
+router.post('/', (req, res) => {
 
-router.post('/login', (req, res) => {
-  // Mock user
-  const user = {
-    id: 1,
-    username: 'paul',
-    email: 'test@email.com'
+  const { email, password } = req.body;
+
+  // Simple validation
+  if(!email || !password) {
+    return res.status(400).json({ msg: 'Please enter all fields' });
   }
-  jwt.sign({user}, 'secretkey', (err, token) => {
-    res.json({
-      token: token
+
+  // Check for existing user
+  User.findOne({ email })
+    .then(user => {
+      if(!user) return res.status(400).json({ msg: 'User does not exist' });
+
+      // Validate password
+      bcrypt.compare(password, user.password)
+        .then(isMatch => {
+          if(!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+
+          jwt.sign(
+            { id: user.id },
+            config.get('jwtSecret'),
+            { expiresIn: 3600 },
+            (err, token) => {
+              if(err) throw err;
+              res.json({
+                token,
+                user: {
+                  id: user.id,
+                  name: user.name,
+                  email: user.email
+                }
+              });
+            }
+          )
+
+        })
+
     });
-  });
-});
 
-// Verify Token
-function verifyToken(req, res, next) {
-  // Get auth header value
-  const bearerHeader = req.headers['authorization'];
-  if(typeof bearerHeader !== 'undefined') {
-    const bearer = bearerHeader.split(' ');
-    const bearerToken = bearer[1];
-    req.token = bearerToken;
-    next();
-  } else {
-    res.sendStatus(403);
-  }
-}
+});
 
 module.exports = router;
