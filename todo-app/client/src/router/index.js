@@ -4,6 +4,7 @@ import Project from '../views/Project'
 import Eisenhower from '../views/Eisenhower'
 import Kanban from '../views/Kanban'
 import Pomodoro from '../views/Pomodoro'
+import Register from '../views/Register'
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/paradigm/pomodoro',
     name: 'Pomodoro',
     component: Pomodoro,
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register,
   },
 ]
 
