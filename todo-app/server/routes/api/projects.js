@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const mongodb = require('mongodb');
 
 // Project model
 const Project = require('../../models/Project');
