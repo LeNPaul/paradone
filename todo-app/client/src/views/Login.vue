@@ -1,22 +1,18 @@
 <template>
   <form @submit="onSubmit" class="form-signin d-grid gap-2">
       <div class="text-center mb-4"><a href="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></a>
-          <h1 class="h3 mb-3 font-weight-normal">Create Account</h1>
+          <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
       </div>
       <div class="form-floating">
-        <input v-model="username" class="form-control" type="text" placeholder="Username" name="username" minlength="4" pattern="^[a-zA-Z0-9@.]*$" required="" autofocus=""/>
-        <label for="inputUsername">Choose a Username</label>
-      </div>
-      <div class="form-floating">
-        <input v-model="email" class="form-control" type="email" placeholder="Email" name="email" required=""/>
-        <label for="inputUsername">Enter your email</label>
+        <input v-model="email" class="form-control" type="email" placeholder="Email" name="email" required="" autofocus=""/>
+        <label for="inputUsername">Email</label>
       </div>
       <div class="form-floating">
         <input v-model="password" class="form-control" type="password" placeholder="Password" name="password" required=""/>
-        <label for="inputPassword">Create a Password</label>
+        <label for="inputPassword">Password</label>
       </div>
-      <button class="btn btn-lg btn-dark btn-block" type="submit">Create Account</button>
-      <div class="text-center mb-4"><a class="nav-link text-dark" href="/login">Already have an account?</a></div>
+      <button class="btn btn-lg btn-dark btn-block" type="submit">Sign in</button>
+      <div class="text-center mb-4"><a class="nav-link text-dark" href="/register">Don't have an account?</a></div>
   </form>
 </template>
 
@@ -25,7 +21,6 @@ export default {
   name: 'Register',
   data() {
     return {
-      username: '',
       email: '',
       password: ''
     }
@@ -33,17 +28,16 @@ export default {
   methods: {
     async onSubmit(e) {
       e.preventDefault()
-      const newUser = {
-        name: this.username,
+      const user = {
         email: this.email,
         password: this.password
       }
-      const res = await fetch('/api/users', {
+      const res = await fetch('/api/auth', {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
         },
-        body: JSON.stringify(newUser)
+        body: JSON.stringify(user)
       })
       const data = await res.json()
       //this.$router.push('/')

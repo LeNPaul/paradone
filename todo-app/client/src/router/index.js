@@ -5,6 +5,7 @@ import Eisenhower from '../views/Eisenhower'
 import Kanban from '../views/Kanban'
 import Pomodoro from '../views/Pomodoro'
 import Register from '../views/Register'
+import Login from '../views/Login'
 
 const routes = [
   {
@@ -36,6 +37,11 @@ const routes = [
     path: '/register',
     name: 'Register',
     component: Register,
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login,
   },
 ]
 
