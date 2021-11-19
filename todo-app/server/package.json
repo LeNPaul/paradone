@@ -4,8 +4,10 @@
   "description": "todo-app backend server",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "production": "node index.js",
+    "backend": "nodemon index.js",
+    "database": "sudo mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath ~/data/db/",
+    "stop": "sudo pkill mongod"
   },
   "author": "Paul Le",
   "license": "ISC",
