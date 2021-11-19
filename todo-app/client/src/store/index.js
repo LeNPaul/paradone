@@ -2,7 +2,6 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    status: '',
     token: localStorage.getItem('token') || '',
     user : JSON.parse(localStorage.getItem('user')) || {}
   },
@@ -10,10 +9,10 @@ export default createStore({
     register(state, newUser) {
       state.user = newUser.user
       state.token = newUser.token
-      state.status = 'success'
     },
     login(state, user) {
-      console.log(user)
+      state.user = user.user
+      state.token = user.token
     }
   },
   actions: {
@@ -30,8 +29,18 @@ export default createStore({
       localStorage.setItem('user', JSON.stringify(data.user))
       commit('register', data)
     },
-    login({ commit }) {
-      commit('login', 'login')
+    async login({ commit }, user) {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+        },
+        body: JSON.stringify(user)
+      })
+      const data = await res.json()
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+      commit('login', data)
     }
   },
   modules: {

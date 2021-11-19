@@ -32,16 +32,8 @@ export default {
         email: this.email,
         password: this.password
       }
-      const res = await fetch('/api/auth', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(user)
-      })
-      const data = await res.json()
-      //this.$router.push('/')
-      return data
+      this.$store.dispatch('login', user)
+      this.$router.push('/')
     }
   }
 }
