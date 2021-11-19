@@ -2,8 +2,8 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    token: localStorage.getItem('token') || '',
-    user : JSON.parse(localStorage.getItem('user')) || {}
+    user : JSON.parse(localStorage.getItem('user')) || {},
+    token: localStorage.getItem('token') || ''
   },
   mutations: {
     register(state, newUser) {
@@ -13,6 +13,10 @@ export default createStore({
     login(state, user) {
       state.user = user.user
       state.token = user.token
+    },
+    logout(state) {
+      state.user = {}
+      state.token = ''
     }
   },
   actions: {
