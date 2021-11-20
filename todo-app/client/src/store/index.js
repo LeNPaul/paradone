@@ -2,22 +2,18 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    user : JSON.parse(localStorage.getItem('user')) || {},
-    token: localStorage.getItem('token') || ''
+    token: localStorage.getItem('token') || '',
+    user : {}
   },
   mutations: {
-    register(state, newUser) {
-      state.user = newUser.user
-      state.token = newUser.token
+    auth_success(state, data){
+      state.token = data.token
+      state.user = data.user
     },
-    login(state, user) {
-      state.user = user.user
-      state.token = user.token
-    },
-    logout(state) {
-      state.user = {}
+    logout(state){
       state.token = ''
-    }
+      state.user = {}
+    },
   },
   actions: {
     async register({ commit }, newUser) {
@@ -31,7 +27,7 @@ export default createStore({
       const data = await res.json()
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      commit('register', data)
+      commit('auth_success', data)
     },
     async login({ commit }, user) {
       const res = await fetch('/api/auth', {
@@ -44,8 +40,16 @@ export default createStore({
       const data = await res.json()
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      commit('login', data)
+      commit('auth_success', data)
+    },
+    logout({ commit }) {
+      commit('logout')
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
     }
+  },
+  getters: {
+    isLoggedIn: state => !!state.token
   },
   modules: {
   }
