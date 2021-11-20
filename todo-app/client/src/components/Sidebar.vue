@@ -35,6 +35,13 @@
           <router-link class="nav-link text-truncate link-dark" to="/paradigm/pomodoro"><i class="fas fa-clock"></i><span class="ms-1 d-none d-sm-inline">Pomodoro</span></router-link>
         </li>
       </ul>
+      <hr>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/register"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Register</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/login"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Login</span></router-link>
+        </li>
+      </ul>
     </div>
   </div>
 </template>
