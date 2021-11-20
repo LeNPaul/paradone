@@ -38,8 +38,7 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/register"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Register</span></router-link>
-          <router-link class="nav-link text-truncate link-dark" to="/login"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Login</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/" @click="logout"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Logout</span></router-link>
         </li>
       </ul>
     </div>
@@ -71,6 +70,9 @@ export default {
     },
     async updateProjects() {
       this.projects = await this.fetchProjects()
+    },
+    logout: function () {
+      this.$store.dispatch('logout')
     }
   },
   async created() {
