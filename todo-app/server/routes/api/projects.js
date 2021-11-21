@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../../middleware/auth')
 
 // Project model
 const Project = require('../../models/Project');
@@ -7,14 +8,14 @@ const Project = require('../../models/Project');
 // @route  GET api/projects
 // @desc   Get user projects
 // @access Private
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   res.send(await Project.find({}));
 });
 
 // @route  POST api/projects
 // @desc   Create a new project
 // @access Private
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const project = {
     name:  req.body.name
   }
@@ -26,7 +27,7 @@ router.post('/', async (req, res) => {
 // @route  PUT api/projects/:id
 // @desc   Update an existing project
 // @access Private
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   const project = {
     name: req.body.name
   }
@@ -41,7 +42,7 @@ router.put('/:id', async (req, res) => {
 // @route  DELETE api/projects/:id
 // @desc   Delete an existing project
 // @access Private
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   await Project.deleteOne({ name: req.params.id });
   res.status(200).send({});
 });

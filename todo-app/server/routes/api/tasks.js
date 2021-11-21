@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const mongodb = require('mongodb');
+const auth = require('../../middleware/auth')
 
 // Task model
 const Task = require('../../models/Task');
@@ -8,7 +9,7 @@ const Task = require('../../models/Task');
 // @route  GET api/tasks
 // @desc   Get user tasks and filter by project if param exists
 // @access Private
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   let filter = {}
   if(req.query.project) {
     filter = {project: req.query.project}
@@ -19,7 +20,7 @@ router.get('/', async (req, res) => {
 // @route  GET api/tasks/:id
 // @desc   Get a user task by id
 // @access Private
-router.get('/:id', async (req, res) => {
+router.get('/:id', auth, async (req, res) => {
   const task = await Task.findOne({ _id: new mongodb.ObjectID(req.params.id) });
   res.status(200).send(task);
 });
@@ -27,7 +28,7 @@ router.get('/:id', async (req, res) => {
 // @route  POST api/tasks
 // @desc   Create a new task
 // @access Private
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const task = {
     content:  req.body.content,
     label:    req.body.label,
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 // @route  PUT api/tasks/:id
 // @desc   Update an existing task
 // @access Private
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   const task = {
     content:  req.body.content,
     label:    req.body.label,
@@ -60,7 +61,7 @@ router.put('/:id', async (req, res) => {
 // @route  DELETE api/tasks/:id
 // @desc   Delete an existing task
 // @access Private
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
   res.status(200).send({});
 });
