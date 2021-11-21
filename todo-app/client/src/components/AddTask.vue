@@ -56,12 +56,20 @@
         this.$emit('close-add-task')
       },
       async fetchProjects() {
-        const res = await fetch('/api/projects')
+        const res = await fetch('/api/projects', {
+          headers: {
+            'x-auth-token': localStorage.getItem('token') || ''
+          }
+        })
         const data = await res.json()
         return data
       },
       async fetchLabels() {
-        const res = await fetch('/api/labels')
+        const res = await fetch('/api/labels', {
+          headers: {
+            'x-auth-token': localStorage.getItem('token') || ''
+          }
+        })
         const data = await res.json()
         return data
       }

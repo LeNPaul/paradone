@@ -33,6 +33,7 @@
           method: 'PUT',
           headers: {
             'Content-type': 'application/json',
+            'x-auth-token': localStorage.getItem('token') || ''
           },
           body: JSON.stringify(updProject),
         })
@@ -44,6 +45,9 @@
         if(confirm('Are you sure?')) {
           const res = await fetch(`/api/projects/${id}`, {
             method: 'DELETE',
+            headers: {
+              'x-auth-token': localStorage.getItem('token') || ''
+            }
           })
           res.status === 200
             ? this.$router.push('/')

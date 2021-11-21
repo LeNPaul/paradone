@@ -21,6 +21,7 @@ export default createStore({
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
+          'x-auth-token': localStorage.getItem('token') || ''
         },
         body: JSON.stringify(newUser)
       })
@@ -34,6 +35,7 @@ export default createStore({
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
+          'x-auth-token': localStorage.getItem('token') || ''
         },
         body: JSON.stringify(user)
       })

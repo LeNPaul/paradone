@@ -61,7 +61,11 @@ export default {
   },
   methods: {
     async fetchProjects() {
-      const res = await fetch('/api/projects')
+      const res = await fetch('/api/projects', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
       const data = await res.json()
       return data
     },

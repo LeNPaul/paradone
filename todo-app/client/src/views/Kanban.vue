@@ -37,6 +37,7 @@ export default {
         method: 'POST',
         headers: {
           'Content-type': 'application/json',
+          'x-auth-token': localStorage.getItem('token') || ''
         },
         body: JSON.stringify(task),
       })
@@ -46,6 +47,9 @@ export default {
     async deleteTask(id) {
       const res = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
       })
       res.status === 200
         ? (this.tasks = this.tasks.filter((task) => task._id !== id))
@@ -56,12 +60,20 @@ export default {
       if(this.$route.params.project) {
         filter = '?project=' + this.$route.params.project
       }
-      const res = await fetch('/api/tasks' + filter)
+      const res = await fetch('/api/tasks' + filter, {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
       const data = await res.json()
       return data
     },
     async fetchTask(id) {
-      const res = await fetch(`/api/tasks/${id}`)
+      const res = await fetch(`/api/tasks/${id}`, {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
       const data = await res.json()
       return data
     },

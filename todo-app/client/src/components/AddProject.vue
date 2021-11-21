@@ -35,6 +35,7 @@
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
+            'x-auth-token': localStorage.getItem('token') || ''
           },
           body: JSON.stringify(project),
         })
