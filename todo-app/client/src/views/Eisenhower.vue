@@ -13,7 +13,7 @@ import DashboardHeader from '../components/DashboardHeader'
 import EisenhowerMatrix from '../components/EisenhowerMatrix'
 import AddTask from '../components/AddTask'
 export default {
-  name: 'Dashboard',
+  name: 'Eisenhower',
   props: {
 
   },

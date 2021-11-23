@@ -13,7 +13,7 @@ import DashboardHeader from '../components/DashboardHeader'
 import KanbanBoard from '../components/KanbanBoard'
 import AddTask from '../components/AddTask'
 export default {
-  name: 'Dashboard',
+  name: 'Kanban',
   props: {
 
   },
