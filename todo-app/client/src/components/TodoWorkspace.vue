@@ -1,7 +1,7 @@
 <template>
-  <Header @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
+  <DashboardHeader @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
   <AddTask v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
-  <Tasks
+  <TodoTasks
     @delete-task="deleteTask"
     @update-task="updateTask"
     :tasks="tasks"
@@ -9,17 +9,17 @@
 </template>
 
 <script>
-import Header from '../components/Header'
-import Tasks from '../components/Tasks'
+import DashboardHeader from '../components/DashboardHeader'
+import TodoTasks from '../components/TodoTasks'
 import AddTask from '../components/AddTask'
 export default {
-  name: 'Dashboard',
+  name: 'TodoWorkspace',
   props: {
 
   },
   components: {
-    Header,
-    Tasks,
+    DashboardHeader,
+    TodoTasks,
     AddTask
   },
   data() {

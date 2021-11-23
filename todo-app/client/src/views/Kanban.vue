@@ -1,5 +1,5 @@
 <template>
-  <Header @toggle-add-task="toggleAddTask" title="Kanban Board" :showAddTask="showAddTask"/>
+  <DashboardHeader @toggle-add-task="toggleAddTask" title="Kanban Board" :showAddTask="showAddTask"/>
   <AddTask v-show="showAddTask" @add-task="addTask" />
   <KanbanBoard
     @delete-task="deleteTask"
@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import Header from '../components/Header'
+import DashboardHeader from '../components/DashboardHeader'
 import KanbanBoard from '../components/KanbanBoard'
 import AddTask from '../components/AddTask'
 export default {
@@ -18,7 +18,7 @@ export default {
 
   },
   components: {
-    Header,
+    DashboardHeader,
     KanbanBoard,
     AddTask,
   },

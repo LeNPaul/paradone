@@ -49,7 +49,7 @@
 import AddProject from '../components/AddProject'
 
 export default {
-  name: 'Sidebar',
+  name: 'AppSidebar',
   components: {
     AddProject
   },

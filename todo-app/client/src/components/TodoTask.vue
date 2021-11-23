@@ -11,7 +11,7 @@
 import EditTask from './EditTask'
 
 export default {
-  name: 'Task',
+  name: 'TodoTask',
   props: {
     task: Object
   },
@@ -31,6 +31,3 @@ export default {
   }
 }
 </script>
-
-<style scope>
-</style>

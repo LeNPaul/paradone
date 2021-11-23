@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'Button',
+  name: 'ToggleButton',
   methods: {
     onClick() {
       this.$emit('btn-click')
@@ -12,6 +12,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-</style>

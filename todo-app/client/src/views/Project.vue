@@ -1,15 +1,15 @@
 <template>
-  <Workspace :key="$route"/>
+  <TodoWorkspace :key="$route"/>
 </template>
 
 <script>
-import Workspace from '../components/Workspace'
+import TodoWorkspace from '../components/TodoWorkspace'
 
 export default {
   name: 'Project',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
-    Workspace
+    TodoWorkspace
   }
 };
 </script>

@@ -13,7 +13,7 @@
 <script>
 
 export default {
-  name: 'Home',
+  name: 'PomodoroTimer',
   inheritAttrs: false, // disable 'non-props' warning
   data() {
       return {

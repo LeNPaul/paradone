@@ -1,18 +1,18 @@
 <template>
   <PomodoroTimer/>
-  <Workspace :key="$route"/>
+  <TodoWorkspace :key="$route"/>
 </template>
 
 <script>
 import PomodoroTimer from '../components/PomodoroTimer'
-import Workspace from '../components/Workspace'
+import TodoWorkspace from '../components/TodoWorkspace'
 
 export default {
   name: 'Home',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     PomodoroTimer,
-    Workspace
+    TodoWorkspace
   }
 };
 </script>
