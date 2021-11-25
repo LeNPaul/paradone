@@ -15,3 +15,19 @@ variable "secret_key" {
   type        = string
   sensitive   = true
 }
+
+resource "aws_vpc" "main_vpc" {
+  cidr_block = "172.31.0.0/16"
+  tags = {
+    Name = "tf-example"
+  }
+}
+
+resource "aws_subnet" "main_subnet" {
+  vpc_id            = aws_vpc.main_vpc.id
+  cidr_block        = "172.31.0.0/20"
+  availability_zone = "us-east-2a"
+  tags = {
+    Name = "tf-example"
+  }
+}

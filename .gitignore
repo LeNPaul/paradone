@@ -4,6 +4,6 @@ package-lock.json
 dist
 
 secret.tfvars
-*.tfstate
+*.tfstate*
 *.lock.hcl
 .terraform
