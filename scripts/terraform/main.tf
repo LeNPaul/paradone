@@ -51,6 +51,11 @@ resource "aws_route_table" "tf_route_table" {
   }
 }
 
+resource "aws_route_table_association" "tf_route_table_association" {
+  subnet_id      = aws_subnet.tf_subnet.id
+  route_table_id = aws_route_table.tf_route_table.id
+}
+
 resource "aws_security_group" "tf_security_group" {
   name        = "allow_ssh"
   description = "Allow SSH inbound traffic"
