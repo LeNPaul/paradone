@@ -87,6 +87,7 @@ resource "aws_instance" "tf_instance" {
   associate_public_ip_address = true
   key_name = "uw-test"
   vpc_security_group_ids = [aws_security_group.tf_security_group.id]
+  user_data = "${file("setup.sh")}"
   tags = {
     Name = "tf-example"
   }
