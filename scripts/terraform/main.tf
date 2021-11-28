@@ -40,8 +40,8 @@ resource "aws_internet_gateway" "tf_internet_gateway" {
   }
 }
 
-resource "aws_route_table" "tf_route_table" {
-  vpc_id = aws_vpc.tf_vpc.id
+resource "aws_default_route_table" "tf_default_route_table" {
+  default_route_table_id = aws_vpc.tf_vpc.default_route_table_id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.tf_internet_gateway.id
@@ -53,21 +53,29 @@ resource "aws_route_table" "tf_route_table" {
 
 resource "aws_route_table_association" "tf_route_table_association" {
   subnet_id      = aws_subnet.tf_subnet.id
-  route_table_id = aws_route_table.tf_route_table.id
+  route_table_id = aws_default_route_table.tf_default_route_table.id
 }
 
 resource "aws_security_group" "tf_security_group" {
-  name        = "allow_ssh"
-  description = "Allow SSH inbound traffic"
+  name        = "tf-example"
+  description = "Security group rules for tf-example"
   vpc_id      = aws_vpc.tf_vpc.id
   ingress {
-    description      = "TLS from VPC"
+    description      = "Allow SSH from home IP address"
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
     cidr_blocks      = ["99.247.121.26/32"]
   }
+  ingress {
+    description      = "Allow application access from home IP address"
+    from_port        = 8080
+    to_port          = 8080
+    protocol         = "tcp"
+    cidr_blocks      = ["99.247.121.26/32"]
+  }
   egress {
+    description      = "Allow all outbound traffic"
     from_port        = 0
     to_port          = 0
     protocol         = "-1"
@@ -75,7 +83,7 @@ resource "aws_security_group" "tf_security_group" {
     ipv6_cidr_blocks = ["::/0"]
   }
   tags = {
-    Name = "allow_ssh"
+    Name = "tf-example"
   }
 }
 
