@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Update OS first
+sudo apt update
+
 # Create user for running application
 
 # Add user
@@ -12,9 +15,6 @@ usermod -aG sudo paradone
 
 # Need to install git on Ubuntu first to clone repository
 sudo apt install -y git
-
-# Update OS
-sudo apt update
 
 # Install MongoDB
 sudo apt install -y mongodb
@@ -29,17 +29,18 @@ sudo bash nodesource_setup.sh;
 sudo apt install -y nodejs;
 sudo apt install -y npm;)
 
-# Install nginx and update firewall
-sudo apt install -y nginx
-sudo ufw allow 'Nginx HTTP'
-
-# Install Let's Encrypt
-sudo snap install core; sudo snap refresh core
-sudo snap install --classic certbot
-
 # Install PM2
 sudo npm install pm2@latest -g
 pm2 startup systemd > temp.txt ; cat temp.txt | grep sudo > pm2.sh
 bash pm2.sh
 rm temp.txt
 rm pm2.sh
+
+# Install nginx and update firewall
+sudo apt install -y nginx
+sudo ufw allow 'Nginx HTTP'
+sudo ufw allow 'ssh'
+
+# Install Let's Encrypt
+sudo snap install core; sudo snap refresh core
+sudo snap install --classic certbot
