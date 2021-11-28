@@ -19,7 +19,10 @@ import AddTask from './AddTask'
 export default {
   name: 'KanbanBoard',
   props: {
-    tasks: Array
+    tasks: {
+      type: Array,
+      required: true
+    }
   },
   components: {
     AddTask,

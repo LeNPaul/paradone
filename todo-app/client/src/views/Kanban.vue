@@ -14,9 +14,6 @@ import KanbanBoard from '../components/KanbanBoard'
 import AddTask from '../components/AddTask'
 export default {
   name: 'Kanban',
-  props: {
-
-  },
   components: {
     DashboardHeader,
     KanbanBoard,

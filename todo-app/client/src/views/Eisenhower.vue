@@ -14,9 +14,6 @@ import EisenhowerMatrix from '../components/EisenhowerMatrix'
 import AddTask from '../components/AddTask'
 export default {
   name: 'Eisenhower',
-  props: {
-
-  },
   components: {
     DashboardHeader,
     EisenhowerMatrix,

@@ -14,8 +14,13 @@ import EditProject from './EditProject'
 export default {
   name: 'DashboardHeader',
   props: {
-    title: String,
-    showAddTask: Boolean
+    title: {
+      type: String
+    },
+    showAddTask: {
+      type: Boolean,
+      required: true
+    }
   },
   components: {
     ToggleButton,

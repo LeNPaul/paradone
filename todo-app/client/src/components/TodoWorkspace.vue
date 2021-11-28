@@ -14,9 +14,6 @@ import TodoTasks from '../components/TodoTasks'
 import AddTask from '../components/AddTask'
 export default {
   name: 'TodoWorkspace',
-  props: {
-
-  },
   components: {
     DashboardHeader,
     TodoTasks,

@@ -10,7 +10,10 @@ import TodoTask from './TodoTask'
 export default {
   name: 'TodoTasks',
   props: {
-    tasks: Array
+    tasks: {
+      type: Array,
+      required: true
+    }
   },
   components: {
     TodoTask,

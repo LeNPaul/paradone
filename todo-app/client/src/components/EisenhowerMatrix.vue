@@ -23,7 +23,10 @@ import TodoTask from './TodoTask'
 export default {
   name: 'EisenhowerMatrix',
   props: {
-    tasks: Array
+    tasks: {
+      type: Array,
+      required: true
+    }
   },
   components: {
     TodoTask,

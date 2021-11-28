@@ -13,7 +13,10 @@ import EditTask from './EditTask'
 export default {
   name: 'TodoTask',
   props: {
-    task: Object
+    task: {
+      type: Object,
+      required: true
+    }
   },
   components: {
     EditTask

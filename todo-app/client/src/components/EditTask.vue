@@ -36,7 +36,10 @@
       }
     },
     props: {
-      task: Object
+      task: {
+        type: Object,
+        required: true
+      }
     },
     methods: {
       async onSubmit(e) {

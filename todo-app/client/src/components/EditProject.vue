@@ -12,7 +12,9 @@
   export default {
     name: 'EditProject',
     props: {
-      project: String
+      project: {
+        type: String
+      }
     },
     data() {
       return {
