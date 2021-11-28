@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Create user for running application
+
+# Add user
+adduser paradone
+
+# Add permissions for user
+usermod -aG sudo paradone
+
 # Install and configure components needed to run application
 
 # Need to install git on Ubuntu first to clone repository
