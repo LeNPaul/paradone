@@ -16,7 +16,7 @@ export default {
   name: 'PomodoroTimer',
   inheritAttrs: false, // disable 'non-props' warning
   data() {
-      return {
+    return {
       timer: null,
       totalTime: (25 * 60),
       resetButton: false,
