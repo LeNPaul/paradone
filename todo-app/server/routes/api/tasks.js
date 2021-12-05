@@ -11,7 +11,7 @@ function encrypt(plainText) {
 }
 
 function decrypt(cipherText) {
-  return CryptoJS.AES.decrypt(cipherText.toString(), secret.toString(CryptoJS.enc.Utf8);
+  return CryptoJS.AES.decrypt(cipherText.toString(), secret).toString(CryptoJS.enc.Utf8);
 }
 
 // Task model
