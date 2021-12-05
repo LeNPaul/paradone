@@ -1,18 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mongodb = require('mongodb');
-const CryptoJS = require('crypto-js');
 const auth = require('../../middleware/auth');
-
-let secret = 'keyboardcat123'
-
-function encrypt(plainText) {
-  return CryptoJS.AES.encrypt(plainText, secret).toString();
-}
-
-function decrypt(cipherText) {
-  return CryptoJS.AES.decrypt(cipherText.toString(), secret).toString(CryptoJS.enc.Utf8);
-}
+const encrypt = require('../../middleware/encrypt')
 
 // Task model
 const Task = require('../../models/Task');
@@ -39,7 +29,7 @@ router.get('/:id', auth, async (req, res) => {
 // @route  POST api/tasks
 // @desc   Create a new task
 // @access Private
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, encrypt, async (req, res) => {
   const task = {
     content:  req.body.content,
     label:    req.body.label,
