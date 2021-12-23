@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const mongodb = require('mongodb');
 const auth = require('../../middleware/auth');
-const encrypt = require('../../middleware/encrypt')
 
 // Task model
 const Task = require('../../models/Task');
@@ -29,7 +28,7 @@ router.get('/:id', auth, async (req, res) => {
 // @route  POST api/tasks
 // @desc   Create a new task
 // @access Private
-router.post('/', auth, encrypt, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const task = {
     content:  req.body.content,
     label:    req.body.label,
