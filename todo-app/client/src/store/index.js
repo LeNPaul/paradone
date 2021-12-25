@@ -8,12 +8,14 @@ export default createStore({
   },
   mutations: {
     auth_success(state, data){
-      state.token = data.token
-      state.user = data.user
+      state.token     = data.token
+      state.user      = data.user
+      state.expiresIn = data.expiresIn
     },
     logout(state){
       state.token = ''
-      state.user = {}
+      state.user = ''
+      state.expiresIn = 0
     },
   },
   actions: {
@@ -36,8 +38,7 @@ export default createStore({
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: {
-          'Content-type': 'application/json',
-          'x-auth-token': localStorage.getItem('token') || ''
+          'Content-type': 'application/json'
         },
         body: JSON.stringify(user)
       })
@@ -51,6 +52,7 @@ export default createStore({
       commit('logout')
       localStorage.removeItem('token')
       localStorage.removeItem('user')
+      localStorage.removeItem('expiresIn')
     }
   },
   getters: {
