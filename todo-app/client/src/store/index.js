@@ -23,15 +23,16 @@ export default createStore({
       const res = await fetch('/api/users', {
         method: 'POST',
         headers: {
-          'Content-type': 'application/json',
-          'x-auth-token': localStorage.getItem('token') || ''
+          'Content-type': 'application/json'
         },
         body: JSON.stringify(newUser)
       })
       const data = await res.json()
+      const expiresIn = Date.now() + 60000
+      data.expiresIn = expiresIn
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      localStorage.setItem('expiresIn', Date.now() + 60000)
+      localStorage.setItem('expiresIn', expiresIn)
       commit('auth_success', data)
     },
     async login({ commit }, user) {
@@ -43,9 +44,11 @@ export default createStore({
         body: JSON.stringify(user)
       })
       const data = await res.json()
+      const expiresIn = Date.now() + 60000
+      data.expiresIn = expiresIn
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
-      localStorage.setItem('expiresIn', Date.now() + 60000)
+      localStorage.setItem('expiresIn', expiresIn)
       commit('auth_success', data)
     },
     logout({ commit }) {
