@@ -1,6 +1,6 @@
 <template>
   <form @submit="onSubmit" class="form-signin d-grid gap-2">
-      <div class="text-center mb-4"><a href="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></a>
+      <div class="text-center mb-4"><router-link to="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></router-link>
           <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
       </div>
       <div class="form-floating">
@@ -12,7 +12,7 @@
         <label for="inputPassword">Password</label>
       </div>
       <button class="btn btn-lg btn-dark btn-block" type="submit">Sign in</button>
-      <div class="text-center mb-4"><a class="nav-link text-dark" href="/register">Don't have an account?</a></div>
+      <div class="text-center mb-4"><router-link to="/register" class="nav-link text-dark">Don't have an account?</router-link></div>
   </form>
 </template>
 
