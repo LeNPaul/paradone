@@ -21,17 +21,17 @@
     </symbol>
   </svg>
   <div class="container py-5">
-    <header class="d-flex flex-column flex-md-row align-items-center pb-3 mb-5 border-bottom"><a class="d-flex align-items-center text-dark text-decoration-none" href="/">
-        <span class="fs-4 fw-bold">paradone</span></a>
+    <header class="d-flex flex-column flex-md-row align-items-center pb-3 mb-5 border-bottom"><router-link to="/" class="d-flex align-items-center text-dark text-decoration-none">
+        <span class="fs-4 fw-bold">paradone</span></router-link>
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
-        <a class="me-3 py-2 text-dark text-decoration-none" href="/register">register</a>
-        <a class="me-3 py-2 text-dark text-decoration-none" href="/login">login</a>
+        <router-link to="/register" class="me-3 py-2 text-dark text-decoration-none">register</router-link>
+        <router-link to="/login" class="me-3 py-2 text-dark text-decoration-none">login</router-link>
       </nav>
     </header>
     <div class="container py-5">
       <h1 class="col-md-7">Choose your productivity paradigm with paradone</h1>
       <p class="fs-5 col-md-7">Organize your tasks to fit any productivity system paradigm.</p>
-      <div class="mb-5"><a class="btn btn-dark btn-lg px-4" href="/register">Get Started</a></div>
+      <div class="mb-5"><router-link to="/register" class="btn btn-dark btn-lg px-4">Get Started</router-link></div>
     </div>
     <div class="container py-5">
       <div class="row py-5">
@@ -70,7 +70,7 @@
     <div class="container py-5">
       <div class="row py-5">
         <div class="col-md-6 mx-auto text-center">
-          <h1 class="pb-5">Get things done with paradone</h1><a class="btn btn-dark btn-lg px-4" href="/register">Get Started</a>
+          <h1 class="pb-5">Get things done with paradone</h1><router-link to="/register" class="btn btn-dark btn-lg px-4">Get Started</router-link>
         </div>
       </div>
     </div>
@@ -82,8 +82,8 @@
         <div class="col-6 col-md">
           <h5>Resources</h5>
           <ul class="list-unstyled text-small">
-            <li class="mb-1"><a class="link-secondary text-decoration-none" href="/register">Register</a></li>
-            <li class="mb-1"><a class="link-secondary text-decoration-none" href="/login">Login</a></li>
+            <li class="mb-1"><router-link to="/register" class="link-secondary text-decoration-none">Register</router-link></li>
+            <li class="mb-1"><router-link to="/login" class="link-secondary text-decoration-none">Login</router-link></li>
           </ul>
         </div>
       </div>
