@@ -1,4 +1,5 @@
 {
   "mongoURI": "mongodb://localhost/todo-app-backend",
-  "jwtSecret": "keyboard_cat_secret"
+  "jwtSecret": "keyboard_cat_secret",
+  "expiresIn": "30d"
 }
