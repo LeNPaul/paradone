@@ -2,8 +2,9 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    token: localStorage.getItem('token') || '',
-    user : {}
+    token     : localStorage.getItem('token') || '',
+    user      : localStorage.getItem('user') || '',
+    expiresIn : localStorage.getItem('expiresIn') || 0,
   },
   mutations: {
     auth_success(state, data){
@@ -28,6 +29,7 @@ export default createStore({
       const data = await res.json()
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
+      localStorage.setItem('expiresIn', Date.now() + 60000)
       commit('auth_success', data)
     },
     async login({ commit }, user) {
@@ -42,6 +44,7 @@ export default createStore({
       const data = await res.json()
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
+      localStorage.setItem('expiresIn', Date.now() + 60000)
       commit('auth_success', data)
     },
     logout({ commit }) {
@@ -51,7 +54,7 @@ export default createStore({
     }
   },
   getters: {
-    isLoggedIn: state => !!state.token
+    isLoggedIn: state => !!state.token && state.expiresIn > Date.now()
   },
   modules: {
   }
