@@ -1,5 +1,5 @@
 <template>
-  <TodoWorkspace v-if="this.$store.getters.isLoggedIn" :key="$route"/>
+  <TodoWorkspace v-if="isLoggedIn" :key="$route"/>
   <AppHome v-else/>
 </template>
 
@@ -13,6 +13,12 @@ export default {
   components: {
     AppHome,
     TodoWorkspace
+  },
+  props: {
+    isLoggedIn: {
+      type: Boolean,
+      required: true
+    }
   }
 };
 </script>
