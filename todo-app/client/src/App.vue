@@ -8,7 +8,7 @@
                   <i class="fas fa-bars" data-bs-toggle="offcanvas" data-bs-target="#offcanvas"></i>
               </button>
               <div class="col-lg-6 mx-auto p-3 py-md-5">
-                <router-view :isLoggedIn="isLoggedIn"></router-view>
+                <router-view></router-view>
               </div>
           </div>
       </div>
@@ -31,7 +31,18 @@ export default {
   mounted() {
     setInterval(() => {
       this.isLoggedIn = this.$store.getters.isLoggedIn
+      if(this.$route.path == '/' || this.$route.path == '/login' || this.$route.path == '/register') {
+        return
+      }
+      if(!this.isLoggedIn) {
+        this.$router.push('/')
+      }
     }, 1000)
+  },
+  watch:{
+    $route (){
+      this.isLoggedIn = this.$store.getters.isLoggedIn
+    }
   }
 }
 

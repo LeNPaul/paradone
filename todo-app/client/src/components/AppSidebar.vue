@@ -8,7 +8,7 @@
     <div class="offcanvas-body px-0">
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/app"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
         </li>
       </ul>
       <hr>

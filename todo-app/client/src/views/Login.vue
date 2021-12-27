@@ -19,6 +19,7 @@
 <script>
 export default {
   name: 'Login',
+  inheritAttrs: false, // disable 'non-props' warning
   data() {
     return {
       email: '',
@@ -32,8 +33,9 @@ export default {
         email: this.email,
         password: this.password
       }
-      this.$store.dispatch('login', user)
-      this.$router.push('/app')
+      this.$store.dispatch('login', user).then(() => {
+        this.$router.push('/app')
+      })
     }
   }
 }
