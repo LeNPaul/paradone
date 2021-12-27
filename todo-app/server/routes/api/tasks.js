@@ -12,7 +12,9 @@ const Task = require('../../models/Task');
 router.get('/', auth, async (req, res) => {
   let filter = {}
   if(req.query.project) {
-    filter = {project: req.query.project}
+    filter = {project: req.query.project, user_id: req.user.id}
+  } else {
+    filter = {user_id: req.user.id}
   }
   res.send(await Task.find(filter));
 });
@@ -46,6 +48,7 @@ router.post('/', auth, async (req, res) => {
 // @access Private
 router.put('/:id', auth, async (req, res) => {
   const task = {
+    user_id:  req.user.id,
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
