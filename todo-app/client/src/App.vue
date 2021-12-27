@@ -42,6 +42,9 @@ export default {
   watch:{
     $route (){
       this.isLoggedIn = this.$store.getters.isLoggedIn
+      if(this.isLoggedIn && (this.$route.path == '/' || this.$route.path == '/login' || this.$route.path == '/register')) {
+        this.$router.push('/app')
+      }
     }
   }
 }
