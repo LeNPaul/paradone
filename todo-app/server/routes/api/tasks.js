@@ -7,12 +7,12 @@ const auth = require('../../middleware/auth');
 const Task = require('../../models/Task');
 
 // @route  GET api/tasks
-// @desc   Get user tasks and filter by project if param exists
+// @desc   Get user tasks and filter by project_name if param exists
 // @access Private
 router.get('/', auth, async (req, res) => {
   let filter = {}
-  if(req.query.project) {
-    filter = {project: req.query.project, user_id: req.user.id}
+  if(req.query.project_name) {
+    filter = {project_name: req.query.project_name, user_id: req.user.id}
   } else {
     filter = {user_id: req.user.id}
   }
@@ -36,7 +36,7 @@ router.post('/', auth, async (req, res) => {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
-    project:  req.body.project
+    project_name:  req.body.project_name
   }
   const insertedTask = await Task.create(task);
   task._id = insertedTask._id;
@@ -52,7 +52,7 @@ router.put('/:id', auth, async (req, res) => {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
-    project:  req.body.project
+    project_name:  req.body.project_name
   }
   const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
