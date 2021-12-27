@@ -9,7 +9,7 @@ const Project = require('../../models/Project');
 // @desc   Get user projects
 // @access Private
 router.get('/', auth, async (req, res) => {
-  res.send(await Project.find({}));
+  res.send(await Project.find({user_id: req.user.id}));
 });
 
 // @route  POST api/projects
@@ -17,7 +17,8 @@ router.get('/', auth, async (req, res) => {
 // @access Private
 router.post('/', auth, async (req, res) => {
   const project = {
-    name:  req.body.name
+    project_name:  req.body.project_name,
+    user_id:  req.user.id
   }
   const insertedProject = await Project.create(project);
   project._id = insertedProject._id;
@@ -29,7 +30,8 @@ router.post('/', auth, async (req, res) => {
 // @access Private
 router.put('/:id', auth, async (req, res) => {
   const project = {
-    name: req.body.name
+    project_name: req.body.project_name,
+    user_id:  req.user.id
   }
   const updatedProject = await Project.findOneAndUpdate(
     { name: req.params.id },

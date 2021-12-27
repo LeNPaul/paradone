@@ -3,7 +3,11 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const ProjectSchema = new Schema({
-  name: {
+  project_name: {
+    type: String,
+    required: true
+  },
+  user_id: {
     type: String,
     required: true
   }
