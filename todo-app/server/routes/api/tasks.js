@@ -30,6 +30,7 @@ router.get('/:id', auth, async (req, res) => {
 // @access Private
 router.post('/', auth, async (req, res) => {
   const task = {
+    user_id:  req.user.id,
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,

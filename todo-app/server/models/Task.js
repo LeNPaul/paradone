@@ -3,6 +3,10 @@ const Schema = mongoose.Schema;
 
 // Create Schema
 const TaskSchema = new Schema({
+  user_id: {
+    type: String,
+    required: true  
+  },
   content: {
     type: String,
     required: true
