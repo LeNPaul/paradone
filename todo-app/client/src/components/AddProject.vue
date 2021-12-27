@@ -1,7 +1,7 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form p-3 border-0">
     <div class="mb-3">
-      <input type="text" v-model="name" name="name" placeholder="Project name" class="form-control">
+      <input type="text" v-model="project_name" name="name" placeholder="Project name" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
@@ -12,32 +12,32 @@
     name: 'AddProject',
     data() {
       return {
-        name: '',
+        project_name: '',
       }
     },
     methods: {
       onSubmit(e) {
         e.preventDefault()
-        if(!this.name) {
+        if(!this.project_name) {
           alert('Please add a project')
           return
         }
         const newProject = {
-          name: this.name
+          project_name: this.project_name
         }
         this.addProject(newProject)
-        this.name = ''
+        this.project_name = ''
         this.$emit('close-add-project')
         this.$emit('update-projects')
       },
-      async addProject(project) {
+      async addProject(newProject) {
         const res = await fetch('/api/projects', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
             'x-auth-token': localStorage.getItem('token') || ''
           },
-          body: JSON.stringify(project),
+          body: JSON.stringify(newProject),
         })
         const data = await res.json()
         return data

@@ -1,10 +1,10 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 mt-3 p-3">
     <div class="mb-3">
-      <input type="text" name="name" v-model="name" class="form-control">
+      <input type="text" name="project_name" v-model="project_name" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
-    <button @click="deleteProject(name)" class="btn btn-outline-dark btn-sm float-end" type="button"><i class="fas fa-trash"></i></button>
+    <button @click="deleteProject(project_name)" class="btn btn-outline-dark btn-sm float-end" type="button"><i class="fas fa-trash"></i></button>
   </form>
 </template>
 
@@ -18,18 +18,18 @@
     },
     data() {
       return {
-        name: ''
+        project_name: ''
       }
     },
     methods: {
       async onSubmit(e) {
         e.preventDefault()
-        if(!this.name) {
-          alert('Please add a project')
+        if(!this.project_name) {
+          alert('Please provide a project name')
           return
         }
         const updProject = {
-          name: this.name
+          project_name: this.project_name
         }
         const res = await fetch(`/api/projects/${this.$props.project}`, {
           method: 'PUT',
@@ -40,12 +40,12 @@
           body: JSON.stringify(updProject),
         })
         const data = await res.json()
-        this.$router.push(this.name)
+        this.$router.push(this.project_name)
         return data
       },
-      async deleteProject(id) {
+      async deleteProject(project_name) {
         if(confirm('Are you sure?')) {
-          const res = await fetch(`/api/projects/${id}`, {
+          const res = await fetch(`/api/projects/${project_name}`, {
             method: 'DELETE',
             headers: {
               'x-auth-token': localStorage.getItem('token') || ''
@@ -58,7 +58,7 @@
       }
     },
     created() {
-      this.name = this.$props.project
+      this.project_name = this.$props.project
     }
   }
 </script>

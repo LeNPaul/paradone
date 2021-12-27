@@ -15,8 +15,8 @@
       <button @click="toggleAddProject" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Projects</span><i class="fas fa-plus"></i></button>
       <AddProject v-show="showAddProject" @close-add-project="toggleAddProject" @update-projects="updateProjects"/>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
-        <li :key='project.name' v-for="project in projects" class="nav-item">
-          <router-link :to="{ name: 'Project', params: { project: project.name } }" class="nav-link text-truncate link-dark"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.name }}</span></router-link>
+        <li :key='project.project_name' v-for="project in projects" class="nav-item">
+          <router-link :to="{ name: 'Project', params: { project: project.project_name } }" class="nav-link text-truncate link-dark"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ project.project_name }}</span></router-link>
         </li>
       </ul>
       <hr>
