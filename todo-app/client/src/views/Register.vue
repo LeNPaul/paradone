@@ -23,6 +23,7 @@
 <script>
 export default {
   name: 'Register',
+  inheritAttrs: false, // disable 'non-props' warning
   data() {
     return {
       username: '',

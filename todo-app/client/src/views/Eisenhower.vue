@@ -14,6 +14,7 @@ import EisenhowerMatrix from '../components/EisenhowerMatrix'
 import AddTask from '../components/AddTask'
 export default {
   name: 'Eisenhower',
+  inheritAttrs: false, // disable 'non-props' warning
   components: {
     DashboardHeader,
     EisenhowerMatrix,

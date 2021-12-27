@@ -14,6 +14,7 @@ import KanbanBoard from '../components/KanbanBoard'
 import AddTask from '../components/AddTask'
 export default {
   name: 'Kanban',
+  inheritAttrs: false, // disable 'non-props' warning
   components: {
     DashboardHeader,
     KanbanBoard,
