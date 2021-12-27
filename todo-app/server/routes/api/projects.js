@@ -34,7 +34,7 @@ router.put('/:id', auth, async (req, res) => {
     user_id:  req.user.id
   }
   const updatedProject = await Project.findOneAndUpdate(
-    { name: req.params.id },
+    { project_name: req.params.id },
     { $set: project }
   );
   project._id = updatedProject._id;
