@@ -1,6 +1,5 @@
 <template>
-  <WorkspaceHeader @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
-  <AddTask v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
+  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTask()"/>
   <TodoTasks
     @delete-task="deleteTask"
     @update-task="updateTask"
@@ -11,37 +10,20 @@
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
 import TodoTasks from '../components/TodoTasks'
-import AddTask from '../components/AddTask'
+
 export default {
   name: 'App',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     WorkspaceHeader,
     TodoTasks,
-    AddTask
   },
   data() {
     return {
-      tasks: [],
-      showAddTask: false,
+      tasks: []
     }
   },
   methods: {
-    toggleAddTask() {
-      this.showAddTask = !this.showAddTask
-    },
-    async addTask(task) {
-      const res = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-          'x-auth-token': localStorage.getItem('token') || ''
-        },
-        body: JSON.stringify(task),
-      })
-      const data = await res.json()
-      this.tasks = [...this.tasks, data]
-    },
     async deleteTask(id) {
       const res = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',

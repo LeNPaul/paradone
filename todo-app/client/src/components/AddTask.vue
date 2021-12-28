@@ -35,8 +35,9 @@
         projects: []
       }
     },
+    emits: ['update-tasks', 'close-add-task'],
     methods: {
-      onSubmit(e) {
+      async onSubmit(e) {
         e.preventDefault()
         if(!this.content) {
           alert('Please add a task')
@@ -48,12 +49,22 @@
           priority: this.priority,
           project_name: this.project_name
         }
-        this.$emit('add-task', newTask)
+        const res = await fetch('/api/tasks', {
+          method: 'POST',
+          headers: {
+            'Content-type': 'application/json',
+            'x-auth-token': localStorage.getItem('token') || ''
+          },
+          body: JSON.stringify(newTask),
+        })
+        const data = await res.json()
+        this.$emit('update-tasks')
         this.content = ''
         this.label = ''
         this.priority = ''
         this.project_name = ''
         this.$emit('close-add-task')
+        return data
       },
       async fetchProjects() {
         const res = await fetch('/api/projects', {
