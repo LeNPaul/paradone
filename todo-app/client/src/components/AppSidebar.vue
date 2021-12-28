@@ -36,6 +36,13 @@
         </li>
       </ul>
       <hr>
+
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li class="nav-item">
+          <span class="nav-link text-truncate link-dark ms-1 d-none d-sm-inline text-muted">Logged in as {{ username }}</span>
+        </li>
+      </ul>
+
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
           <router-link class="nav-link text-truncate link-dark" to="/" @click="logout"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Logout</span></router-link>
@@ -56,7 +63,8 @@ export default {
   data() {
     return {
       showAddProject: false,
-      projects: []
+      projects: [],
+      username: ''
     }
   },
   methods: {
@@ -81,6 +89,8 @@ export default {
   },
   async created() {
     this.projects = await this.fetchProjects()
+    let user = JSON.parse(localStorage.getItem('user') || '')
+    this.username = user.name
   }
 }
 </script>
