@@ -1,18 +1,18 @@
 <template>
-  <TodoWorkspace v-if="isLoggedIn" :key="$route"/>
+  <Workspace v-if="isLoggedIn" :key="$route"/>
   <AppHome v-else/>
 </template>
 
 <script>
 import AppHome from '../components/AppHome'
-import TodoWorkspace from '../components/TodoWorkspace'
+import Workspace from '../components/Workspace'
 
 export default {
   name: 'Main',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     AppHome,
-    TodoWorkspace
+    Workspace
   },
   props: {
     isLoggedIn: {

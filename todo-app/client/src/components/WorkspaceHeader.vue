@@ -13,7 +13,7 @@
 import EditProject from './EditProject'
 
 export default {
-  name: 'DashboardHeader',
+  name: 'WorkspaceHeader',
   props: {
     title: {
       type: String

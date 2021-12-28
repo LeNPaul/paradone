@@ -1,6 +1,5 @@
 <template>
-  <DashboardHeader @toggle-add-task="toggleAddTask" title="Eisenhower Matrix" :showAddTask="showAddTask"/>
-  <AddTask v-show="showAddTask" @add-task="addTask" />
+  <WorkspaceHeader @toggle-add-task="toggleAddTask" title="Eisenhower Matrix" :showAddTask="showAddTask"/>
   <EisenhowerMatrix
     @delete-task="deleteTask"
     @update-task="updateTask"
@@ -9,16 +8,14 @@
 </template>
 
 <script>
-import DashboardHeader from '../components/DashboardHeader'
+import WorkspaceHeader from '../components/WorkspaceHeader'
 import EisenhowerMatrix from '../components/EisenhowerMatrix'
-import AddTask from '../components/AddTask'
 export default {
   name: 'Eisenhower',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
-    DashboardHeader,
+    WorkspaceHeader,
     EisenhowerMatrix,
-    AddTask,
   },
   data() {
     return {
