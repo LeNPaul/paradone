@@ -45,7 +45,7 @@ router.put('/:id', auth, async (req, res) => {
 // @desc   Delete an existing project
 // @access Private
 router.delete('/:id', auth, async (req, res) => {
-  await Project.deleteOne({ name: req.params.id });
+  await Project.deleteOne({ project_name: req.params.id, user_id:  req.user.id });
   res.status(200).send({});
 });
 
