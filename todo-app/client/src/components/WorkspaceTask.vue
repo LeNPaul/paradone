@@ -11,7 +11,7 @@
 import WorkspaceTaskEdit from './WorkspaceTaskEdit'
 
 export default {
-  name: 'TodoTask',
+  name: 'WorkspaceTask',
   props: {
     task: {
       type: Object,

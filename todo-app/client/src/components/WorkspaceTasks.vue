@@ -1,11 +1,11 @@
 <template>
   <div :key="task._id" v-for="task in tasks">
-    <TodoTask @update-task="$emit('update-task')" @delete-task="$emit('delete-task', task._id)" :task="task"/>
+    <WorkspaceTask @update-task="$emit('update-task')" @delete-task="$emit('delete-task', task._id)" :task="task"/>
   </div>
 </template>
 
 <script>
-import TodoTask from './TodoTask'
+import WorkspaceTask from './WorkspaceTask'
 
 export default {
   name: 'WorkspaceTasks',
@@ -16,7 +16,7 @@ export default {
     }
   },
   components: {
-    TodoTask,
+    WorkspaceTask,
   },
   emits: ['delete-task', 'update-task']
 }
