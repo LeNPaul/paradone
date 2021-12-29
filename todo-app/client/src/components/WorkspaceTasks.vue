@@ -8,7 +8,7 @@
 import TodoTask from './TodoTask'
 
 export default {
-  name: 'TodoTasks',
+  name: 'WorkspaceTasks',
   props: {
     tasks: {
       type: Array,
