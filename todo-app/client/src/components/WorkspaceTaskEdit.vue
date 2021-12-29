@@ -24,7 +24,7 @@
 
 <script>
   export default {
-    name: 'EditTask',
+    name: 'WorkspaceTaskEdit',
     data() {
       return {
         content: '',
