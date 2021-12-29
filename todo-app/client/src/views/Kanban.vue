@@ -1,6 +1,6 @@
 <template>
   <WorkspaceHeader @toggle-add-task="toggleAddTask" title="Kanban Board" :showAddTask="showAddTask"/>
-  <WorkspaceTaskAdd v-show="showAddTask" @add-task="addTask" />
+  <WorkspaceHeaderTaskAdd v-show="showAddTask" @add-task="addTask" />
   <KanbanBoard
     @delete-task="deleteTask"
     @update-task="updateTask"
@@ -11,14 +11,14 @@
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
 import KanbanBoard from '../components/KanbanBoard'
-import WorkspaceTaskAdd from '../components/WorkspaceTaskAdd'
+import WorkspaceHeaderTaskAdd from '../components/WorkspaceHeaderTaskAdd'
 export default {
   name: 'Kanban',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     WorkspaceHeader,
     KanbanBoard,
-    WorkspaceTaskAdd,
+    WorkspaceHeaderTaskAdd,
   },
   data() {
     return {
