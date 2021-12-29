@@ -1,6 +1,6 @@
 <template>
   <WorkspaceHeader @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
-  <AddTask v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
+  <WorkspaceTaskAdd v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
   <TodoTasks
     @delete-task="deleteTask"
     @update-task="updateTask"
@@ -11,14 +11,14 @@
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
 import TodoTasks from '../components/TodoTasks'
-import AddTask from '../components/AddTask'
+import WorkspaceTaskAdd from '../components/WorkspaceTaskAdd'
 
 export default {
   name: 'Workspace',
   components: {
     WorkspaceHeader,
     TodoTasks,
-    AddTask
+    WorkspaceTaskAdd
   },
   data() {
     return {

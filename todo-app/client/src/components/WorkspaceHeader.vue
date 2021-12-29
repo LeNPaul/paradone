@@ -5,11 +5,11 @@
     <button @click="toggleEditProject()" class="btn btn-link link-dark float-end"><i class="fas fa-ellipsis-v" v-show="this.$route.params.project"></i></button>
     <EditProject v-show="showEditProject" :project="this.$route.params.project"/>
   </header>
-  <AddTask v-show="showAddTask" @close-add-task="toggleAddTask" @update-tasks="$emit('update-tasks')"/>
+  <WorkspaceTaskAdd v-show="showAddTask" @close-add-task="toggleAddTask" @update-tasks="$emit('update-tasks')"/>
 </template>
 
 <script>
-import AddTask from '../components/AddTask'
+import WorkspaceTaskAdd from '../components/WorkspaceTaskAdd'
 import EditProject from './EditProject'
 
 export default {
@@ -20,7 +20,7 @@ export default {
     }
   },
   components: {
-    AddTask,
+    WorkspaceTaskAdd,
     EditProject
   },
   data() {
