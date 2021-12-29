@@ -1,47 +1,24 @@
 <template>
-  <WorkspaceHeader @toggle-add-task="toggleAddTask" :title="this.$route.params.project" :showAddTask="showAddTask"/>
-  <WorkspaceTaskAdd v-show="showAddTask" @add-task="addTask" @close-add-task="toggleAddTask"/>
-  <TodoTasks
-    @delete-task="deleteTask"
-    @update-task="updateTask"
-    :tasks="tasks"
-  />
+  <WorkspaceHeader :title="this.$route.params.project"/>
+  <TodoTasks @delete-task="deleteTask" @update-task="updateTask" :tasks="tasks"/>
 </template>
 
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
 import TodoTasks from '../components/TodoTasks'
-import WorkspaceTaskAdd from '../components/WorkspaceTaskAdd'
 
 export default {
   name: 'Workspace',
   components: {
     WorkspaceHeader,
-    TodoTasks,
-    WorkspaceTaskAdd
+    TodoTasks
   },
   data() {
     return {
-      tasks: [],
-      showAddTask: false,
+      tasks: []
     }
   },
   methods: {
-    toggleAddTask() {
-      this.showAddTask = !this.showAddTask
-    },
-    async addTask(task) {
-      const res = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-          'x-auth-token': localStorage.getItem('token') || ''
-        },
-        body: JSON.stringify(task),
-      })
-      const data = await res.json()
-      this.tasks = [...this.tasks, data]
-    },
     async deleteTask(id) {
       const res = await fetch(`/api/tasks/${id}`, {
         method: 'DELETE',
