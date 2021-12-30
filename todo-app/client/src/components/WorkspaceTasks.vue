@@ -1,6 +1,6 @@
 <template>
   <div :key="task._id" v-for="task in tasks">
-    <WorkspaceTask @update-task="$emit('update-task')" @delete-task="$emit('delete-task', task._id)" :task="task"/>
+    <WorkspaceTask @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"/>
   </div>
 </template>
 
@@ -18,6 +18,18 @@ export default {
   components: {
     WorkspaceTask,
   },
-  emits: ['delete-task', 'update-task']
+  emits: ['delete-task', 'update-task'],
+  methods: {
+    async deleteTask(id) {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      res.status === 200
+        : alert('Error deleting task')
+    }
+  }
 }
 </script>
