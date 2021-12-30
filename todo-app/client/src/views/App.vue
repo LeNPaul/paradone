@@ -1,8 +1,8 @@
 <template>
-  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTask()"/>
+  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
   <WorkspaceTasks
-    @delete-task="updateTask()"
-    @update-task="updateTask()"
+    @delete-task="updateTasks()"
+    @update-task="updateTasks()"
     :tasks="tasks"
   />
 </template>
@@ -24,7 +24,7 @@ export default {
     }
   },
   methods: {
-    async fetchTasks() {
+    async updateTasks() {
       let filter = ''
       if(this.$route.params.project) {
         filter = '?project=' + this.$route.params.project
@@ -34,24 +34,11 @@ export default {
           'x-auth-token': localStorage.getItem('token') || ''
         }
       })
-      const data = await res.json()
-      return data
-    },
-    async fetchTask(id) {
-      const res = await fetch(`/api/tasks/${id}`, {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
-    async updateTask() {
-      this.tasks = await this.fetchTasks()
+      this.tasks = await res.json()
     }
   },
   async created() {
-    this.tasks = await this.fetchTasks()
+    this.updateTasks()
   },
 }
 </script>
