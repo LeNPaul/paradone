@@ -1,8 +1,8 @@
 <template>
   <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTask()"/>
   <WorkspaceTasks
-    @delete-task="deleteTask"
-    @update-task="updateTask"
+    @delete-task="updateTask()"
+    @update-task="updateTask()"
     :tasks="tasks"
   />
 </template>
@@ -24,17 +24,6 @@ export default {
     }
   },
   methods: {
-    async deleteTask(id) {
-      const res = await fetch(`/api/tasks/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      res.status === 200
-        ? (this.tasks = this.tasks.filter((task) => task._id !== id))
-        : alert('Error deleting task')
-    },
     async fetchTasks() {
       let filter = ''
       if(this.$route.params.project) {

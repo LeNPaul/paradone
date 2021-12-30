@@ -28,6 +28,7 @@ export default {
         }
       })
       res.status === 200
+        ? this.$emit('delete-task')
         : alert('Error deleting task')
     }
   }
