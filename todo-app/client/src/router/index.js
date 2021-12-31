@@ -1,11 +1,10 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Home from '../views/Home'
-import App from '../views/App'
-//import Project from '../views/Project'
-import Eisenhower from '../views/Eisenhower'
-import Kanban from '../views/Kanban'
-import Pomodoro from '../views/Pomodoro'
+import Workspace from '../views/Workspace'
+//import Eisenhower from '../views/Eisenhower'
+//import Kanban from '../views/Kanban'
+//import Pomodoro from '../views/Pomodoro'
 import Register from '../views/Register'
 import Login from '../views/Login'
 
@@ -17,8 +16,8 @@ const routes = [
   },
   {
     path: '/app',
-    name: 'App',
-    component: App,
+    name: 'Dashboard',
+    component: Workspace,
     meta: {
       requiresAuth: true
     }
@@ -26,12 +25,12 @@ const routes = [
   {
     path: '/app/project/:project',
     name: 'Project',
-    component: App,
+    component: Workspace,
     meta: {
       requiresAuth: true
     }
   },
-  {
+/*  {
     path: '/app/paradigm/eisenhower',
     name: 'Eisenhower',
     component: Eisenhower,
@@ -54,7 +53,7 @@ const routes = [
     meta: {
       requiresAuth: true
     }
-  },
+  },*/
   {
     path: '/register',
     name: 'Register',

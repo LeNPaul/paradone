@@ -51,5 +51,10 @@ export default {
   async created() {
     this.updateTasks()
   },
+  watch:{
+    $route (){
+      this.updateTasks()
+    }
+  }
 }
 </script>
