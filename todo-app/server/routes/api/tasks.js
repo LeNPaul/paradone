@@ -52,8 +52,9 @@ router.put('/:id', auth, async (req, res) => {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
-    project_name:  req.body.project_name
+    project_id:  req.body.project_id
   }
+  console.log(task)
   const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
     { $set: task }

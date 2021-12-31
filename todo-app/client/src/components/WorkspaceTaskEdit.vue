@@ -17,7 +17,7 @@
     </ul>
     <button class="btn btn-outline-dark btn-sm float-end me-2" type="button" data-bs-toggle="dropdown"><i class="fas fa-tasks"> </i> {{ project_name }} </button>
     <ul class="dropdown-menu">
-        <li :key='project.project_name' v-for="project in projects" @click="this.project_name=project.project_name"><a class="dropdown-item">{{ project.project_name }}</a></li>
+        <li :key='project.project_name' v-for="project in projects" @click="this.project_id=project._id,this.project_name=project.project_name"><a class="dropdown-item">{{ project.project_name }}</a></li>
     </ul>
   </form>
 </template>
@@ -32,6 +32,7 @@
         labels: [],
         priority: '',
         project_name: '',
+        project_id: '',
         projects: []
       }
     },
@@ -54,7 +55,7 @@
           content: this.content,
           label: this.label,
           priority: this.priority,
-          project_name: this.project_name
+          project_id: this.project_id
         }
         const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
           method: 'PUT',
@@ -98,12 +99,13 @@
       }
     },
     async created() {
+      this.projects = await this.fetchProjects()
+      this.labels = await this.fetchLabels()
+      this.project_id = this.$props.task.project_id
       this.content = this.$props.task.content
       this.label = this.$props.task.label
       this.priority = this.$props.task.priority
-      this.project_name = this.$props.task.project_name
-      this.projects = await this.fetchProjects()
-      this.labels = await this.fetchLabels()
+      this.project_name = this.projects.find(o => o._id === this.$props.task.project_id).project_name
     }
   }
 </script>
