@@ -11,8 +11,8 @@ const Task = require('../../models/Task');
 // @access Private
 router.get('/', auth, async (req, res) => {
   let filter = {}
-  if(req.query.project_name) {
-    filter = {project_name: req.query.project_name, user_id: req.user.id}
+  if(req.query.project_id) {
+    filter = {project_id: req.query.project_id, user_id: req.user.id}
   } else {
     filter = {user_id: req.user.id}
   }

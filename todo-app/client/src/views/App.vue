@@ -24,10 +24,21 @@ export default {
     }
   },
   methods: {
+    async fetchProjects() {
+      const res = await fetch('/api/projects', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      const data = await res.json()
+      return data
+    },
     async updateTasks() {
       let filter = ''
       if(this.$route.params.project) {
-        filter = '?project=' + this.$route.params.project
+        const projects = await this.fetchProjects()
+        const project_id = projects.find(o => o.project_name === this.$route.params.project)._id
+        filter = '?project_id=' + project_id
       }
       const res = await fetch('/api/tasks' + filter, {
         headers: {

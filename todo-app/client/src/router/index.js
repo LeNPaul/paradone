@@ -2,7 +2,7 @@ import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Home from '../views/Home'
 import App from '../views/App'
-import Project from '../views/Project'
+//import Project from '../views/Project'
 import Eisenhower from '../views/Eisenhower'
 import Kanban from '../views/Kanban'
 import Pomodoro from '../views/Pomodoro'
@@ -26,7 +26,7 @@ const routes = [
   {
     path: '/app/project/:project',
     name: 'Project',
-    component: Project,
+    component: App,
     meta: {
       requiresAuth: true
     }
