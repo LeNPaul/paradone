@@ -36,7 +36,7 @@ router.post('/', auth, async (req, res) => {
     content:  req.body.content,
     label:    req.body.label,
     priority: req.body.priority,
-    project_name:  req.body.project_name
+    project_id:  req.body.project_id
   }
   const insertedTask = await Task.create(task);
   task._id = insertedTask._id;
