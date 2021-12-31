@@ -1,6 +1,6 @@
 <template>
   <WorkspaceHeader @toggle-add-task="toggleAddTask" title="Eisenhower Matrix" :showAddTask="showAddTask"/>
-  <EisenhowerMatrix
+  <WorkspaceParadigmEisenhowerMatrix
     @delete-task="deleteTask"
     @update-task="updateTask"
     :tasks="tasks"
@@ -9,13 +9,13 @@
 
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
-import EisenhowerMatrix from '../components/EisenhowerMatrix'
+import WorkspaceParadigmEisenhowerMatrix from '../components/WorkspaceParadigmEisenhowerMatrix'
 export default {
   name: 'Eisenhower',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     WorkspaceHeader,
-    EisenhowerMatrix,
+    WorkspaceParadigmEisenhowerMatrix,
   },
   data() {
     return {

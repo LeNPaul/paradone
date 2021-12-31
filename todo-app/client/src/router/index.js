@@ -2,9 +2,9 @@ import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Home from '../views/Home'
 import Workspace from '../views/Workspace'
-//import Eisenhower from '../views/Eisenhower'
-//import Kanban from '../views/Kanban'
-//import Pomodoro from '../views/Pomodoro'
+import WorkspaceParadigmEisenhower from '../views/WorkspaceParadigmEisenhower'
+import WorkspaceParadigmKanban from '../views/WorkspaceParadigmKanban'
+import WorkspaceParadigmPomodoro from '../views/WorkspaceParadigmPomodoro'
 import Register from '../views/Register'
 import Login from '../views/Login'
 
@@ -30,18 +30,18 @@ const routes = [
       requiresAuth: true
     }
   },
-/*  {
-    path: '/app/paradigm/eisenhower',
-    name: 'Eisenhower',
-    component: Eisenhower,
+  {
+    path: '/app/paradigm/kanban',
+    name: 'Kanban',
+    component: WorkspaceParadigmKanban,
     meta: {
       requiresAuth: true
     }
   },
   {
-    path: '/app/paradigm/kanban',
-    name: 'Kanban',
-    component: Kanban,
+    path: '/app/paradigm/eisenhower',
+    name: 'Eisenhower',
+    component: WorkspaceParadigmEisenhower,
     meta: {
       requiresAuth: true
     }
@@ -49,11 +49,11 @@ const routes = [
   {
     path: '/app/paradigm/pomodoro',
     name: 'Pomodoro',
-    component: Pomodoro,
+    component: WorkspaceParadigmPomodoro,
     meta: {
       requiresAuth: true
     }
-  },*/
+  },
   {
     path: '/register',
     name: 'Register',
