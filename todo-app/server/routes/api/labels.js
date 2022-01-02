@@ -18,8 +18,8 @@ router.get('/', auth, async (req, res) => {
 // @access Private
 router.post('/', auth, async (req, res) => {
   await Label.create({
-    label_id: req.body.label_id,
-    name:     req.body.name
+    user_id:  req.user.id,
+    label_name: req.body.label_name
   });
   res.status(201).send();
 });
