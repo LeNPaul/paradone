@@ -50,7 +50,6 @@
           priority: this.priority,
           project_id: this.project_id
         }
-        console.log(newTask)
         const res = await fetch('/api/tasks', {
           method: 'POST',
           headers: {
