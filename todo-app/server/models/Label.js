@@ -2,15 +2,21 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // Create Schema
+// Use the document ID as the label_id
 const LabelSchema = new Schema({
-  name: {
+  label_name: {
     type: String,
     required: true
   },
-  label_id: {
+  user_id: {
     type: String,
-    required: true,
-    unique: true
+    required: true
+  },
+  colour: {
+    type: String
+  },
+  order: {
+    type: Number
   }
 });
 
