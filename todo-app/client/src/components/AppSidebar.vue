@@ -48,21 +48,29 @@
           <router-link class="nav-link text-truncate link-dark" to="/" @click="logout"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Logout</span></router-link>
         </li>
       </ul>
+
+      <button @click="toggleAddLabel" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Add Label</span><i class="fas fa-plus"></i></button>
+      <AddLabel v-show="showAddLabel" @close-add-label="toggleAddLabel" @update-label="updateLabels"/>
+
     </div>
   </div>
 </template>
 
 <script>
 import AddProject from '../components/AddProject'
+import AddLabel from '../components/AddLabel'
+
 
 export default {
   name: 'AppSidebar',
   components: {
-    AddProject
+    AddProject,
+    AddLabel
   },
   data() {
     return {
       showAddProject: false,
+      showAddLabel: false,
       projects: [],
       username: ''
     }
@@ -82,6 +90,13 @@ export default {
     },
     async updateProjects() {
       this.projects = await this.fetchProjects()
+    },
+    toggleAddLabel() {
+      this.showAddLabel = !this.showAddLabel
+    },
+    async updateLabels() {
+      // Placeholder for updating labels on sidebar
+      //this.projects = await this.fetchProjects()
     },
     logout: function () {
       this.$store.dispatch('logout')
