@@ -16,11 +16,10 @@ router.get('/', auth, async (req, res) => {
 // @desc   Create a new project
 // @access Private
 router.post('/', auth, async (req, res) => {
-  const project = {
+  const insertedProject = await Project.create({
     project_name:  req.body.project_name,
     user_id:  req.user.id
-  }
-  const insertedProject = await Project.create(project);
+  });
   project._id = insertedProject._id;
   res.status(201).send(project);
 });

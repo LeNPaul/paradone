@@ -17,11 +17,12 @@ router.get('/', auth, async (req, res) => {
 // @desc   Create a new label
 // @access Private
 router.post('/', auth, async (req, res) => {
-  await Label.create({
+  const insertedLabel = await Label.create({
     user_id:  req.user.id,
     label_name: req.body.label_name
   });
-  res.status(201).send();
+  label._id = insertedLabel._id
+  res.status(201).send(label);
 });
 
 // @route  DELETE api/labels/:id
