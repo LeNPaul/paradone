@@ -105,7 +105,8 @@
       this.content = this.$props.task.content
       this.label = this.$props.task.label
       this.priority = this.$props.task.priority
-      this.project_name = this.projects.find(o => o._id === this.$props.task.project_id).project_name
+      let project = this.projects.find(o => o._id === this.$props.task.project_id)
+      this.project_name = project ? project.project_name : ''
     }
   }
 </script>
