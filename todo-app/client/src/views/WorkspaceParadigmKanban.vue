@@ -1,9 +1,8 @@
 <template>
-  <WorkspaceHeader @toggle-add-task="toggleAddTask" title="Kanban Board" :showAddTask="showAddTask"/>
-  <WorkspaceHeaderTaskAdd v-show="showAddTask" @add-task="addTask" />
+  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
   <WorkspaceParadigmKanbanBoard
-    @delete-task="deleteTask"
-    @update-task="updateTask"
+    @delete-task="updateTasks()"
+    @update-task="updateTasks()"
     :tasks="tasks"
   />
 </template>
@@ -11,14 +10,13 @@
 <script>
 import WorkspaceHeader from '../components/WorkspaceHeader'
 import WorkspaceParadigmKanbanBoard from '../components/WorkspaceParadigmKanbanBoard'
-import WorkspaceHeaderTaskAdd from '../components/WorkspaceHeaderTaskAdd'
+
 export default {
   name: 'Kanban',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     WorkspaceHeader,
-    WorkspaceParadigmKanbanBoard,
-    WorkspaceHeaderTaskAdd,
+    WorkspaceParadigmKanbanBoard
   },
   data() {
     return {
@@ -27,60 +25,32 @@ export default {
     }
   },
   methods: {
-    toggleAddTask() {
-      this.showAddTask = !this.showAddTask
-    },
-    async addTask(task) {
-      const res = await fetch('/api/tasks', {
-        method: 'POST',
-        headers: {
-          'Content-type': 'application/json',
-          'x-auth-token': localStorage.getItem('token') || ''
-        },
-        body: JSON.stringify(task),
-      })
-      const data = await res.json()
-      this.tasks = [...this.tasks, data]
-    },
-    async deleteTask(id) {
-      const res = await fetch(`/api/tasks/${id}`, {
-        method: 'DELETE',
+    async fetchProjects() {
+      const res = await fetch('/api/projects', {
         headers: {
           'x-auth-token': localStorage.getItem('token') || ''
         }
       })
-      res.status === 200
-        ? (this.tasks = this.tasks.filter((task) => task._id !== id))
-        : alert('Error deleting task')
+      const data = await res.json()
+      return data
     },
-    async fetchTasks() {
-      var filter = ''
+    async updateTasks() {
+      let filter = ''
       if(this.$route.params.project) {
-        filter = '?project=' + this.$route.params.project
+        const projects = await this.fetchProjects()
+        const project_id = projects.find(o => o.project_name === this.$route.params.project)._id
+        filter = '?project_id=' + project_id
       }
       const res = await fetch('/api/tasks' + filter, {
         headers: {
           'x-auth-token': localStorage.getItem('token') || ''
         }
       })
-      const data = await res.json()
-      return data
-    },
-    async fetchTask(id) {
-      const res = await fetch(`/api/tasks/${id}`, {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
-    async updateTask() {
-      this.tasks = await this.fetchTasks()
+      this.tasks = await res.json()
     }
   },
   async created() {
-    this.tasks = await this.fetchTasks()
+    this.updateTasks()
   },
 }
 </script>
