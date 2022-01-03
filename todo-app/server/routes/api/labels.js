@@ -13,6 +13,14 @@ router.get('/', auth, async (req, res) => {
   res.send(await Label.find({}));
 });
 
+// @route  GET api/labels/:id
+// @desc   Get user label by id
+// @access Private
+router.get('/:id', auth, async (req, res) => {
+  const label = await Label.findOne({ _id: new mongodb.ObjectID(req.params.id) });
+  res.status(200).send(label);
+});
+
 // @route  POST api/labels
 // @desc   Create a new label
 // @access Private
