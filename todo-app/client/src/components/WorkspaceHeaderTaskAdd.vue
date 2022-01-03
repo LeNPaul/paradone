@@ -6,7 +6,7 @@
     <button type="submit" class="btn btn-dark">Save</button>
     <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i> {{ label }} </button>
     <ul class="dropdown-menu">
-        <li :key='label.label_id' v-for="label in labels" @click="this.label=label.name"><a class="dropdown-item">{{ label.name }}</a></li>
+        <li :key='label.label_name' v-for="label in labels" @click="this.label=label.label_name, this.label_ids[0]=label._id"><a class="dropdown-item">{{ label.label_name }}</a></li>
     </ul>
     <button class="btn btn-outline-dark btn-sm float-end me-2" type="button" data-bs-toggle="dropdown"><i class="far fa-flag"> </i> {{ priority }} </button>
     <ul class="dropdown-menu">
@@ -29,6 +29,7 @@
       return {
         content: '',
         label: '',
+        label_ids: [],
         labels: [],
         priority: '',
         project_name: '',
@@ -46,7 +47,7 @@
         }
         const newTask = {
           content: this.content,
-          label: this.label,
+          label_ids: this.label_ids,
           priority: this.priority,
           project_id: this.project_id
         }
@@ -62,6 +63,7 @@
         this.$emit('update-tasks')
         this.content = ''
         this.label = ''
+        this.label_ids = []
         this.priority = ''
         this.project_id = ''
         this.$emit('close-add-task')
