@@ -32,11 +32,11 @@ router.get('/:id', auth, async (req, res) => {
 // @access Private
 router.post('/', auth, async (req, res) => {
   const task = {
-    user_id:  req.user.id,
-    content:  req.body.content,
-    label:    req.body.label,
-    priority: req.body.priority,
-    project_id:  req.body.project_id
+    user_id:    req.user.id,
+    content:    req.body.content,
+    label_ids:  req.body.label_ids,
+    priority:   req.body.priority,
+    project_id: req.body.project_id
   }
   const insertedTask = await Task.create(task);
   task._id = insertedTask._id;
@@ -48,13 +48,12 @@ router.post('/', auth, async (req, res) => {
 // @access Private
 router.put('/:id', auth, async (req, res) => {
   const task = {
-    user_id:  req.user.id,
-    content:  req.body.content,
-    label:    req.body.label,
-    priority: req.body.priority,
-    project_id:  req.body.project_id
+    user_id:    req.user.id,
+    content:    req.body.content,
+    label_ids:  req.body.label_ids,
+    priority:   req.body.priority,
+    project_id: req.body.project_id
   }
-  console.log(task)
   const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
     { $set: task }
