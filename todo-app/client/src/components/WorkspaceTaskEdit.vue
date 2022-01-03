@@ -6,7 +6,7 @@
     <button type="submit" class="btn btn-dark">Save</button>
     <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-tags"></i> {{ label }} </button>
     <ul class="dropdown-menu">
-        <li :key='label.label_id' v-for="label in labels" @click="this.label=label.name"><a class="dropdown-item">{{ label.name }}</a></li>
+        <li :key='label.label_name' v-for="label in labels" @click="this.label=label.label_name, this.label_ids[0]=label._id"><a class="dropdown-item">{{ label.label_name }}</a></li>
     </ul>
     <button class="btn btn-outline-dark btn-sm float-end me-2" type="button" data-bs-toggle="dropdown"><i class="far fa-flag"> </i> {{ priority }} </button>
     <ul class="dropdown-menu">
@@ -30,6 +30,7 @@
         content: '',
         label: '',
         labels: [],
+        label_ids: [],
         priority: '',
         project_name: '',
         project_id: '',
@@ -53,7 +54,7 @@
         const updTask = {
           ...taskToUpdate,
           content: this.content,
-          label: this.label,
+          label_ids: this.label_ids,
           priority: this.priority,
           project_id: this.project_id
         }
@@ -88,6 +89,15 @@
         const data = await res.json()
         return data
       },
+      async fetchLabel(id) {
+        const res = await fetch(`/api/labels/${id}`, {
+          headers: {
+            'x-auth-token': localStorage.getItem('token') || ''
+          }
+        })
+        const data = await res.json()
+        return data
+      },
       async fetchLabels() {
         const res = await fetch('/api/labels', {
           headers: {
@@ -103,7 +113,8 @@
       this.labels = await this.fetchLabels()
       this.project_id = this.$props.task.project_id
       this.content = this.$props.task.content
-      this.label = this.$props.task.label
+      let label = await this.fetchLabel(this.$props.task.label_ids[0])
+      this.label = label.label_name
       this.priority = this.$props.task.priority
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
