@@ -115,6 +115,7 @@
       this.content = this.$props.task.content
       let label = await this.fetchLabel(this.$props.task.label_ids[0])
       this.label = label.label_name
+      this.label_ids = this.$props.task.label_ids
       this.priority = this.$props.task.priority
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
