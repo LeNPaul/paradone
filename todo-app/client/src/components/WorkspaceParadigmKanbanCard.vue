@@ -1,6 +1,6 @@
 <template>
-  <div class="card mb-3 px-3">
-    <div class="card-body">
+  <div class="card mb-3">
+    <div class="card-body d-inline-block text-truncate" style="max-width: 280px;">
       <button class="btn btn-link link-dark" type="submit"><i @click="$emit('delete-task', task._id)" class="far fa-circle"></i></button>
       {{ task.content }}
       <button class="btn btn-link link-dark float-end" type="submit"><i @click="toggleEditTask()" class="fas fa-edit"></i></button>
