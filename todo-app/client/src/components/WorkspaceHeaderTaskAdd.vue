@@ -65,6 +65,7 @@
         this.label = ''
         this.label_ids = []
         this.priority = ''
+        this.project_name = ''
         this.project_id = ''
         this.$emit('close-add-task')
         return data
