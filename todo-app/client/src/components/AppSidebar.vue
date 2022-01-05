@@ -105,7 +105,7 @@ export default {
   async created() {
     this.projects = await this.fetchProjects()
     let user = JSON.parse(localStorage.getItem('user') || '')
-    this.username = user.name
+    this.username = user.username
   }
 }
 </script>

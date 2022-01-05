@@ -35,7 +35,7 @@ export default {
     async onSubmit(e) {
       e.preventDefault()
       const newUser = {
-        name: this.username,
+        username: this.username,
         email: this.email,
         password: this.password
       }
