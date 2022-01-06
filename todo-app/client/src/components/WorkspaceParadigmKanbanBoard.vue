@@ -3,7 +3,7 @@
       <div class="col">
         <div class="text-center pb-3 mb-3 border-bottom">To Do</div>
         <div :key="task._id" v-for="task in todoTasks">
-          <WorkspaceParadigmKanbanCard
+          <WorkspaceParadigmTask
             @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
           />
         </div>
@@ -11,7 +11,7 @@
       <div class="col">
         <div class="text-center pb-3 mb-3 border-bottom">Doing</div>
         <div :key="task._id" v-for="task in doingTasks">
-          <WorkspaceParadigmKanbanCard
+          <WorkspaceParadigmTask
             @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
           />
         </div>
@@ -19,7 +19,7 @@
       <div class="col">
         <div class="text-center pb-3 mb-3 border-bottom">Done</div>
         <div :key="task._id" v-for="task in doneTasks">
-          <WorkspaceParadigmKanbanCard
+          <WorkspaceParadigmTask
             @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
           />
         </div>
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import WorkspaceParadigmKanbanCard from './WorkspaceParadigmKanbanCard'
+import WorkspaceParadigmTask from './WorkspaceParadigmTask'
 
 export default {
   name: 'WorkspaceParadigmKanbanBoard',
@@ -47,7 +47,7 @@ export default {
     }
   },
   components: {
-    WorkspaceParadigmKanbanCard
+    WorkspaceParadigmTask
   },
   emits: ['delete-task', 'update-task'],
   methods: {

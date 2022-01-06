@@ -15,7 +15,7 @@
 import WorkspaceTaskEdit from './WorkspaceTaskEdit'
 
 export default {
-  name: 'WorkspaceParadigmKanbanCard',
+  name: 'WorkspaceParadigmTask',
   props: {
     task: {
       type: Object,
