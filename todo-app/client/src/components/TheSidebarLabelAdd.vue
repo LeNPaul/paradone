@@ -9,7 +9,7 @@
 
 <script>
   export default {
-    name: 'AddLabel',
+    name: 'TheSidebarLabelAdd',
     data() {
       return {
         label_name: '',

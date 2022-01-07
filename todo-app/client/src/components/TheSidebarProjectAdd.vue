@@ -9,7 +9,7 @@
 
 <script>
   export default {
-    name: 'AddProject',
+    name: 'TheSidebarProjectAdd',
     data() {
       return {
         project_name: '',

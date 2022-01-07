@@ -1,5 +1,5 @@
 <template>
-  <AppSidebar v-if="isLoggedIn" :key="$route"/>
+  <TheSidebar v-if="isLoggedIn" :key="$route"/>
   <div class="container-fluid">
       <div class="row">
           <div class="col min-vh-100 p-4">
@@ -16,12 +16,12 @@
 </template>
 
 <script>
-import AppSidebar from './components/AppSidebar'
+import TheSidebar from './components/TheSidebar'
 
 export default {
   name: 'App',
   components: {
-    AppSidebar,
+    TheSidebar,
   },
   data() {
     return {
