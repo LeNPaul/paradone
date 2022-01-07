@@ -2,7 +2,7 @@
   <div class="row align-items-start mh-100">
     <div class="col">
       <div class="text-center pb-3 mb-3 border-bottom">Urgent/Important</div>
-      <div :key="task._id" v-for="task in one">
+      <div :key="task._id" v-for="task in priorityOne">
         <WorkspaceParadigmTask
           @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
         />
@@ -10,7 +10,7 @@
     </div>
     <div class="col">
       <div class="text-center pb-3 mb-3 border-bottom">Not Urgent/Important</div>
-      <div :key="task._id" v-for="task in two">
+      <div :key="task._id" v-for="task in priorityTwo">
         <WorkspaceParadigmTask
           @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
         />
@@ -20,7 +20,7 @@
   <div class="row align-items-start">
     <div class="col">
       <div class="text-center pb-3 mb-3 border-bottom">Urgent/Not Important</div>
-      <div :key="task._id" v-for="task in three">
+      <div :key="task._id" v-for="task in priorityThree">
         <WorkspaceParadigmTask
           @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
         />
@@ -28,7 +28,7 @@
     </div>
     <div class="col">
       <div class="text-center pb-3 mb-3 border-bottom">Not Urgent/Not Important</div>
-      <div :key="task._id" v-for="task in four">
+      <div :key="task._id" v-for="task in priorityFour">
         <WorkspaceParadigmTask
           @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
         />
@@ -44,10 +44,10 @@ export default {
   name: 'EisenhowerMatrix',
   data() {
     return {
-      one: [],
-      two: [],
-      three: [],
-      four: []
+      priorityOne: [],
+      priorityTwo: [],
+      priorityThree: [],
+      priorityFour: []
     }
   },
   props: {
@@ -77,10 +77,10 @@ export default {
       return filteredTasks
     },
     async resetBoard() {
-      this.one = await this.filteredTasks('1', this.$props.tasks)
-      this.two = await this.filteredTasks('2', this.$props.tasks)
-      this.three = await this.filteredTasks('3', this.$props.tasks)
-      this.four = await this.filteredTasks('4', this.$props.tasks)
+      this.priorityOne = await this.filteredTasks('1', this.$props.tasks)
+      this.priorityTwo = await this.filteredTasks('2', this.$props.tasks)
+      this.priorityThree = await this.filteredTasks('3', this.$props.tasks)
+      this.priorityFour = await this.filteredTasks('4', this.$props.tasks)
     }
   },
   watch: {
