@@ -1,15 +1,15 @@
 <template>
-  <WorkspaceParadigmPomodoroTimer/>
+  <TheWorkspaceParadigmPomodoroTimer/>
 </template>
 
 <script>
-import WorkspaceParadigmPomodoroTimer from '../components/WorkspaceParadigmPomodoroTimer'
+import TheWorkspaceParadigmPomodoroTimer from '../components/TheWorkspaceParadigmPomodoroTimer'
 
 export default {
-  name: 'Pomodoro',
+  name: 'WorkspaceParadigmPomodoro',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
-    WorkspaceParadigmPomodoroTimer
+    TheWorkspaceParadigmPomodoroTimer
   }
 };
 </script>

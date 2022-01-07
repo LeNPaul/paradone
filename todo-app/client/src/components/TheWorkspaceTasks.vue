@@ -8,7 +8,7 @@
 import WorkspaceTask from './WorkspaceTask'
 
 export default {
-  name: 'WorkspaceTasks',
+  name: 'TheWorkspaceTasks',
   props: {
     tasks: {
       type: Array,

@@ -31,7 +31,7 @@
 import WorkspaceParadigmTask from './WorkspaceParadigmTask'
 
 export default {
-  name: 'WorkspaceParadigmKanbanBoard',
+  name: 'TheWorkspaceParadigmKanbanBoard',
   data() {
     return {
       todoTasks: [],

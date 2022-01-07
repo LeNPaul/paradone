@@ -94,7 +94,7 @@
 
 <script>
 export default {
-  name: 'AppHome',
+  name: 'Home',
   inheritAttrs: false, // disable 'non-props' warning
 }
 </script>

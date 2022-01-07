@@ -1,6 +1,6 @@
 <template>
   <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
-  <WorkspaceParadigmKanbanBoard
+  <TheWorkspaceParadigmKanbanBoard
     @delete-task="updateTasks()"
     @update-task="updateTasks()"
     :tasks="tasks"
@@ -9,14 +9,14 @@
 
 <script>
 import TheWorkspaceHeader from '../components/TheWorkspaceHeader'
-import WorkspaceParadigmKanbanBoard from '../components/WorkspaceParadigmKanbanBoard'
+import TheWorkspaceParadigmKanbanBoard from '../components/TheWorkspaceParadigmKanbanBoard'
 
 export default {
-  name: 'Kanban',
+  name: 'WorkspaceParadigmKanban',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheWorkspaceHeader,
-    WorkspaceParadigmKanbanBoard
+    TheWorkspaceParadigmKanbanBoard
   },
   data() {
     return {
