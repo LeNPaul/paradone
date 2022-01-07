@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
+  <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
   <WorkspaceParadigmEisenhowerMatrix
     @delete-task="updateTasks()"
     @update-task="updateTasks()"
@@ -8,13 +8,13 @@
 </template>
 
 <script>
-import WorkspaceHeader from '../components/WorkspaceHeader'
+import TheWorkspaceHeader from '../components/TheWorkspaceHeader'
 import WorkspaceParadigmEisenhowerMatrix from '../components/WorkspaceParadigmEisenhowerMatrix'
 export default {
   name: 'Eisenhower',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
-    WorkspaceHeader,
+    TheWorkspaceHeader,
     WorkspaceParadigmEisenhowerMatrix,
   },
   data() {

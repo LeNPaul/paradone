@@ -1,5 +1,5 @@
 <template>
-  <WorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
+  <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
   <WorkspaceTasks
     @delete-task="updateTasks()"
     @update-task="updateTasks()"
@@ -8,14 +8,14 @@
 </template>
 
 <script>
-import WorkspaceHeader from '../components/WorkspaceHeader'
+import TheWorkspaceHeader from '../components/TheWorkspaceHeader'
 import WorkspaceTasks from '../components/WorkspaceTasks'
 
 export default {
   name: 'App',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
-    WorkspaceHeader,
+    TheWorkspaceHeader,
     WorkspaceTasks,
   },
   data() {

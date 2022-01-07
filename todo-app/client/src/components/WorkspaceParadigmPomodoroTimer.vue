@@ -13,7 +13,7 @@
 <script>
 
 export default {
-  name: 'PomodoroTimer',
+  name: 'WorkspaceParadigmPomodoroTimer',
   inheritAttrs: false, // disable 'non-props' warning
   data() {
     return {

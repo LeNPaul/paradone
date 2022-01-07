@@ -3,25 +3,25 @@
     <span class="fs-4">{{ title }}</span>
     <button @click="toggleAddTask()" class="btn btn-link link-dark"><i class="fas fa-plus"></i></button>
     <button @click="toggleEditProject()" class="btn btn-link link-dark float-end"><i class="fas fa-ellipsis-v" v-show="this.$route.params.project"></i></button>
-    <WorkspaceHeaderProjectEdit v-show="showEditProject" :project="this.$route.params.project"/>
+    <TheWorkspaceHeaderProjectEdit v-show="showEditProject" :project="this.$route.params.project"/>
   </header>
-  <WorkspaceHeaderTaskAdd v-show="showAddTask" @close-add-task="toggleAddTask" @update-tasks="$emit('update-tasks')"/>
+  <TheWorkspaceHeaderTaskAdd v-show="showAddTask" @close-add-task="toggleAddTask" @update-tasks="$emit('update-tasks')"/>
 </template>
 
 <script>
-import WorkspaceHeaderTaskAdd from '../components/WorkspaceHeaderTaskAdd'
-import WorkspaceHeaderProjectEdit from './WorkspaceHeaderProjectEdit'
+import TheWorkspaceHeaderTaskAdd from '../components/TheWorkspaceHeaderTaskAdd'
+import TheWorkspaceHeaderProjectEdit from './TheWorkspaceHeaderProjectEdit'
 
 export default {
-  name: 'WorkspaceHeader',
+  name: 'TheWorkspaceHeader',
   props: {
     title: {
       type: String
     }
   },
   components: {
-    WorkspaceHeaderTaskAdd,
-    WorkspaceHeaderProjectEdit
+    TheWorkspaceHeaderTaskAdd,
+    TheWorkspaceHeaderProjectEdit
   },
   data() {
     return {

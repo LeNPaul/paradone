@@ -41,7 +41,7 @@
 import WorkspaceParadigmTask from './WorkspaceParadigmTask'
 
 export default {
-  name: 'EisenhowerMatrix',
+  name: 'WorkspaceParadigmEisenhowerMatrix',
   data() {
     return {
       priorityOne: [],

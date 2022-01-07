@@ -24,7 +24,7 @@
 
 <script>
   export default {
-    name: 'WorkspaceHeaderTaskAdd',
+    name: 'TheWorkspaceHeaderTaskAdd',
     data() {
       return {
         content: '',
