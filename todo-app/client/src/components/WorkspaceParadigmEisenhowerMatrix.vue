@@ -1,27 +1,55 @@
 <template>
-  <h3 class="pb-3 mb-3 border-bottom">Urgent and Important</h3>
-  <div :key="task._id" v-for="task in tasks">
-    <WorkspaceTask v-if="task.priority=='1'" @delete-task="$emit('delete-task', task._id)" @update-task="$emit('update-task')" :task="task"/>
+  <div class="row align-items-start mh-100">
+    <div class="col">
+      <div class="text-center pb-3 mb-3 border-bottom">Urgent/Important</div>
+      <div :key="task._id" v-for="task in one">
+        <WorkspaceParadigmTask
+          @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
+        />
+      </div>
+    </div>
+    <div class="col">
+      <div class="text-center pb-3 mb-3 border-bottom">Not Urgent/Important</div>
+      <div :key="task._id" v-for="task in two">
+        <WorkspaceParadigmTask
+          @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
+        />
+      </div>
+    </div>
   </div>
-  <h3 class="pb-3 mb-3 border-bottom">Important but Not Urgent</h3>
-  <div :key="task._id" v-for="task in tasks">
-    <WorkspaceTask v-if="task.priority=='2'" @delete-task="$emit('delete-task', task._id)" @update-task="$emit('update-task')" :task="task"/>
-  </div>
-  <h3 class="pb-3 mb-3 border-bottom">Urgent but Not Important</h3>
-  <div :key="task._id" v-for="task in tasks">
-    <WorkspaceTask v-if="task.priority=='3'" @delete-task="$emit('delete-task', task._id)" @update-task="$emit('update-task')" :task="task"/>
-  </div>
-  <h3 class="pb-3 mb-3 border-bottom">Not Urgent and Not Important</h3>
-  <div :key="task._id" v-for="task in tasks">
-    <WorkspaceTask v-if="task.priority=='4' || task.priority == ''" @delete-task="$emit('delete-task', task._id)" @update-task="$emit('update-task')" :task="task"/>
+  <div class="row align-items-start">
+    <div class="col">
+      <div class="text-center pb-3 mb-3 border-bottom">Urgent/Not Important</div>
+      <div :key="task._id" v-for="task in three">
+        <WorkspaceParadigmTask
+          @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
+        />
+      </div>
+    </div>
+    <div class="col">
+      <div class="text-center pb-3 mb-3 border-bottom">Not Urgent/Not Important</div>
+      <div :key="task._id" v-for="task in four">
+        <WorkspaceParadigmTask
+          @update-task="$emit('update-task')" @delete-task="deleteTask(task._id)" :task="task"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-import WorkspaceTask from './WorkspaceTask'
+import WorkspaceParadigmTask from './WorkspaceParadigmTask'
 
 export default {
   name: 'EisenhowerMatrix',
+  data() {
+    return {
+      one: [],
+      two: [],
+      three: [],
+      four: []
+    }
+  },
   props: {
     tasks: {
       type: Array,
@@ -29,8 +57,36 @@ export default {
     }
   },
   components: {
-    WorkspaceTask,
+    WorkspaceParadigmTask
   },
-  emits: ['delete-task', 'update-task']
+  emits: ['delete-task', 'update-task'],
+  methods: {
+    async deleteTask(id) {
+      const res = await fetch(`/api/tasks/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      res.status === 200
+        ? this.$emit('delete-task')
+        : alert('Error deleting task')
+    },
+    async filteredTasks(priority, tasks) {
+      let filteredTasks = tasks.filter(o => o.priority[0] === priority)
+      return filteredTasks
+    },
+    async resetBoard() {
+      this.one = await this.filteredTasks('1', this.$props.tasks)
+      this.two = await this.filteredTasks('2', this.$props.tasks)
+      this.three = await this.filteredTasks('3', this.$props.tasks)
+      this.four = await this.filteredTasks('4', this.$props.tasks)
+    }
+  },
+  watch: {
+    tasks: function() {
+      this.resetBoard()
+    }
+  }
 }
 </script>
