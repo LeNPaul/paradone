@@ -37,6 +37,11 @@ export default {
     toggleEditProject() {
       this.showEditProject = !this.showEditProject
     }
+  },
+  watch:{
+    $route (){
+      this.showEditProject = false
+    }
   }
 }
 </script>
