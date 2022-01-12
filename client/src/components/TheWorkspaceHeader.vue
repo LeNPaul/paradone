@@ -38,9 +38,10 @@ export default {
       this.showEditProject = !this.showEditProject
     }
   },
-  watch:{
-    $route (){
+  watch: {
+    $route() {
       this.showEditProject = false
+      this.showAddTask = false
     }
   }
 }
