@@ -59,6 +59,11 @@
     },
     created() {
       this.project_name = this.$props.project
+    },
+    watch: {
+      project: function() {
+        this.project_name = this.$props.project
+      }
     }
   }
 </script>
