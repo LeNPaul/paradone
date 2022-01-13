@@ -13,25 +13,20 @@ const Label = require('../../models/Label');
 // @desc   Register new user
 // @access Public
 router.post('/', (req, res) => {
-
   const { username, email, password } = req.body;
-
   // Simple validation
   if(!username || !email || !password) {
     return res.status(400).json({ msg: 'Please enter all fields' });
   }
-
   // Check for existing user
   User.findOne({ email })
     .then(user => {
-      if(user) return res.status(400).json({ msg: 'User already exists' });
-
+      if(user) return res.status(400).json({ msg: 'User with email already exists' });
       const newUser = new User({
         username,
         email,
         password
       });
-
       // Create salt & hash
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {
@@ -39,7 +34,6 @@ router.post('/', (req, res) => {
           newUser.password = hash;
           newUser.save()
           .then(user => {
-
             jwt.sign(
               { id: user.id },
               config.get('jwtSecret'),
@@ -68,13 +62,10 @@ router.post('/', (req, res) => {
                 });
               }
             )
-
           });
         });
       });
-
     });
-
 });
 
 module.exports = router;
