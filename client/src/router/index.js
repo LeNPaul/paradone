@@ -31,6 +31,14 @@ const routes = [
     }
   },
   {
+    path: '/app/label/:label',
+    name: 'Label',
+    component: Workspace,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/app/paradigm/kanban',
     name: 'Kanban',
     component: WorkspaceParadigmKanban,
