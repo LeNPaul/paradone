@@ -15,6 +15,9 @@
         <input v-model="password" class="form-control" type="password" placeholder="Password" name="password" required=""/>
         <label for="inputPassword">Create a Password</label>
       </div>
+      <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
+        {{ errorMessage }}
+      </div>
       <button class="btn btn-lg btn-dark btn-block" type="submit">Create Account</button>
       <div class="text-center mb-4"><router-link to="/login" class="nav-link text-dark">Already have an account?</router-link></div>
   </form>
@@ -28,7 +31,8 @@ export default {
     return {
       username: '',
       email: '',
-      password: ''
+      password: '',
+      errorMessage: ''
     }
   },
   methods: {
@@ -39,8 +43,12 @@ export default {
         email: this.email,
         password: this.password
       }
-      this.$store.dispatch('register', newUser).then(() => {
-        this.$router.push('/app')
+      this.$store.dispatch('register', newUser).then((error) => {
+        if (error) {
+          this.errorMessage = error.msg
+        } else {
+          this.$router.push('/app')
+        }
       })
     }
   }
