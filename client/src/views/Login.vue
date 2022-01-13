@@ -11,6 +11,9 @@
         <input v-model="password" class="form-control" type="password" placeholder="Password" name="password" required=""/>
         <label for="inputPassword">Password</label>
       </div>
+      <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
+        {{ errorMessage }}
+      </div>
       <button class="btn btn-lg btn-dark btn-block" type="submit">Sign in</button>
       <div class="text-center mb-4"><router-link to="/register" class="nav-link text-dark">Don't have an account?</router-link></div>
   </form>
@@ -23,7 +26,8 @@ export default {
   data() {
     return {
       email: '',
-      password: ''
+      password: '',
+      errorMessage: ''
     }
   },
   methods: {
@@ -33,8 +37,12 @@ export default {
         email: this.email,
         password: this.password
       }
-      this.$store.dispatch('login', user).then(() => {
-        this.$router.push('/app')
+      this.$store.dispatch('login', user).then((error) => {
+        if (error) {
+          this.errorMessage = error.msg
+        } else {
+          this.$router.push('/app')
+        }
       })
     }
   }

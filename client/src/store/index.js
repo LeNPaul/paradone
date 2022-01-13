@@ -28,7 +28,6 @@ export default createStore({
         body: JSON.stringify(newUser)
       })
       const data = await res.json()
-      // Interpret response here
       if(res.status == 200) {
         const expiresIn = Date.now() + 2592000000
         data.expiresIn = expiresIn
@@ -49,12 +48,16 @@ export default createStore({
         body: JSON.stringify(user)
       })
       const data = await res.json()
-      const expiresIn = Date.now() + 2592000000
-      data.expiresIn = expiresIn
-      localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify(data.user))
-      localStorage.setItem('expiresIn', expiresIn)
-      commit('auth_success', data)
+        if(res.status == 200) {
+        const expiresIn = Date.now() + 2592000000
+        data.expiresIn = expiresIn
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        localStorage.setItem('expiresIn', expiresIn)
+        commit('auth_success', data)
+      } else {
+        return data
+      }
     },
     logout({ commit }) {
       commit('logout')
