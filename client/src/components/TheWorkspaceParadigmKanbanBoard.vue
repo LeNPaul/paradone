@@ -78,9 +78,9 @@ export default {
     },
     async resetBoard() {
       this.labels = await this.fetchLabels()
-      this.todoTasks = await this.filteredTasks('To Do', this.$props.tasks)
-      this.doingTasks = await this.filteredTasks('Doing', this.$props.tasks)
-      this.doneTasks = await this.filteredTasks('Done', this.$props.tasks)
+      this.todoTasks = await this.filteredTasks('todo', this.$props.tasks)
+      this.doingTasks = await this.filteredTasks('doing', this.$props.tasks)
+      this.doneTasks = await this.filteredTasks('done', this.$props.tasks)
     }
   },
   watch: {
