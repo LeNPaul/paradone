@@ -34,6 +34,22 @@ router.post('/', auth, async (req, res) => {
   res.status(201).send(label);
 });
 
+// @route  PUT api/labels/:id
+// @desc   Update an existing label
+// @access Private
+router.put('/:id', auth, async (req, res) => {
+  const label = {
+    label_name: req.body.label_name,
+    user_id:  req.user.id
+  }
+  const updatedLabel = await Label.findOneAndUpdate(
+    { label_name: req.params.id },
+    { $set: label }
+  );
+  label._id = updatedLabel._id;
+  res.status(200).send(label);
+});
+
 // @route  DELETE api/labels/:id
 // @desc   Delete an existing label
 // @access Private
