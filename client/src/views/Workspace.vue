@@ -1,5 +1,5 @@
 <template>
-  <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
+  <TheWorkspaceHeader :title="this.$route.params.project || this.$route.params.label" @update-tasks="updateTasks()"/>
   <TheWorkspaceTasks
     @delete-task="updateTasks()"
     @update-task="updateTasks()"
@@ -33,12 +33,26 @@ export default {
       const data = await res.json()
       return data
     },
+    async fetchLabels() {
+      const res = await fetch('/api/labels', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      const data = await res.json()
+      return data
+    },
     async updateTasks() {
       let filter = ''
       if(this.$route.params.project) {
         const projects = await this.fetchProjects()
         const project_id = projects.find(o => o.project_name === this.$route.params.project)._id
         filter = '?project_id=' + project_id
+      }
+      if(this.$route.params.label) {
+        const labels = await this.fetchLabels()
+        const label_id = labels.find(o => o.label_name.toLowerCase().replace(/\s/g, '') === this.$route.params.label)._id
+        filter = '?label_id=' + label_id
       }
       const res = await fetch('/api/tasks' + filter, {
         headers: {
