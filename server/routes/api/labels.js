@@ -38,7 +38,7 @@ router.post('/', auth, async (req, res) => {
 // @desc   Delete an existing label
 // @access Private
 router.delete('/:id', auth, async (req, res) => {
-  await Label.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+  await Label.deleteOne({ label_name: req.params.id, user_id:  req.user.id });
   res.status(200).send({});
 });
 
