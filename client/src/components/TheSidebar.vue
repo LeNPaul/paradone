@@ -20,6 +20,14 @@
         </li>
       </ul>
       <hr>
+      <button @click="toggleAddLabel" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Labels</span><i class="fas fa-plus"></i></button>
+      <TheSidebarLabelAdd v-show="showAddLabel" @close-add-label="toggleAddLabel" @update-labels="updateLabels"/>
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
+        <li :key='label.label_name' v-for="label in labels" class="nav-item">
+          <router-link :to="{ name: 'Label', params: { label: label.label_name.toLowerCase().replace(/\s/g, '') } }" class="nav-link text-truncate link-dark"><i class="fas fa-arrow-right"></i><span class="ms-1 d-none d-sm-inline">{{ label.label_name }}</span></router-link>
+        </li>
+      </ul>
+      <hr>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
           <router-link class="nav-link text-truncate link-dark" to="/app/paradigm/eisenhower"><i class="fas fa-th-large"></i><span class="ms-1 d-none d-sm-inline">Eisenhower Matrix</span></router-link>
@@ -49,8 +57,7 @@
         </li>
       </ul>
 
-      <button @click="toggleAddLabel" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Add Label</span><i class="fas fa-plus"></i></button>
-      <TheSidebarLabelAdd v-show="showAddLabel" @close-add-label="toggleAddLabel" @update-label="updateLabels"/>
+
 
     </div>
   </div>
@@ -72,12 +79,22 @@ export default {
       showAddProject: false,
       showAddLabel: false,
       projects: [],
+      labels: [],
       username: ''
     }
   },
   methods: {
     async fetchProjects() {
       const res = await fetch('/api/projects', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      const data = await res.json()
+      return data
+    },
+    async fetchLabels() {
+      const res = await fetch('/api/labels', {
         headers: {
           'x-auth-token': localStorage.getItem('token') || ''
         }
@@ -95,8 +112,7 @@ export default {
       this.showAddLabel = !this.showAddLabel
     },
     async updateLabels() {
-      // Placeholder for updating labels on sidebar
-      //this.projects = await this.fetchProjects()
+      this.labels = await this.fetchLabels()
     },
     logout: function () {
       this.$store.dispatch('logout')
@@ -104,6 +120,7 @@ export default {
   },
   async created() {
     this.projects = await this.fetchProjects()
+    this.labels = await this.fetchLabels()
     let user = JSON.parse(localStorage.getItem('user') || '')
     this.username = user.username
   }
