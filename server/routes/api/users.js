@@ -42,15 +42,15 @@ router.post('/', (req, res) => {
                 if(err) throw err;
                 Label.create({
                   user_id:  user.id,
-                  label_name: "To Do"
+                  label_name: "todo"
                 });
                 Label.create({
                   user_id:  user.id,
-                  label_name: "Doing"
+                  label_name: "doing"
                 });
                 Label.create({
                   user_id:  user.id,
-                  label_name: "Done"
+                  label_name: "done"
                 });
                 res.json({
                   token,
