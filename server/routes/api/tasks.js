@@ -14,7 +14,7 @@ router.get('/', auth, async (req, res) => {
   if(req.query.project_id) {
     filter = {project_id: req.query.project_id, user_id: req.user.id}
   } else if(req.query.label_id) {
-    filter = {label_id: req.query.label_id, user_id: req.user.id}
+    filter = {label_ids: req.query.label_id, user_id: req.user.id}
   } else {
     filter = {user_id: req.user.id}
   }
