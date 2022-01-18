@@ -28,7 +28,7 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   const insertedLabel = await Label.create({
     user_id:  req.user.id,
-    label_name: req.body.label_name.toLowerCase().replace(/\s/g, '')
+    label_name: req.body.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_')
   });
   label._id = insertedLabel._id
   res.status(201).send(label);
