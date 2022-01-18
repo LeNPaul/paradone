@@ -39,7 +39,7 @@ router.post('/', auth, async (req, res) => {
 // @access Private
 router.put('/:id', auth, async (req, res) => {
   const label = {
-    label_name: req.body.label_name,
+    label_name: req.body.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_'),
     user_id:  req.user.id
   }
   const updatedLabel = await Label.findOneAndUpdate(
