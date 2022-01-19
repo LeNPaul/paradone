@@ -40,7 +40,7 @@
           body: JSON.stringify(updLabel),
         })
         const data = await res.json()
-        this.$router.push(this.label_name)
+        this.$router.push(this.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_'))
         return data
       },
       async deleteLabel(label_name) {
