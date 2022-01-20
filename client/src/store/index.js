@@ -5,6 +5,8 @@ export default createStore({
     token     : localStorage.getItem('token') || '',
     user      : localStorage.getItem('user') || '',
     expiresIn : localStorage.getItem('expiresIn') || 0,
+    labels: [],
+    projects: []
   },
   mutations: {
     auth_success(state, data){
