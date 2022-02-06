@@ -19,6 +19,12 @@ export default createStore({
       state.user = ''
       state.expiresIn = 0
     },
+    update_labels(state, data){
+      state.labels = data
+    },
+    update_projects(state, data){
+      state.projects = data
+    }
   },
   actions: {
     async register({ commit }, newUser) {
@@ -67,7 +73,7 @@ export default createStore({
       localStorage.removeItem('user')
       localStorage.removeItem('expiresIn')
     },
-    async fetchLabels() {
+    async fetchLabels({ commit }) {
       const res = await fetch('/api/labels', {
         headers: {
           'x-auth-token': localStorage.getItem('token') || ''
@@ -75,12 +81,12 @@ export default createStore({
       })
       const data = await res.json()
       if(res.status == 200) {
-        localStorage.setItem('labels', JSON.stringify(data))
+        commit('update_labels', data)
       } else {
         return data
       }
     },
-    async fetchProjects() {
+    async fetchProjects({ commit }) {
       const res = await fetch('/api/projects', {
         headers: {
           'x-auth-token': localStorage.getItem('token') || ''
@@ -88,7 +94,7 @@ export default createStore({
       })
       const data = await res.json()
       if(res.status == 200) {
-        localStorage.setItem('projects', JSON.stringify(data))
+        commit('update_projects', data)
       } else {
         return data
       }
