@@ -66,6 +66,32 @@ export default createStore({
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('expiresIn')
+    },
+    async fetchLabels() {
+      const res = await fetch('/api/labels', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      const data = await res.json()
+      if(res.status == 200) {
+        localStorage.setItem('labels', JSON.stringify(data))
+      } else {
+        return data
+      }
+    },
+    async fetchProjects() {
+      const res = await fetch('/api/projects', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      const data = await res.json()
+      if(res.status == 200) {
+        localStorage.setItem('projects', JSON.stringify(data))
+      } else {
+        return data
+      }
     }
   },
   getters: {
