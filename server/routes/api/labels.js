@@ -10,7 +10,7 @@ const Label = require('../../models/Label');
 // @desc   Get user labels
 // @access Private
 router.get('/', auth, async (req, res) => {
-  const labels = await Label.find({})
+  const labels = await Label.find({user_id: req.user.id})
   res.status(200).send(labels);
 });
 
