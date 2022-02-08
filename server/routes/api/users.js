@@ -68,4 +68,17 @@ router.post('/', (req, res) => {
     });
 });
 
+router.put('/', (req, res) => {
+
+  const { email, currentPassword, newPassword } = req.body;
+
+  // Simple validation
+  if(!email || !currentPassword || !newPassword) {
+    return res.status(400).json({ msg: 'Please enter all fields' });
+  }
+
+  res.json({})
+
+});
+
 module.exports = router;
