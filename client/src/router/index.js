@@ -7,6 +7,7 @@ import WorkspaceParadigmKanban from '../views/WorkspaceParadigmKanban'
 import WorkspaceParadigmPomodoro from '../views/WorkspaceParadigmPomodoro'
 import Register from '../views/Register'
 import Login from '../views/Login'
+import ResetPassword from '../views/ResetPassword'
 
 const routes = [
   {
@@ -72,6 +73,14 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/app/resetpassword',
+    name: 'ResetPassword',
+    component: ResetPassword,
+    meta: {
+      requiresAuth: true
+    }
+  }
 ]
 
 const router = createRouter({
