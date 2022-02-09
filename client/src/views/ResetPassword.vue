@@ -35,11 +35,18 @@ export default {
       e.preventDefault()
       let user = JSON.parse(localStorage.getItem('user') || '')
       this.email = user.email
-      const resetPassword = {
+      const newPassword = {
         email: this.email,
         currentPassword: this.currentPassword,
         newPassword: this.newPassword
       }
+      this.$store.dispatch('resetPassword', newPassword).then((error) => {
+        if (error) {
+          this.errorMessage = error.msg
+        } else {
+          this.$router.push('/app')
+        }
+      })
     }
   }
 }
