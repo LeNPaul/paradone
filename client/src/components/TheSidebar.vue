@@ -51,6 +51,12 @@
         </li>
       </ul>
 
+      <ul class="nav nav-pills flex-column mb-sm-auto mb-0 mt-2 align-items-start" id="menu">
+        <li class="nav-item">
+          <router-link class="nav-link text-truncate link-dark" to="/app/resetpassword"><i class="fas fa-cog"></i><span class="ms-1 d-none d-sm-inline">Reset Password</span></router-link>
+        </li>
+      </ul>
+
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
           <router-link class="nav-link text-truncate link-dark" to="/" @click="logout"><i class="fas fa-sign-out-alt"></i><span class="ms-1 d-none d-sm-inline">Logout</span></router-link>
