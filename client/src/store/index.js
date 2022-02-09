@@ -56,7 +56,27 @@ export default createStore({
         body: JSON.stringify(user)
       })
       const data = await res.json()
-        if(res.status == 200) {
+      if(res.status == 200) {
+        const expiresIn = Date.now() + 2592000000
+        data.expiresIn = expiresIn
+        localStorage.setItem('token', data.token)
+        localStorage.setItem('user', JSON.stringify(data.user))
+        localStorage.setItem('expiresIn', expiresIn)
+        commit('auth_success', data)
+      } else {
+        return data
+      }
+    },
+    async resetPassword({ commit }, user) {
+      const res = await fetch('/api/users', {
+        method: 'PUT',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(user)
+      })
+      const data = await res.json()
+      if(res.status == 200) {
         const expiresIn = Date.now() + 2592000000
         data.expiresIn = expiresIn
         localStorage.setItem('token', data.token)
