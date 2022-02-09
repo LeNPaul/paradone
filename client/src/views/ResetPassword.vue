@@ -11,6 +11,10 @@
         <input v-model="newPassword" class="form-control" type="password" placeholder="New Password" name="newPassword" required=""/>
         <label for="inputNewPassword">New Password</label>
       </div>
+      <div class="form-floating">
+        <input v-model="newPasswordCheck" class="form-control" type="password" placeholder="Confirm New Password" name="newPasswordCheck" required=""/>
+        <label for="inputNewPassword">Confirm New Password</label>
+      </div>
       <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
         {{ errorMessage }}
       </div>
@@ -27,12 +31,17 @@ export default {
       email: '',
       currentPassword: '',
       newPassword: '',
+      newPasswordCheck: '',
       errorMessage: ''
     }
   },
   methods: {
     async onSubmit(e) {
       e.preventDefault()
+      if(this.newPassword !== this.newPasswordCheck) {
+        this.errorMessage = 'Please ensure the new passwords match'
+        return
+      }
       let user = JSON.parse(localStorage.getItem('user') || '')
       this.email = user.email
       const newPassword = {
