@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "production": "node index.js",
-    "backend": "nodemon index.js",
-    "database": "sudo mongod --fork --logpath /var/log/mongodb/mongod.log --dbpath ~/data/db/",
-    "stop": "sudo pkill mongod"
+    "server": "nodemon index.js",
+    "startdb": "brew services start mongodb-community@5.0",
+    "stopdb": "brew services stop mongodb-community@5.0"
   },
   "author": "Paul Le",
   "license": "ISC",
