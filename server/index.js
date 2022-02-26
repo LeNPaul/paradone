@@ -40,7 +40,10 @@ app.set('view engine', 'pug')
 
 // Handle blog posts
 app.get('/blog', (req, res) => {
-  res.render('blog', { title: 'Hey', message: 'Hello there!' })
+  res.render('blog')
+})
+app.get('/blog/the-five-pillars-of-getting-things-done', (req, res) => {
+  res.render('posts/the-five-pillars-of-getting-things-done')
 })
 
 // Handle production SPA when built
