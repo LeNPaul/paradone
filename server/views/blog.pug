@@ -27,10 +27,7 @@ body
                 a.me-3.py-2.text-dark.text-decoration-none(href='https://paradone.com/register') register
                 a.me-3.py-2.text-dark.text-decoration-none(href='https://paradone.com/login') login
             .container.py-5
-              .row.py-5
-                //.col-md-2
-                  svg(width='100%')
-                    use(xlink:href='#home')
+              .row
                 .col-md-8
                   h4.fw-bold.mb-3 The Five Pillars of Getting Things Done
                   p
@@ -40,7 +37,7 @@ body
               .row.py-5
                 .col-md-6.mx-auto.text-center
                   h1.pb-5 Get things done with paradone
-                  router-link.btn.btn-dark.btn-lg.px-4(to='/register') Get Started
+                  a.btn.btn-dark.btn-lg.px-4(href='https://paradone.com/register') Get Started
             footer.pt-4.my-md-5.pt-md-5.border-top
               .row
                 .col-12.col-md
