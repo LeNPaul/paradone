@@ -5,8 +5,10 @@ head
   meta(name='viewport' content='width=device-width,initial-scale=1.0')
   link(rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css')
   link(rel='stylesheet' href='/assets/libs/bootstrap/bootstrap.min.css')
-  link(rel='icon' href='<%= BASE_URL %>favicon.ico')
-  title
+  //- Custom styles for this template
+  link(rel='stylesheet', href='/assets/css/post.css')
+  link(rel='icon' href='favicon.ico')
+  title Paradone
   // Global site tag (gtag.js) - Google Analytics
   script(async='' src='https://www.googletagmanager.com/gtag/js?id=G-X2ZKVME3KP')
   script.
@@ -21,7 +23,7 @@ body
         .col-lg-6.mx-auto.p-3.py-md-5
           .container.py-5
             header.d-flex.flex-column.flex-md-row.align-items-center.pb-3.mb-5.border-bottom
-              router-link.d-flex.align-items-center.text-dark.text-decoration-none(to='/')
+              a.d-flex.align-items-center.text-dark.text-decoration-none(href='/')
                 span.fs-4.fw-bold paradone
               nav.d-inline-flex.mt-2.mt-md-0.ms-md-auto
                 a.me-3.py-2.text-dark.text-decoration-none(href='https://paradone.com/register') register
