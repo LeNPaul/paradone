@@ -24,6 +24,7 @@
     <header class="d-flex flex-column flex-md-row align-items-center pb-3 mb-5 border-bottom"><router-link to="/" class="d-flex align-items-center text-dark text-decoration-none">
         <span class="fs-4 fw-bold">paradone</span></router-link>
       <nav class="d-inline-flex mt-2 mt-md-0 ms-md-auto">
+        <a href="https://blog.paradone.com" class="me-3 py-2 text-dark text-decoration-none">blog</a>
         <router-link to="/register" class="me-3 py-2 text-dark text-decoration-none">register</router-link>
         <router-link to="/login" class="me-3 py-2 text-dark text-decoration-none">login</router-link>
       </nav>
@@ -80,10 +81,11 @@
           <h5>paradone</h5><small class="d-block mb-3 text-muted">© 2021</small>
         </div>
         <div class="col-6 col-md">
-          <h5>Resources</h5>
+          <h5>resources</h5>
           <ul class="list-unstyled text-small">
-            <li class="mb-1"><router-link to="/register" class="link-secondary text-decoration-none">Register</router-link></li>
-            <li class="mb-1"><router-link to="/login" class="link-secondary text-decoration-none">Login</router-link></li>
+            <li class="mb-1"><a href="https://blog.paradone.com" class="link-secondary text-decoration-none">blog</a></li>
+            <li class="mb-1"><router-link to="/register" class="link-secondary text-decoration-none">register</router-link></li>
+            <li class="mb-1"><router-link to="/login" class="link-secondary text-decoration-none">login</router-link></li>
           </ul>
         </div>
       </div>
