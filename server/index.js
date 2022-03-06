@@ -35,17 +35,6 @@ app.use('/api/users', users);
 // Static folder
 app.use(express.static(__dirname + '/public/'));
 
-// View engine setup
-app.set('view engine', 'pug')
-
-// Handle blog posts
-app.get('/blog', (req, res) => {
-  res.render('blog')
-})
-app.get('/blog/the-five-pillars-of-getting-things-done', (req, res) => {
-  res.render('posts/the-five-pillars-of-getting-things-done')
-})
-
 // Handle production SPA when built
 app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
