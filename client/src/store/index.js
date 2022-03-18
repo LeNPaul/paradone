@@ -21,11 +21,9 @@ export default createStore({
     },
     update_labels(state, data){
       state.labels = data
-      localStorage.setItem('labels', JSON.stringify(data))
     },
     update_projects(state, data){
       state.projects = data
-      localStorage.setItem('projects', JSON.stringify(data))
     }
   },
   actions: {
@@ -104,6 +102,7 @@ export default createStore({
         })
         const data = await res.json()
         if(res.status == 200) {
+          localStorage.setItem('labels', JSON.stringify(data))
           commit('update_labels', data)
         } else {
           return data
@@ -119,6 +118,7 @@ export default createStore({
         })
         const data = await res.json()
         if(res.status == 200) {
+          localStorage.setItem('projects', JSON.stringify(data))
           commit('update_projects', data)
         } else {
           return data
