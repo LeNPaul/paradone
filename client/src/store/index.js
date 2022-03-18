@@ -5,8 +5,8 @@ export default createStore({
     token     : localStorage.getItem('token') || '',
     user      : localStorage.getItem('user') || '',
     expiresIn : localStorage.getItem('expiresIn') || 0,
-    labels    : localStorage.getItem('labels') || '',
-    projects: []
+    labels    : localStorage.getItem('labels') || [],
+    projects  : localStorage.getItem('projects') || []
   },
   mutations: {
     auth_success(state, data){
@@ -25,6 +25,7 @@ export default createStore({
     },
     update_projects(state, data){
       state.projects = data
+      localStorage.setItem('projects', JSON.stringify(data))
     }
   },
   actions: {
@@ -110,16 +111,18 @@ export default createStore({
       }
     },
     async fetchProjects({ commit }) {
-      const res = await fetch('/api/projects', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
+      if(!localStorage.getItem('projects')) {
+        const res = await fetch('/api/projects', {
+          headers: {
+            'x-auth-token': localStorage.getItem('token') || ''
+          }
+        })
+        const data = await res.json()
+        if(res.status == 200) {
+          commit('update_projects', data)
+        } else {
+          return data
         }
-      })
-      const data = await res.json()
-      if(res.status == 200) {
-        commit('update_projects', data)
-      } else {
-        return data
       }
     }
   },
