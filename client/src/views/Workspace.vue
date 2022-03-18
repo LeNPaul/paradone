@@ -64,6 +64,7 @@ export default {
   },
   async created() {
     this.updateTasks()
+    this.$store.dispatch('fetchLabels')
   },
   watch:{
     $route (){

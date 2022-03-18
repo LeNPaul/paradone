@@ -5,7 +5,7 @@ export default createStore({
     token     : localStorage.getItem('token') || '',
     user      : localStorage.getItem('user') || '',
     expiresIn : localStorage.getItem('expiresIn') || 0,
-    labels: [],
+    labels    : localStorage.getItem('labels') || '',
     projects: []
   },
   mutations: {
@@ -21,6 +21,7 @@ export default createStore({
     },
     update_labels(state, data){
       state.labels = data
+      localStorage.setItem('labels', JSON.stringify(data))
     },
     update_projects(state, data){
       state.projects = data
@@ -94,16 +95,18 @@ export default createStore({
       localStorage.removeItem('expiresIn')
     },
     async fetchLabels({ commit }) {
-      const res = await fetch('/api/labels', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
+      if(!localStorage.getItem('labels')) {
+        const res = await fetch('/api/labels', {
+          headers: {
+            'x-auth-token': localStorage.getItem('token') || ''
+          }
+        })
+        const data = await res.json()
+        if(res.status == 200) {
+          commit('update_labels', data)
+        } else {
+          return data
         }
-      })
-      const data = await res.json()
-      if(res.status == 200) {
-        commit('update_labels', data)
-      } else {
-        return data
       }
     },
     async fetchProjects({ commit }) {
