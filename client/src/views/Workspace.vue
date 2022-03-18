@@ -45,9 +45,9 @@ export default {
     }
   },
   async created() {
-    this.updateTasks()
     this.$store.dispatch('fetchLabels')
     this.$store.dispatch('fetchProjects')
+    this.updateTasks()
   },
   watch:{
     $route (){
