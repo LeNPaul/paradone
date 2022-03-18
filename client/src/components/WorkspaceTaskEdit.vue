@@ -80,26 +80,8 @@
         const data = await res.json()
         return data
       },
-      async fetchProjects() {
-        const res = await fetch('/api/projects', {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
-      },
       async fetchLabel(id) {
         const res = await fetch(`/api/labels/${id}`, {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
-      },
-      async fetchLabels() {
-        const res = await fetch('/api/labels', {
           headers: {
             'x-auth-token': localStorage.getItem('token') || ''
           }
@@ -109,14 +91,14 @@
       }
     },
     async created() {
-      this.projects = await this.fetchProjects()
-      this.labels = await this.fetchLabels()
+      this.projects = JSON.parse(localStorage.getItem('projects'))
+      this.labels = JSON.parse(localStorage.getItem('labels'))
       this.project_id = this.$props.task.project_id
       this.content = this.$props.task.content
       if(this.$props.task.label_ids[0]) {
         let label = await this.fetchLabel(this.$props.task.label_ids[0])
         this.label = label.label_name
-        this.label_ids = this.$props.task.label_ids  
+        this.label_ids = this.$props.task.label_ids
       }
       this.priority = this.$props.task.priority
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
