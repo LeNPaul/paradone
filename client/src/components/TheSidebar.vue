@@ -90,43 +90,25 @@ export default {
     }
   },
   methods: {
-    async fetchProjects() {
-      const res = await fetch('/api/projects', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
-    async fetchLabels() {
-      const res = await fetch('/api/labels', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
     toggleAddProject() {
       this.showAddProject = !this.showAddProject
     },
     async updateProjects() {
-      this.projects = await this.fetchProjects()
+      this.projects = JSON.parse(localStorage.getItem('projects'))
     },
     toggleAddLabel() {
       this.showAddLabel = !this.showAddLabel
     },
     async updateLabels() {
-      this.labels = await this.fetchLabels()
+      this.labels = JSON.parse(localStorage.getItem('labels'))
     },
     logout: function () {
       this.$store.dispatch('logout')
     }
   },
   async created() {
-    this.projects = await this.fetchProjects()
-    this.labels = await this.fetchLabels()
+    this.projects = JSON.parse(localStorage.getItem('projects'))
+    this.labels = JSON.parse(localStorage.getItem('labels'))
     let user = JSON.parse(localStorage.getItem('user') || '')
     this.username = user.username
   }
