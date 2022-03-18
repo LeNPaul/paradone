@@ -38,24 +38,6 @@ export default {
     toggleEditTask() {
       this.showEditTask = !this.showEditTask
     },
-    async fetchProjects() {
-      const res = await fetch('/api/projects', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
-    async fetchLabels() {
-      const res = await fetch('/api/labels', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
     async fetchLabel(id) {
       const res = await fetch(`/api/labels/${id}`, {
         headers: {
@@ -66,11 +48,11 @@ export default {
       return data
     },
     async resetTask() {
-      this.projects = await this.fetchProjects()
+      this.projects = this.projects = JSON.parse(localStorage.getItem('projects'))
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
       if(this.$props.task.label_ids[0]) {
-        this.labels = await this.fetchLabels()
+        this.labels = JSON.parse(localStorage.getItem('labels'))
         let label = await this.fetchLabel(this.$props.task.label_ids[0])
         this.label_name = label.label_name
       }
