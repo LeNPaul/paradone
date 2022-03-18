@@ -37,17 +37,8 @@ export default {
     toggleEditTask() {
       this.showEditTask = !this.showEditTask
     },
-    async fetchProjects() {
-      const res = await fetch('/api/projects', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
     async resetTask() {
-      this.projects = await this.fetchProjects()
+      this.projects = JSON.parse(localStorage.getItem('projects'))
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
     }

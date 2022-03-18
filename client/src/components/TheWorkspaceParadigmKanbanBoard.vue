@@ -62,22 +62,13 @@ export default {
         ? this.$emit('delete-task')
         : alert('Error deleting task')
     },
-    async fetchLabels() {
-      const res = await fetch('/api/labels', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
     async filteredTasks(labelFilter, tasks) {
       let label = this.labels.find(o => o.label_name === labelFilter)
       let filteredTasks = tasks.filter(o => o.label_ids[0] === label._id)
       return filteredTasks
     },
     async resetBoard() {
-      this.labels = await this.fetchLabels()
+      this.labels = JSON.parse(localStorage.getItem('labels'))
       this.todoTasks = await this.filteredTasks('todo', this.$props.tasks)
       this.doingTasks = await this.filteredTasks('doing', this.$props.tasks)
       this.doneTasks = await this.filteredTasks('done', this.$props.tasks)
