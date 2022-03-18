@@ -69,29 +69,11 @@
         this.project_id = ''
         this.$emit('close-add-task')
         return data
-      },
-      async fetchProjects() {
-        const res = await fetch('/api/projects', {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
-      },
-      async fetchLabels() {
-        const res = await fetch('/api/labels', {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
       }
     },
     async created() {
-      this.projects = await this.fetchProjects()
-      this.labels = await this.fetchLabels()
+      this.projects = JSON.parse(localStorage.getItem('projects'))
+      this.labels = JSON.parse(localStorage.getItem('labels'))
     }
   }
 </script>
