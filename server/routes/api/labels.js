@@ -26,10 +26,11 @@ router.get('/:id', auth, async (req, res) => {
 // @desc   Create a new label
 // @access Private
 router.post('/', auth, async (req, res) => {
-  const insertedLabel = await Label.create({
-    user_id:  req.user.id,
-    label_name: req.body.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_')
-  });
+  const label = {
+    label_name: req.body.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_'),
+    user_id:  req.user.id
+  }
+  const insertedLabel = await Label.create(label);
   label._id = insertedLabel._id
   res.status(201).send(label);
 });
