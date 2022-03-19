@@ -40,8 +40,6 @@ export default {
     }
   },
   async created() {
-    this.$store.dispatch('fetchLabels')
-    this.$store.dispatch('fetchProjects')
     this.updateTasks()
   },
 }

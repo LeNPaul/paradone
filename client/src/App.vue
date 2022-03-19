@@ -39,6 +39,10 @@ export default {
       }
     }, 1000)
   },
+  async created() {
+    this.$store.dispatch('fetchLabels')
+    this.$store.dispatch('fetchProjects')
+  },
   watch:{
     $route (){
       this.isLoggedIn = this.$store.getters.isLoggedIn
