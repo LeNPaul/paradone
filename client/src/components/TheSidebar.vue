@@ -93,8 +93,8 @@ export default {
     toggleAddProject() {
       this.showAddProject = !this.showAddProject
     },
-    async updateProjects() {
-      this.projects = JSON.parse(localStorage.getItem('projects'))
+    async updateProjects(newProject) {
+      this.projects.push(newProject)
     },
     toggleAddLabel() {
       this.showAddLabel = !this.showAddLabel
