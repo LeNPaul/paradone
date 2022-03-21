@@ -99,8 +99,8 @@ export default {
     toggleAddLabel() {
       this.showAddLabel = !this.showAddLabel
     },
-    async updateLabels() {
-      this.labels = JSON.parse(localStorage.getItem('labels'))
+    async updateLabels(newLabel) {
+      this.labels.push(newLabel)
     },
     logout: function () {
       this.$store.dispatch('logout')

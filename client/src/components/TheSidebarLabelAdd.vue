@@ -26,9 +26,11 @@
           label_name: this.label_name
         }
         this.addLabel(newLabel)
+        localStorage.removeItem('labels')
+        this.$store.dispatch('fetchLabels')
         this.label_name = ''
         this.$emit('close-add-label')
-        this.$emit('update-labels')
+        this.$emit('update-labels', newLabel)
       },
       async addLabel(newLabel) {
         const res = await fetch('/api/labels', {
