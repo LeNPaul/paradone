@@ -72,8 +72,8 @@
       }
     },
     async created() {
-      this.projects = JSON.parse(this.$store.state.projects)
-      this.labels = JSON.parse(this.$store.state.labels)
+      this.projects = this.$store.state.projects
+      this.labels = this.$store.state.labels
     }
   }
 </script>

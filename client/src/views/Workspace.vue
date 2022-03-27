@@ -27,12 +27,12 @@ export default {
     async updateTasks() {
       let filter = ''
       if(this.$route.params.project) {
-        const projects = JSON.parse(this.$store.state.projects)
+        const projects = this.$store.state.projects
         const project_id = projects.find(o => o.project_name === this.$route.params.project)._id
         filter = '?project_id=' + project_id
       }
       if(this.$route.params.label) {
-        const labels = JSON.parse(this.$store.state.labels)
+        const labels = this.$store.state.labels
         const label_id = labels.find(o => o.label_name.toLowerCase().replace(/\s/g, '') === this.$route.params.label)._id
         filter = '?label_id=' + label_id
       }
