@@ -48,11 +48,11 @@ export default {
       return data
     },
     async resetTask() {
-      this.projects = this.projects = JSON.parse(localStorage.getItem('projects'))
+      this.projects = this.projects = JSON.parse(this.$store.state.projects)
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
       if(this.$props.task.label_ids[0]) {
-        this.labels = JSON.parse(localStorage.getItem('labels'))
+        this.labels = JSON.parse(this.$store.state.labels)
         let label = await this.fetchLabel(this.$props.task.label_ids[0])
         this.label_name = label.label_name
       }

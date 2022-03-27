@@ -27,7 +27,7 @@ export default {
     async updateTasks() {
       let filter = ''
       if(this.$route.params.project) {
-        const projects = JSON.parse(localStorage.getItem('projects'))
+        const projects = JSON.parse(this.$store.state.projects)
         const project_id = projects.find(o => o.project_name === this.$route.params.project)._id
         filter = '?project_id=' + project_id
       }

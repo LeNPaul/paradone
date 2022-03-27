@@ -68,7 +68,7 @@ export default {
       return filteredTasks
     },
     async resetBoard() {
-      this.labels = JSON.parse(localStorage.getItem('labels'))
+      this.labels = JSON.parse(this.$store.state.labels)
       this.todoTasks = await this.filteredTasks('todo', this.$props.tasks)
       this.doingTasks = await this.filteredTasks('doing', this.$props.tasks)
       this.doneTasks = await this.filteredTasks('done', this.$props.tasks)

@@ -38,7 +38,7 @@ export default {
       this.showEditTask = !this.showEditTask
     },
     async resetTask() {
-      this.projects = JSON.parse(localStorage.getItem('projects'))
+      this.projects = JSON.parse(this.$store.state.projects)
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
     }

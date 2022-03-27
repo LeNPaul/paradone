@@ -107,8 +107,8 @@ export default {
     }
   },
   async created() {
-    this.projects = JSON.parse(localStorage.getItem('projects'))
-    this.labels = JSON.parse(localStorage.getItem('labels'))
+    this.projects = JSON.parse(this.$store.state.projects)
+    this.labels = JSON.parse(this.$store.state.labels)
     let user = JSON.parse(localStorage.getItem('user') || '')
     this.username = user.username
   }
