@@ -25,12 +25,13 @@
         const newProject = {
           project_name: this.project_name
         }
-        this.addProject(newProject)
-        localStorage.removeItem('projects')
-        this.$store.dispatch('fetchProjects')
-        this.project_name = ''
-        this.$emit('close-add-project')
-        this.$emit('update-projects', newProject)
+        this.addProject(newProject).then(() => {
+          localStorage.removeItem('projects')
+          this.$store.dispatch('fetchProjects')
+          this.project_name = ''
+          this.$emit('close-add-project')
+          this.$emit('update-projects', newProject)
+        })
       },
       async addProject(newProject) {
         const res = await fetch('/api/projects', {
