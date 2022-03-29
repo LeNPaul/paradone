@@ -103,6 +103,14 @@
       this.priority = this.$props.task.priority
       let project = this.projects.find(o => o._id === this.$props.task.project_id)
       this.project_name = project ? project.project_name : ''
+    },
+    watch: {
+      '$store.state.projects': function() {
+        this.projects = this.$store.state.projects
+      },
+      '$store.state.labels': function() {
+        this.labels = this.$store.state.labels
+      }
     }
   }
 </script>

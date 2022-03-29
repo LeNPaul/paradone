@@ -74,6 +74,14 @@
     async created() {
       this.projects = this.$store.state.projects
       this.labels = this.$store.state.labels
+    },
+    watch: {
+      '$store.state.projects': function() {
+        this.projects = this.$store.state.projects
+      },
+      '$store.state.labels': function() {
+        this.labels = this.$store.state.labels
+      }
     }
   }
 </script>

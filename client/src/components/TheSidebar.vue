@@ -111,6 +111,14 @@ export default {
     this.labels = this.$store.state.labels
     let user = JSON.parse(localStorage.getItem('user') || '')
     this.username = user.username
+  },
+  watch: {
+    '$store.state.projects': function() {
+      this.projects = this.$store.state.projects
+    },
+    '$store.state.labels': function() {
+      this.labels = this.$store.state.labels
+    }
   }
 }
 </script>
