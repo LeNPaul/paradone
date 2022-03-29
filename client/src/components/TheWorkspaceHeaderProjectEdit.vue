@@ -51,9 +51,16 @@
               'x-auth-token': localStorage.getItem('token') || ''
             }
           })
-          res.status === 200
-            ? this.$router.push('/')
-            : alert('Error deleting task')
+          if(res.status === 200) {
+            this.$store.state.projects = this.$store.state.projects.filter(function(item) {
+              return item.project_name !== project_name
+            })
+            localStorage.removeItem('projects')
+            this.$store.dispatch('fetchProjects')
+            this.$router.push('/')
+          } else {
+            alert('Error deleting task')
+          }
         }
       }
     },
