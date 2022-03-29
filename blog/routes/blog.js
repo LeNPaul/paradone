@@ -11,4 +11,8 @@ router.get('/the-five-pillars-of-getting-things-done', (req, res) => {
   res.render('posts/the-five-pillars-of-getting-things-done')
 })
 
+router.get('/the-pomodoro-technique-the-life-changing-time-management-system-francesco-cirillo-book-summary', (req, res) => {
+  res.render('posts/the-pomodoro-technique-the-life-changing-time-management-system-francesco-cirillo-book-summary')
+})
+
 module.exports = router;
