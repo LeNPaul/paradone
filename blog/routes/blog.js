@@ -3,7 +3,7 @@ var router = express.Router();
 
 // Blog post listing
 router.get('/', (req, res) => {
-  res.render('blog')
+  res.render('blog', {title: 'Blog'})
 });
 
 // Inidividual blog posts
