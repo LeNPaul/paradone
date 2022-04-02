@@ -8,7 +8,7 @@
     <div class="offcanvas-body px-0">
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/app"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/"><i class="fas fa-home fs-5"></i><span class="ms-1 d-none d-sm-inline">Home</span></router-link>
         </li>
       </ul>
       <hr>
@@ -30,17 +30,17 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/app/paradigm/eisenhower"><i class="fas fa-th-large"></i><span class="ms-1 d-none d-sm-inline">Eisenhower Matrix</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/eisenhower"><i class="fas fa-th-large"></i><span class="ms-1 d-none d-sm-inline">Eisenhower Matrix</span></router-link>
         </li>
       </ul>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/app/paradigm/kanban"><i class="fas fa-columns"></i><span class="ms-1 d-none d-sm-inline">Kanban</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/kanban"><i class="fas fa-columns"></i><span class="ms-1 d-none d-sm-inline">Kanban</span></router-link>
         </li>
       </ul>
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/app/paradigm/pomodoro"><i class="fas fa-clock"></i><span class="ms-1 d-none d-sm-inline">Pomodoro</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/paradigm/pomodoro"><i class="fas fa-clock"></i><span class="ms-1 d-none d-sm-inline">Pomodoro</span></router-link>
         </li>
       </ul>
       <hr>
@@ -53,7 +53,7 @@
 
       <ul class="nav nav-pills flex-column mb-sm-auto mb-0 mt-2 align-items-start" id="menu">
         <li class="nav-item">
-          <router-link class="nav-link text-truncate link-dark" to="/app/resetpassword"><i class="fas fa-cog"></i><span class="ms-1 d-none d-sm-inline">Reset Password</span></router-link>
+          <router-link class="nav-link text-truncate link-dark" to="/resetpassword"><i class="fas fa-cog"></i><span class="ms-1 d-none d-sm-inline">Reset Password</span></router-link>
         </li>
       </ul>
 
@@ -104,6 +104,7 @@ export default {
     },
     logout: function () {
       this.$store.dispatch('logout')
+      this.$router.push('/login')
     }
   },
   async created() {
