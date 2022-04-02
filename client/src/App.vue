@@ -40,8 +40,11 @@ export default {
     }, 1000)
   },
   async created() {
-    this.$store.dispatch('fetchLabels')
-    this.$store.dispatch('fetchProjects')
+    this.isLoggedIn = this.$store.getters.isLoggedIn
+    if(this.isLoggedIn) {
+      this.$store.dispatch('fetchLabels')
+      this.$store.dispatch('fetchProjects')
+    }
   },
   watch:{
     $route (){
