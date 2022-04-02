@@ -92,6 +92,8 @@ export default createStore({
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('expiresIn')
+      localStorage.removeItem('projects')
+      localStorage.removeItem('labels')
     },
     async fetchLabels({ commit }) {
       if(!localStorage.getItem('labels')) {
