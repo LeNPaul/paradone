@@ -47,7 +47,7 @@ export default {
         if (error) {
           this.errorMessage = error.msg
         } else {
-          this.$router.push('/app')
+          this.$router.push('/')
         }
       })
     }

@@ -1,6 +1,5 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
-import Home from '../views/Home'
 import Workspace from '../views/Workspace'
 import WorkspaceParadigmEisenhower from '../views/WorkspaceParadigmEisenhower'
 import WorkspaceParadigmKanban from '../views/WorkspaceParadigmKanban'
@@ -12,11 +11,6 @@ import ResetPassword from '../views/ResetPassword'
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
-  },
-  {
-    path: '/app',
     name: 'Dashboard',
     component: Workspace,
     meta: {
@@ -24,7 +18,7 @@ const routes = [
     }
   },
   {
-    path: '/app/project/:project',
+    path: '/project/:project',
     name: 'Project',
     component: Workspace,
     meta: {
@@ -32,7 +26,7 @@ const routes = [
     }
   },
   {
-    path: '/app/label/:label',
+    path: '/label/:label',
     name: 'Label',
     component: Workspace,
     meta: {
@@ -40,7 +34,7 @@ const routes = [
     }
   },
   {
-    path: '/app/paradigm/kanban',
+    path: '/paradigm/kanban',
     name: 'Kanban',
     component: WorkspaceParadigmKanban,
     meta: {
@@ -48,7 +42,7 @@ const routes = [
     }
   },
   {
-    path: '/app/paradigm/eisenhower',
+    path: '/paradigm/eisenhower',
     name: 'Eisenhower',
     component: WorkspaceParadigmEisenhower,
     meta: {
@@ -56,7 +50,7 @@ const routes = [
     }
   },
   {
-    path: '/app/paradigm/pomodoro',
+    path: '/paradigm/pomodoro',
     name: 'Pomodoro',
     component: WorkspaceParadigmPomodoro,
     meta: {
@@ -74,7 +68,7 @@ const routes = [
     component: Login,
   },
   {
-    path: '/app/resetpassword',
+    path: '/resetpassword',
     name: 'ResetPassword',
     component: ResetPassword,
     meta: {

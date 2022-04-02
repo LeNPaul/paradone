@@ -43,7 +43,7 @@ export default {
         } else {
           this.$store.dispatch('fetchLabels').then(() => {
             this.$store.dispatch('fetchProjects').then(() => {
-              this.$router.push('/app')  
+              this.$router.push('/')  
             })
           })
         }
