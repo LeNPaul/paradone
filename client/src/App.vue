@@ -31,7 +31,7 @@ export default {
   mounted() {
     setInterval(() => {
       this.isLoggedIn = this.$store.getters.isLoggedIn
-      if(!this.isLoggedIn) {
+      if(!this.isLoggedIn && (this.$route.path != '/login' && this.$route.path != '/register')) {
         this.$store.dispatch('logout')
         this.$router.push('/login')
       }
