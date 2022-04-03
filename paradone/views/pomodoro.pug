@@ -1,0 +1,75 @@
+extends template.pug
+
+block content
+  h1 Pomodoro Timer
+  script(src='https://unpkg.com/vue@3')
+  #app
+    .col-lg-6.p-3.py-md-5.mx-auto
+      .p-3
+        // https://codepen.io/Chuloo/pen/xWVpqq
+        .mx-auto.text-center.mt-5.mb-3
+          h1.display-1
+            span {{ minutes }}
+            span :
+            span {{ seconds }}
+          .mb-5
+            button.btn.btn-outline-dark.me-2(type='button' v-if='!timer' v-on:click='startTimer') Start
+            button.btn.btn-outline-dark.me-2(type='button' v-if='timer' v-on:click='stopTimer') Pause
+            button.btn.btn-outline-dark(type='button' v-if='resetButton' v-on:click='resetTimer') Reset 
+  script.
+    Vue.createApp({
+    name: 'TheWorkspaceParadigmPomodoroTimer',
+    inheritAttrs: false, // disable 'non-props' warning
+    data() {
+    return {
+    timer: null,
+    totalTime: (25 * 60),
+    resetButton: false,
+    title: "Let the countdown begin!!"
+    }
+    },
+    // ========================
+    methods: {
+    startTimer: function() {
+    this.start = new Date();
+    this.timer = setInterval(() => this.countdown(), 1000);
+    this.resetButton = true;
+    },
+    stopTimer: function() {
+    clearInterval(this.timer);
+    this.timer = null;
+    this.resetButton = true;
+    },
+    resetTimer: function() {
+    this.totalTime = (25 * 60);
+    clearInterval(this.timer);
+    this.timer = null;
+    this.resetButton = false;
+    },
+    padTime: function(time) {
+    return (time < 10 ? '0' : '') + time;
+    },
+    countdown: function() {
+    if(this.totalTime >= 1){
+    this.totalTime = (25 * 60) - Math.floor(((new Date() - this.start) / 1000));
+    } else{
+    // https://soundbible.com/1630-Computer-Magic.html
+    var audio = new Audio('/assets/pomodoro.mp3');
+    audio.play();
+    this.totalTime = 0;
+    this.resetTimer()
+    }
+    }
+    },
+    // ========================
+    computed: {
+    minutes: function() {
+    const minutes = Math.floor(this.totalTime / 60);
+    return this.padTime(minutes);
+    },
+    seconds: function() {
+    const seconds = this.totalTime - (this.minutes * 60);
+    return this.padTime(seconds);
+    }
+    },
+    }).mount('#app')
