@@ -1,6 +1,6 @@
 <template>
   <form @submit="onSubmit" class="form-signin d-grid gap-2">
-      <div class="text-center mb-4"><router-link to="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></router-link>
+      <div class="text-center mb-4"><a href="https://paradone.com"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></a>
           <h1 class="h3 mb-3 font-weight-normal">Create Account</h1>
       </div>
       <div class="form-floating">
