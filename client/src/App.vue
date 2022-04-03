@@ -31,11 +31,9 @@ export default {
   mounted() {
     setInterval(() => {
       this.isLoggedIn = this.$store.getters.isLoggedIn
-      if(this.$route.path == '/' || this.$route.path == '/login' || this.$route.path == '/register') {
-        return
-      }
       if(!this.isLoggedIn) {
-        this.$router.push('/')
+        this.$store.dispatch('logout')
+        this.$router.push('/login')
       }
     }, 1000)
   },
