@@ -49,7 +49,9 @@ export default {
   },
   watch:{
     $route (){
-      this.updateTasks()
+      if(this.$store.getters.isLoggedIn) {
+        this.updateTasks()  
+      }
     }
   }
 }
