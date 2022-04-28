@@ -4,23 +4,23 @@
       <div class="col min-vh-100 p-4">
         <div class="col-lg-6 mx-auto p-3 py-md-5">
           <form @submit="onSubmit" class="form-signin d-grid gap-2">
-          <div class="text-center mb-4"><a href="https://paradone.com"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></a>
-            <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
-          </div>
-          <div class="form-floating">
-            <input v-model="email" class="form-control" type="email" placeholder="Email" name="email" required="" autofocus=""/>
-            <label for="inputUsername">Email</label>
-          </div>
-          <div class="form-floating">
-            <input v-model="password" class="form-control" type="password" placeholder="Password" name="password" required=""/>
-            <label for="inputPassword">Password</label>
-          </div>
-          <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
-            {{ errorMessage }}
-          </div>
-          <button class="btn btn-lg btn-dark btn-block" type="submit">Sign in</button>
-          <div class="text-center mb-4"><router-link to="/register" class="nav-link text-dark">Don't have an account?</router-link></div>
-        </form>
+            <div class="text-center mb-4"><a href="https://paradone.com"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></a>
+              <h1 class="h3 mb-3 font-weight-normal">Sign in</h1>
+            </div>
+            <div class="form-floating">
+              <input v-model="email" class="form-control" type="email" placeholder="Email" name="email" required="" autofocus=""/>
+              <label for="inputUsername">Email</label>
+            </div>
+            <div class="form-floating">
+              <input v-model="password" class="form-control" type="password" placeholder="Password" name="password" required=""/>
+              <label for="inputPassword">Password</label>
+            </div>
+            <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
+              {{ errorMessage }}
+            </div>
+            <button class="btn btn-lg btn-dark btn-block" type="submit">Sign in</button>
+            <div class="text-center mb-4"><router-link to="/register" class="nav-link text-dark">Don't have an account?</router-link></div>
+          </form>
         </div>
       </div>
     </div>
