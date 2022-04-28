@@ -1,6 +1,6 @@
 <template>
   <aside>
-    <div class="d-flex flex-column flex-shrink-0 p-3 bg-white border-end" style="width: 280px;">
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-white" style="width: 280px;">
       <router-link to="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
         <i class="fas fa-home fs-5 me-1"></i>
       </router-link>
