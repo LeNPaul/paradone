@@ -1,27 +1,14 @@
 <template>
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-2 position-fixed border-end shadow">
-        <TheSidebar v-if="isLoggedIn" :key="$route"/>
-      </div>
-      <div class="col-6 offset-4 pt-3 mt-3">
-        <div class="mx-auto py-md-5">
-          <router-view></router-view>
-        </div>
-      </div>
-    </div>
+    <router-view></router-view>
   </div>
 
 </template>
 
 <script>
-import TheSidebar from './components/TheSidebar'
 
 export default {
   name: 'App',
-  components: {
-    TheSidebar,
-  },
   data() {
     return {
       isLoggedIn: false
