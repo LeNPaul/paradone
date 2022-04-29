@@ -1,25 +1,33 @@
 <template>
-  <form @submit="onSubmit" class="form-signin d-grid gap-2">
-      <div class="text-center mb-4"><router-link to="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></router-link>
-          <h1 class="h3 mb-3 font-weight-normal">Reset Password</h1>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col min-vh-100 p-4">
+        <div class="col-lg-6 mx-auto p-3 py-md-5">
+          <form @submit="onSubmit" class="form-signin d-grid gap-2">
+              <div class="text-center mb-4"><router-link to="/"><img class="mb-4" src="../assets/img/light-bulb.png" alt="" width="72" height="72" /></router-link>
+                  <h1 class="h3 mb-3 font-weight-normal">Reset Password</h1>
+              </div>
+              <div class="form-floating">
+                <input v-model="currentPassword" class="form-control" type="password" placeholder="Current Password" name="currentPassword" required=""/>
+                <label for="inputCurrentPassword">Current Password</label>
+              </div>
+              <div class="form-floating">
+                <input v-model="newPassword" class="form-control" type="password" placeholder="New Password" name="newPassword" required=""/>
+                <label for="inputNewPassword">New Password</label>
+              </div>
+              <div class="form-floating">
+                <input v-model="newPasswordCheck" class="form-control" type="password" placeholder="Confirm New Password" name="newPasswordCheck" required=""/>
+                <label for="inputNewPassword">Confirm New Password</label>
+              </div>
+              <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
+                {{ errorMessage }}
+              </div>
+              <button class="btn btn-lg btn-dark btn-block" type="submit">Reset Password</button>
+          </form>
+        </div>
       </div>
-      <div class="form-floating">
-        <input v-model="currentPassword" class="form-control" type="password" placeholder="Current Password" name="currentPassword" required=""/>
-        <label for="inputCurrentPassword">Current Password</label>
-      </div>
-      <div class="form-floating">
-        <input v-model="newPassword" class="form-control" type="password" placeholder="New Password" name="newPassword" required=""/>
-        <label for="inputNewPassword">New Password</label>
-      </div>
-      <div class="form-floating">
-        <input v-model="newPasswordCheck" class="form-control" type="password" placeholder="Confirm New Password" name="newPasswordCheck" required=""/>
-        <label for="inputNewPassword">Confirm New Password</label>
-      </div>
-      <div v-show="errorMessage" class="alert alert-danger mb-0" role="alert">
-        {{ errorMessage }}
-      </div>
-      <button class="btn btn-lg btn-dark btn-block" type="submit">Reset Password</button>
-  </form>
+    </div>
+  </div>
 </template>
 
 <script>
