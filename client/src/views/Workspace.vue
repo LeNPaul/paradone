@@ -1,5 +1,4 @@
 <template>
-
   <div class="row">
     <div class="col-2 position-fixed border-end shadow">
       <TheSidebar :key="$route"/>
@@ -15,7 +14,6 @@
       </div>
     </div>
   </div>
-
 </template>
 
 <script>

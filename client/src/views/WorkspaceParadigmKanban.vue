@@ -1,13 +1,23 @@
 <template>
-  <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
-  <TheWorkspaceParadigmKanbanBoard
-    @delete-task="updateTasks()"
-    @update-task="updateTasks()"
-    :tasks="tasks"
-  />
+  <div class="row">
+    <div class="col-2 position-fixed border-end shadow">
+      <TheSidebar :key="$route"/>
+    </div>
+    <div class="col-6 offset-4 pt-3 mt-3">
+      <div class="mx-auto py-md-5">
+        <TheWorkspaceHeader :title="this.$route.params.project" @update-tasks="updateTasks()"/>
+        <TheWorkspaceParadigmKanbanBoard
+          @delete-task="updateTasks()"
+          @update-task="updateTasks()"
+          :tasks="tasks"
+        />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
+import TheSidebar from '../components/TheSidebar'
 import TheWorkspaceHeader from '../components/TheWorkspaceHeader'
 import TheWorkspaceParadigmKanbanBoard from '../components/TheWorkspaceParadigmKanbanBoard'
 
@@ -15,6 +25,7 @@ export default {
   name: 'WorkspaceParadigmKanban',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
+    TheSidebar,
     TheWorkspaceHeader,
     TheWorkspaceParadigmKanbanBoard
   },
