@@ -40,6 +40,8 @@
           body: JSON.stringify(updLabel),
         })
         const data = await res.json()
+        localStorage.removeItem('labels')
+        this.$store.dispatch('fetchLabels')
         this.$router.push(this.label_name.toLowerCase().replace(/[^0-9a-z]/g, '_'))
         return data
       },
