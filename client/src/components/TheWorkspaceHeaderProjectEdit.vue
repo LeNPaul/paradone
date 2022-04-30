@@ -40,6 +40,8 @@
           body: JSON.stringify(updProject),
         })
         const data = await res.json()
+        localStorage.removeItem('projects')
+        this.$store.dispatch('fetchProjects')
         this.$router.push(this.project_name)
         return data
       },
