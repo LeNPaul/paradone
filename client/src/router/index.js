@@ -1,7 +1,6 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Workspace from '../views/Workspace'
-import WorkspaceParadigmEisenhower from '../views/WorkspaceParadigmEisenhower'
 import WorkspaceParadigmKanban from '../views/WorkspaceParadigmKanban'
 import WorkspaceParadigmPomodoro from '../views/WorkspaceParadigmPomodoro'
 import Register from '../views/Register'
@@ -37,14 +36,6 @@ const routes = [
     path: '/paradigm/kanban',
     name: 'Kanban',
     component: WorkspaceParadigmKanban,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/paradigm/eisenhower',
-    name: 'Eisenhower',
-    component: WorkspaceParadigmEisenhower,
     meta: {
       requiresAuth: true
     }
