@@ -18,16 +18,12 @@
 
 <script>
 import TheSidebar from '../components/TheSidebar'
-import TheWorkspaceHeader from '../components/TheWorkspaceHeader'
-import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
 
 export default {
   name: 'Workspace',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    TheWorkspaceHeader,
-    TheWorkspaceTasks,
   },
   data() {
     return {
