@@ -34,13 +34,6 @@
         <hr>
 
         <li class="nav-item">
-          <router-link to="/paradigm/kanban" class="nav-link link-dark">
-            <i class="fas fa-columns me-1"></i>
-            Kanban
-          </router-link>
-        </li>
-
-        <li class="nav-item">
           <router-link to="/paradigm/pomodoro" class="nav-link link-dark">
             <i class="fas fa-clock me-1"></i>
             Pomodoro
