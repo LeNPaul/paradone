@@ -21,12 +21,10 @@ mongoose.connect(db)
 
 // Routes
 const tasks = require('./routes/api/tasks');
-const projects = require('./routes/api/projects');
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
 
 app.use('/api/tasks', tasks);
-app.use('/api/projects', projects);
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 
