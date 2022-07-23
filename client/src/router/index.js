@@ -15,22 +15,6 @@ const routes = [
     }
   },
   {
-    path: '/project/:project',
-    name: 'Project',
-    component: Workspace,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/label/:label',
-    name: 'Label',
-    component: Workspace,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
     path: '/register',
     name: 'Register',
     component: Register,

@@ -26,8 +26,7 @@ export default {
   async created() {
     this.isLoggedIn = this.$store.getters.isLoggedIn
     if(this.isLoggedIn) {
-      this.$store.dispatch('fetchLabels')
-      this.$store.dispatch('fetchProjects')
+      console.log('isLoggedIn')
     }
   },
   watch:{
