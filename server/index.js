@@ -20,11 +20,9 @@ mongoose.connect(db)
   .catch(err => console.log(err));
 
 // Routes
-const tasks = require('./routes/api/tasks');
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
 
-app.use('/api/tasks', tasks);
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 
