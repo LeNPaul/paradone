@@ -23,8 +23,11 @@ mongoose.connect(db)
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
 
+const todoist = require('./routes/api/integration/todoist');
+
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/todoist', todoist);
 
 // Static folder
 app.use(express.static(__dirname + '/public/'));
