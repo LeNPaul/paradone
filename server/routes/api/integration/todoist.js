@@ -7,15 +7,13 @@ const auth = require('../../../middleware/auth')
 // @route  GET api/subscriptions
 // @desc   Get user subscriptions
 // @access Private
-//router.get('/', auth, async (req, res) => {
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   const todoistRes = await axios.get('https://api.todoist.com/rest/v1/projects', {
     headers: {
       'Authorization': 'Bearer '
     }
   });
-  console.log(todoistRes)
-  res.send('Hello World!');
+  res.send(todoistRes.data);
 });
 
 module.exports = router;
