@@ -7,10 +7,10 @@ const auth = require('../../../middleware/auth')
 // @route  GET api/subscriptions
 // @desc   Get user subscriptions
 // @access Private
-router.get('/', auth, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const todoistRes = await axios.get('https://api.todoist.com/rest/v1/projects', {
     headers: {
-      'Authorization': 'Bearer '
+      'Authorization': 'Bearer ' + req.body.token
     }
   });
   res.send(todoistRes.data);
