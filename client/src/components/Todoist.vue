@@ -5,6 +5,7 @@
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
+  <p :key='task.id' v-for="task in tasks">{{task.content}}</p>
 </template>
 
 <script>
@@ -12,7 +13,8 @@
     name: 'Todoist',
     data() {
       return {
-        token: ''
+        token: '',
+        tasks: []
       }
     },
     methods: {
@@ -34,6 +36,7 @@
           body: JSON.stringify(token)
         })
         const data = await res.json()
+        this.tasks = data
         console.log(data)
         return data
       }
