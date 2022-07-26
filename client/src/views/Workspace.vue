@@ -6,6 +6,7 @@
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
         <Todoist/>
+        <Notion/>
       </div>
     </div>
   </div>
@@ -14,6 +15,7 @@
 <script>
 import TheSidebar from '../components/TheSidebar'
 import Todoist from '../components/Todoist'
+import Notion from '../components/Notion'
 
 export default {
   name: 'Workspace',
@@ -21,6 +23,7 @@ export default {
   components: {
     TheSidebar,
     Todoist,
+    Notion
   },
   data() {
     return {
