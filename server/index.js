@@ -24,10 +24,12 @@ const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
 
 const todoist = require('./routes/api/integration/todoist');
+const notion = require('./routes/api/integration/notion');
 
 app.use('/api/auth', auth);
 app.use('/api/users', users);
 app.use('/api/todoist', todoist);
+app.use('/api/notion', notion);
 
 // Static folder
 app.use(express.static(__dirname + '/public/'));
