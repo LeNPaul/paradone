@@ -8,11 +8,23 @@ const auth = require('../../../middleware/auth')
 // @desc   Get user subscriptions
 // @access Private
 router.post('/', auth, async (req, res) => {
-  const todoistRes = await axios.get('https://api.todoist.com/rest/v1/tasks', {
-    headers: {
-      'Authorization': 'Bearer ' + req.body.token
+  const todoistRes = await axios.post('https://api.notion.com/v1/search',
+  {
+    'query': 'Scratchpad',
+    'sort': {
+      'direction': 'ascending',
+      'timestamp': 'last_edited_time'
     }
+  },
+  {
+    headers: {
+      'Authorization': 'Bearer ' + req.body.token,
+      'Content-Type': 'application/json',
+      'Notion-Version': '2022-06-28'
+    },
+
   });
+  console.log(todoistRes.data.results)
   res.send(todoistRes.data);
 });
 

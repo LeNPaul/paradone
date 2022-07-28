@@ -27,7 +27,7 @@
         const token = {
           token: this.token
         }
-        const res = await fetch('/api/todoist', {
+        const res = await fetch('/api/notion', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
