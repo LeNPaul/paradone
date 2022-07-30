@@ -1,7 +1,8 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
     <div class="mb-3">
-      <input type="text" v-model="token" name="content" placeholder="Task content" class="form-control">
+      <input type="text" v-model="content" name="content" placeholder="Content" class="form-control">
+      <input type="text" v-model="token" name="content" placeholder="Token" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
@@ -14,6 +15,7 @@
     data() {
       return {
         token: '',
+        content: '',
         tasks: []
       }
     },
@@ -25,7 +27,8 @@
           return
         }
         const token = {
-          token: this.token
+          token: this.token,
+          content: this.content
         }
         const res = await fetch('/api/notion', {
           method: 'POST',

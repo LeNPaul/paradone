@@ -13,7 +13,7 @@ router.post('/', auth, async (req, res) => {
     "parent": { "database_id": "eb1b9a99-e313-4830-b520-25d52c6bf77e" },
     "properties": {
 		"Name": {
-			"title": [ { "text": { "content": "Tuscan Kale" } } ]
+			"title": [ { "text": { "content": req.body.content } } ]
 		 }
     }
   },
