@@ -8,12 +8,13 @@ const auth = require('../../../middleware/auth')
 // @desc   Get user subscriptions
 // @access Private
 router.post('/', auth, async (req, res) => {
-  const todoistRes = await axios.post('https://api.notion.com/v1/search',
+  const todoistRes = await axios.post('https://api.notion.com/v1/pages',
   {
-    'query': 'Scratchpad',
-    'sort': {
-      'direction': 'ascending',
-      'timestamp': 'last_edited_time'
+    "parent": { "database_id": "eb1b9a99-e313-4830-b520-25d52c6bf77e" },
+    "properties": {
+		"Name": {
+			"title": [ { "text": { "content": "Tuscan Kale" } } ]
+		 }
     }
   },
   {
