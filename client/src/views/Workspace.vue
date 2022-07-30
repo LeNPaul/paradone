@@ -5,8 +5,7 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <Todoist/>
-        <Notion/>
+        <Sync/>
       </div>
     </div>
   </div>
@@ -14,27 +13,14 @@
 
 <script>
 import TheSidebar from '../components/TheSidebar'
-import Todoist from '../components/Todoist'
-import Notion from '../components/Notion'
+import Sync from '../components/Sync'
 
 export default {
   name: 'Workspace',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    Todoist,
-    Notion
-  },
-  data() {
-    return {
-
-    }
-  },
-  methods: {
-
-  },
-  async created() {
-
+    Sync,
   },
   watch:{
     $route (){

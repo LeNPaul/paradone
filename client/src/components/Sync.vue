@@ -1,7 +1,8 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
     <div class="mb-3">
-      <input type="text" v-model="token" name="content" placeholder="Task content" class="form-control">
+      <input type="text" v-model="todoistToken" name="content" placeholder="Todoist API Token" class="form-control mb-3">
+      <input type="text" v-model="notionToken" name="content" placeholder="Notion API Token" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
@@ -10,10 +11,11 @@
 
 <script>
   export default {
-    name: 'Todoist',
+    name: 'Sync',
     data() {
       return {
-        token: '',
+        todoistToken: '',
+        notionToken: '',
         tasks: []
       }
     },
@@ -24,16 +26,17 @@
           alert('Please add a task')
           return
         }
-        const token = {
-          token: this.token
+        const tokens = {
+          notionToken: this.notionToken,
+          todoistToken: this.todoistToken
         }
-        const res = await fetch('/api/todoist', {
+        const res = await fetch('/api/notion', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
             'x-auth-token': localStorage.getItem('token') || ''
           },
-          body: JSON.stringify(token)
+          body: JSON.stringify(tokens)
         })
         const data = await res.json()
         this.tasks = data
