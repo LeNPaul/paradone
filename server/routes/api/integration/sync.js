@@ -18,7 +18,7 @@ router.post('/', auth, async (req, res) => {
   });
   // Find the label_id for notion
   var notion_label_id
-  for (let i = 0; i < todoistLabels.data.length; i++ ) {
+  for ( let i = 0; i < todoistLabels.data.length; i++ ) {
     if (todoistLabels.data[i].name == 'notion') {
       notion_label_id = todoistLabels.data[i].id
     }
@@ -30,30 +30,28 @@ router.post('/', auth, async (req, res) => {
     }
   });
 
+  for ( let j = 0; j < todoistTasks.data.length; j++ ) {
+    const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
+    {
+      "parent": { "database_id": "eb1b9a99-e313-4830-b520-25d52c6bf77e" },
+      "properties": {
+  		"Name": {
+  			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
+  		 }
+      }
+    },
+    {
+      headers: {
+        'Authorization': 'Bearer ' + req.body.notionToken,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+
+    });
+  }
+
   res.send(todoistTasks.data);
 
 });
-
-/* router.post('/', auth, async (req, res) => {
-  const todoistRes = await axios.post('https://api.notion.com/v1/pages',
-  {
-    "parent": { "database_id": "eb1b9a99-e313-4830-b520-25d52c6bf77e" },
-    "properties": {
-		"Name": {
-			"title": [ { "text": { "content": req.body.content } } ]
-		 }
-    }
-  },
-  {
-    headers: {
-      'Authorization': 'Bearer ' + req.body.token,
-      'Content-Type': 'application/json',
-      'Notion-Version': '2022-06-28'
-    },
-
-  });
-  console.log(todoistRes.data.results)
-  res.send(todoistRes.data);
-}); */
 
 module.exports = router;
