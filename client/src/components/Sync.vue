@@ -22,15 +22,15 @@
     methods: {
       async onSubmit(e) {
         e.preventDefault()
-        if(!this.token) {
+        /*if(!this.token) {
           alert('Please add a task')
           return
-        }
+        }*/
         const tokens = {
           notionToken: this.notionToken,
           todoistToken: this.todoistToken
         }
-        const res = await fetch('/api/notion', {
+        const res = await fetch('/api/sync', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',

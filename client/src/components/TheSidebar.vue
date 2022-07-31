@@ -16,6 +16,7 @@
         </a>
         <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
           <li><router-link to="/resetpassword" class="dropdown-item"><i class="fas fa-cog me-2"></i>Reset Password</router-link></li>
+          <li><router-link to="/settings" class="dropdown-item"><i class="fas fa-cog me-2"></i>Settings</router-link></li>
           <li><hr class="dropdown-divider"></li>
           <li><router-link to="/" @click="logout" class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Sign out</router-link></li>
         </ul>
