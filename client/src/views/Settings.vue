@@ -7,12 +7,12 @@
       <div class="mx-auto py-md-5">
         <form>
           <div class="mb-3">
-            <label for="exampleInputEmail1" class="form-label">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+            <label class="form-label">Todoist API Token</label>
+            <input v-model="todoistToken" type="password" class="form-control">
           </div>
           <div class="mb-3">
-            <label for="exampleInputPassword1" class="form-label">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1">
+            <label class="form-label">Notion API Token</label>
+            <input v-model="notionToken" type="password" class="form-control">
           </div>
           <div class="mb-3">
             <router-link to="/resetpassword" class="text-dark text-decoration-none"><i class="fas fa-lock me-2"></i>Reset Password</router-link>
@@ -32,6 +32,12 @@ export default {
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
+  },
+  data() {
+    return {
+      notionToken: '',
+      todoistToken: '',
+    }
   },
   watch:{
     $route (){
