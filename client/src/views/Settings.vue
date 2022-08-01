@@ -50,7 +50,7 @@ export default {
         todoist_api_token: this.todoistToken
       }
       const res = await fetch('/api/settings', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-type': 'application/json',
           'x-auth-token': localStorage.getItem('token') || ''

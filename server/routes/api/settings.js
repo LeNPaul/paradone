@@ -12,19 +12,22 @@ router.get('/', auth, async (req, res) => {
   res.send(await Setting.find({user_id: req.user.id}));
 });
 
-// @route  POST api/settings
-// @desc   Create a new
+// @route  PUT api/settings
+// @desc   Update existing settings
 // @access Private
-router.post('/', auth, async (req, res) => {
-  console.log(req.body)
+router.put('/', auth, async (req, res) => {
   const settings = {
     notion_api_token: req.body.notion_api_token,
     todoist_api_token: req.body.todoist_api_token,
     user_id: req.user.id
   }
-  const insertedSettings = await Setting.create(settings);
-  settings._id = insertedSettings._id;
-  res.status(201).send(settings);
+  console.log(settings)
+  const updatedSettings = await Setting.findOneAndUpdate(
+    { user_id: req.user.id },
+    { $set: settings }
+  );
+  settings._id = updatedSettings._id;
+  res.status(200).send(settings);
 });
 
 module.exports = router;
