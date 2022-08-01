@@ -5,7 +5,10 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <form>
+        <form @submit="onSubmit">
+          <div class="mb-3">
+            <h3>Settings</h3>
+          </div>
           <div class="mb-3">
             <label class="form-label">Todoist API Token</label>
             <input v-model="todoistToken" type="password" class="form-control">
@@ -17,7 +20,7 @@
           <div class="mb-3">
             <router-link to="/resetpassword" class="text-dark text-decoration-none"><i class="fas fa-lock me-2"></i>Reset Password</router-link>
           </div>
-          <button type="submit" class="btn btn-dark">Submit</button>
+          <button type="submit" class="btn btn-dark">Save</button>
         </form>
       </div>
     </div>
@@ -37,6 +40,24 @@ export default {
     return {
       notionToken: '',
       todoistToken: '',
+    }
+  },
+  methods: {
+    async onSubmit(e) {
+      e.preventDefault()
+      const settings = {
+        notion_api_token: this.notionToken,
+        todoist_api_token: this.todoistToken
+      }
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json',
+          'x-auth-token': localStorage.getItem('token') || ''
+        },
+        body: JSON.stringify(settings),
+      })
+      return await res.json()
     }
   },
   watch:{
