@@ -57,6 +57,8 @@ export default {
         },
         body: JSON.stringify(settings),
       })
+      // TODO: Add error handling here
+      alert('Settings successfully saved')
       return await res.json()
     },
     async getSettings() {
