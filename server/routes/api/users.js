@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 
 // User model
 const User = require('../../models/User');
+// Setting model
+const Setting = require('../../models/Setting');
 
 // @route  POST api/users
 // @desc   Register new user
@@ -38,6 +40,9 @@ router.post('/', (req, res) => {
               { expiresIn: config.get('expiresIn') },
               (err, token) => {
                 if(err) throw err;
+                Setting.create({
+                  user_id:  user.id,
+                });
                 res.json({
                   token,
                   user: {
