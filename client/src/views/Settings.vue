@@ -58,14 +58,20 @@ export default {
         body: JSON.stringify(settings),
       })
       return await res.json()
+    },
+    async getSettings() {
+      const res = await fetch('/api/settings', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      let settings = await res.json()
+      this.notionToken = settings[0].notion_api_token
+      this.todoistToken = settings[0].todoist_api_token
     }
   },
-  watch:{
-    $route (){
-      if(this.$store.getters.isLoggedIn) {
-        console.log('isLoggedIn')
-      }
-    }
+  async created() {
+    this.getSettings()
   }
 }
 </script>
