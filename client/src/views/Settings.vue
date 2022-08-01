@@ -57,8 +57,11 @@ export default {
         },
         body: JSON.stringify(settings),
       })
-      // TODO: Add error handling here
-      alert('Settings successfully saved')
+      if (res.status === 200) {
+        alert('Settings successfully saved')
+      } else {
+        alert('Error saving settings')
+      }
       return await res.json()
     },
     async getSettings() {
