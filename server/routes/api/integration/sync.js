@@ -40,31 +40,83 @@ router.post('/', auth, async (req, res) => {
       }
     });
 
-    res.send(todoistTasks.data)
-
     // Query Notion for database IDs
+    const notionDatabaseIds = await axios.post('https://api.notion.com/v1/search',
+    {
+      'query': 'paradone'
+    },
+    {
+      headers: {
+        'Authorization': 'Bearer ' + settings[0].notion_api_token,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      }
+    });
+    let paradoneDatabaseId = notionDatabaseIds.data.results[0].id
 
-  /*
-    for ( let j = 0; j < todoistTasks.data.length; j++ ) {
-      const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
-      {
-        "parent": { "database_id": "eb1b9a99-e313-4830-b520-25d52c6bf77e" },
-        "properties": {
-    		"Name": {
-    			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
-    		 }
-        }
-      },
+    // Get pages in Notion database
+    const databasePages = await axios.post('https://api.notion.com/v1/databases/' + paradoneDatabaseId + '/query',
+    {},
+    {
+      headers: {
+        'Authorization': 'Bearer ' + settings[0].notion_api_token,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      }
+    });
+
+    let databasePageResults = databasePages.data.results
+
+    var pageIds = []
+
+    // get title property
+    // For each result get the ttitle property and put in array
+    for ( let i = 0; i < databasePageResults.length; i++ ) {
+
+      const pageTitle = await axios.get('https://api.notion.com/v1/pages/' + databasePageResults[i].id + '/properties/title',
       {
         headers: {
-          'Authorization': 'Bearer ' + req.body.notionToken,
+          'Authorization': 'Bearer ' + settings[0].notion_api_token,
           'Content-Type': 'application/json',
           'Notion-Version': '2022-06-28'
-        },
-
+        }
       });
+
+      pageIds.push({title: pageTitle.data.results[0].title.plain_text, id: databasePageResults[i].id})
     }
-  */
+
+    for ( let j = 0; j < todoistTasks.data.length; j++ ) {
+
+      const isFound = pageIds.some(element => {
+        if (element.title === todoistTasks.data[j].content) {
+          return true;
+        }
+        return false;
+      });
+
+      if (!isFound) {
+        const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
+        {
+          "parent": { "database_id": paradoneDatabaseId },
+          "properties": {
+      		"Name": {
+      			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
+      		 }
+          }
+        },
+        {
+          headers: {
+            'Authorization': 'Bearer ' + settings[0].notion_api_token,
+            'Content-Type': 'application/json',
+            'Notion-Version': '2022-06-28'
+          },
+
+        });
+      }
+
+    }
+
+  res.send(todoistTasks.data)
 
   }
 
