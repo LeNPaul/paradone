@@ -7,6 +7,9 @@
     <div v-show="errorMessage" class="alert alert-danger mb-3" role="alert">
       {{ errorMessage }}
     </div>
+    <div v-show="successMessage" class="alert alert-success mb-3" role="alert">
+      {{ successMessage }}
+    </div>
     <button type="submit" class="btn btn-dark">Sync</button>
   </form>
 </template>
@@ -19,6 +22,7 @@
         todoistToken: '',
         notionToken: '',
         errorMessage: '',
+        successMessage: ''
       }
     },
     methods: {
@@ -39,6 +43,8 @@
         const data = await res.json()
         if (data.Error) {
           this.errorMessage = data.Error
+        } else {
+          this.successMessage = data.Success
         }
       }
     }
