@@ -2,7 +2,7 @@
   <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
     <div class="mb-3">
       <h3>Sync Notion with Todoist</h3>
-      <p>Sync any tasks in Todoist with the label "notion" to any database in Notion shared with integration.</p>
+      <p>Sync any tasks in Todoist with the label "notion" to a database in Notion shared with integration with "tasks" in the title</p>
     </div>
     <div v-show="errorMessage" class="alert alert-danger mb-3" role="alert">
       {{ errorMessage }}

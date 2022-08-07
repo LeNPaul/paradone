@@ -7,8 +7,8 @@ const auth = require('../../../middleware/auth')
 // Setting model
 const Setting = require('../../../models/Setting');
 
-// @route  GET api/subscriptions
-// @desc   Get user subscriptions
+// @route  POST api/sync
+// @desc   Sync any tasks in Todoist with the label "notion" to a database in Notion shared with integration with "tasks" in the title
 // @access Private
 
 router.post('/', auth, async (req, res) => {
@@ -20,12 +20,22 @@ router.post('/', auth, async (req, res) => {
     res.status(404).json({'Error': 'Missing Notion or Todoist API token'})
   } else {
 
-    // Get labels from Todoist
-    const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', {
+    let todoistRequestHeader = {
       headers: {
         'Authorization': 'Bearer ' + settings[0].todoist_api_token
       }
-    });
+    }
+
+    let notionRequestHeader = {
+      headers: {
+        'Authorization': 'Bearer ' + settings[0].notion_api_token,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      }
+    }
+
+    // Get labels from Todoist
+    const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', todoistRequestHeader);
     // Find the label_id for notion in Todoist
     var notion_label_id
     for ( let i = 0; i < todoistLabels.data.length; i++ ) {
@@ -34,36 +44,20 @@ router.post('/', auth, async (req, res) => {
       }
     }
 
-    const todoistTasks = await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + notion_label_id, {
-      headers: {
-        'Authorization': 'Bearer ' + settings[0].todoist_api_token
-      }
-    });
+    const todoistTasks = await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + notion_label_id, todoistRequestHeader);
 
     // Query Notion for database IDs
     const notionDatabaseIds = await axios.post('https://api.notion.com/v1/search',
     {
       'query': 'paradone'
     },
-    {
-      headers: {
-        'Authorization': 'Bearer ' + settings[0].notion_api_token,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      }
-    });
+    notionRequestHeader);
     let paradoneDatabaseId = notionDatabaseIds.data.results[0].id
 
     // Get pages in Notion database
     const databasePages = await axios.post('https://api.notion.com/v1/databases/' + paradoneDatabaseId + '/query',
     {},
-    {
-      headers: {
-        'Authorization': 'Bearer ' + settings[0].notion_api_token,
-        'Content-Type': 'application/json',
-        'Notion-Version': '2022-06-28'
-      }
-    });
+    notionRequestHeader);
 
     let databasePageResults = databasePages.data.results
 
@@ -74,13 +68,7 @@ router.post('/', auth, async (req, res) => {
     for ( let i = 0; i < databasePageResults.length; i++ ) {
 
       const pageTitle = await axios.get('https://api.notion.com/v1/pages/' + databasePageResults[i].id + '/properties/title',
-      {
-        headers: {
-          'Authorization': 'Bearer ' + settings[0].notion_api_token,
-          'Content-Type': 'application/json',
-          'Notion-Version': '2022-06-28'
-        }
-      });
+      notionRequestHeader);
 
       pageIds.push({title: pageTitle.data.results[0].title.plain_text, id: databasePageResults[i].id})
     }
@@ -104,14 +92,7 @@ router.post('/', auth, async (req, res) => {
       		 }
           }
         },
-        {
-          headers: {
-            'Authorization': 'Bearer ' + settings[0].notion_api_token,
-            'Content-Type': 'application/json',
-            'Notion-Version': '2022-06-28'
-          },
-
-        });
+        notionRequestHeader);
       }
 
     }
