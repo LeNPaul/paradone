@@ -31,8 +31,7 @@ router.post('/', auth, async (req, res) => {
       }
     }
     // Query Notion for database with "paradone" in the title and extract database ID
-    // TODO: remove hardcoding of "paradone"
-    const notionDatabaseResults = await axios.post('https://api.notion.com/v1/search', { 'query': 'paradone' }, notionRequestHeader);
+    const notionDatabaseResults = await axios.post('https://api.notion.com/v1/search', { 'query': req.body.notionDatabase }, notionRequestHeader);
     let notionDatabaseId = notionDatabaseResults.data.results[0].id
     // Query pages from database with "paradone" in the title
     const notionDatabasePages = await axios.post('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {}, notionRequestHeader);
@@ -44,11 +43,10 @@ router.post('/', auth, async (req, res) => {
       notionPages.push({title: notionPageProperties.data.results[0].title.plain_text, id: notionDatabasePageResults[i].id})
     }
     // Get label_id for "notion" label in Todoist
-    // TODO: remove hardcoding of "notion" label name
     const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', todoistRequestHeader);
     var notionLabelId
     for ( let i = 0; i < todoistLabels.data.length; i++ ) {
-      if (todoistLabels.data[i].name == 'notion') {
+      if (todoistLabels.data[i].name == req.body.todoistLabel) {
         notionLabelId = todoistLabels.data[i].id
       }
     }
