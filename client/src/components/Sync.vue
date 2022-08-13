@@ -3,11 +3,11 @@
     <div class="mb-3">
       <h3>Sync Notion with Todoist</h3>
       <p>Sync any tasks in Todoist with the label:</p>
-      <input type="text" class="form-control">
+      <input v-model="todoistLabel" type="text" class="form-control">
     </div>
     <div class="mb-3">
       <p>To a database in Notion shared with integration called:</p>
-      <input type="text" class="form-control" aria-describedby="passwordHelpInline">
+      <input v-model="notionDatabase" type="text" class="form-control">
     </div>
     <div v-show="errorMessage" class="alert alert-danger mb-3" role="alert">
       {{ errorMessage }}
@@ -24,8 +24,8 @@
     name: 'Sync',
     data() {
       return {
-        todoistToken: '',
-        notionToken: '',
+        todoistLabel: '',
+        notionDatabase: '',
         errorMessage: '',
         successMessage: ''
       }
@@ -33,17 +33,18 @@
     methods: {
       async onSubmit(e) {
         e.preventDefault()
-        const tokens = {
-          notionToken: this.notionToken,
-          todoistToken: this.todoistToken
+        const configuration = {
+          notionDatabase: this.notionDatabase,
+          todoistLabel: this.todoistLabel
         }
+        console.log(configuration)
         const res = await fetch('/api/sync', {
           method: 'POST',
           headers: {
             'Content-type': 'application/json',
             'x-auth-token': localStorage.getItem('token') || ''
           },
-          body: JSON.stringify(tokens)
+          body: JSON.stringify(configuration)
         })
         const data = await res.json()
         if (data.Error) {
