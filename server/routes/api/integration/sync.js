@@ -54,22 +54,29 @@ router.post('/', auth, async (req, res) => {
     const todoistTasks = await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + notionLabelId, todoistRequestHeader);
     // For each task from Todoist, if it does not already exist as a page in Notion then add as page to Notion database
     for ( let j = 0; j < todoistTasks.data.length; j++ ) {
-      const isFound = notionPages.some(element => {
-        if (element.title === todoistTasks.data[j].content) {
-          return true;
-        }
-        return false;
-      });
-      if (!isFound) {
-        const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
-        {
-          "parent": { "database_id": notionDatabaseId },
-          "properties": {
-      		"Name": {
-      			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
-      		 }
+      let isFound = false
+      if (notionPages.length !== 0) {
+        const isFound = notionPages.some(element => {
+          if (element.title === todoistTasks.data[j].content) {
+            return true;
           }
-        }, notionRequestHeader);
+          return false;
+        });
+      }
+      if (!isFound) {
+        try {
+          const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
+          {
+            "parent": { "database_id": notionDatabaseId },
+            "properties": {
+          		"Task": {
+          			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
+          		 }
+            }
+          }, notionRequestHeader);
+        } catch (error) {
+          console.log(error.response.data)
+        }
       }
     }
     res.json({'Success': 'Successfully synced at ' + Date().toString()})
