@@ -93,6 +93,28 @@ router.post('/', auth, async (req, res) => {
         }
       }
     }
+    // For each page in Notion, if task does not exist in Todoist, then remove page
+    for (let i = 0; i < notionPages.length; i++) {
+      let isFound = false
+      if (todoistTasks.data.length !== 0) {
+        isFound = todoistTasks.data.some(element => {
+          if (element.content == notionPages[i].title) {
+            return true;
+          }
+        });
+      }
+      if (!isFound) {
+        try {
+          const notionUpdatePageRes = await axios.patch('https://api.notion.com/v1/pages/' + notionPages[i].id,
+          {
+            "archived": true
+          }, notionRequestHeader);
+        } catch (error) {
+          res.json({'Error': error.response.data.message})
+          return
+        }
+      }
+    }
     res.json({'Success': 'Successfully synced at ' + Date().toString()})
   }
 });
