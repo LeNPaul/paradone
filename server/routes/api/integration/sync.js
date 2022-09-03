@@ -31,8 +31,20 @@ router.post('/', auth, async (req, res) => {
       }
     }
     // Query Notion for database with "paradone" in the title and extract database ID
-    const notionDatabaseResults = await axios.post('https://api.notion.com/v1/search', { 'query': req.body.notionDatabase }, notionRequestHeader);
-    let notionDatabaseId = notionDatabaseResults.data.results[0].id
+    let notionDatabaseResults
+    try {
+      notionDatabaseResults = await axios.post('https://api.notion.com/v1/search', { 'query': req.body.notionDatabase }, notionRequestHeader);
+    } catch (error) {
+      res.json({'Error': error.response.data.message})
+      return
+    }
+    let notionDatabaseId
+    if (notionDatabaseResults.data.results.length == 0) {
+      res.json({'Error': 'Notion - Database with name ' + req.body.notionDatabase + ' not found.' })
+      return
+    } else {
+      notionDatabaseId = notionDatabaseResults.data.results[0].id
+    }
     // Query pages from database with "paradone" in the title
     const notionDatabasePages = await axios.post('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {}, notionRequestHeader);
     let notionDatabasePageResults = notionDatabasePages.data.results
@@ -40,14 +52,16 @@ router.post('/', auth, async (req, res) => {
     var notionPages = []
     for ( let i = 0; i < notionDatabasePageResults.length; i++ ) {
       const notionPageProperties = await axios.get('https://api.notion.com/v1/pages/' + notionDatabasePageResults[i].id + '/properties/title', notionRequestHeader);
-      notionPages.push({title: notionPageProperties.data.results[0].title.plain_text, id: notionDatabasePageResults[i].id})
+      if (notionPageProperties.data.results[0]) {
+        notionPages.push({title: notionPageProperties.data.results[0].title.plain_text, id: notionDatabasePageResults[i].id})
+      }
     }
     // Get label_id for "notion" label in Todoist
     const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', todoistRequestHeader);
     var notionLabelId
-    for ( let i = 0; i < todoistLabels.data.length; i++ ) {
-      if (todoistLabels.data[i].name == req.body.todoistLabel) {
-        notionLabelId = todoistLabels.data[i].id
+    for ( let k = 0; k < todoistLabels.data.length; k++ ) {
+      if (todoistLabels.data[k].name == req.body.todoistLabel) {
+        notionLabelId = todoistLabels.data[k].id
       }
     }
     // Get tasks from Todoist with the "notion" label
@@ -56,11 +70,10 @@ router.post('/', auth, async (req, res) => {
     for ( let j = 0; j < todoistTasks.data.length; j++ ) {
       let isFound = false
       if (notionPages.length !== 0) {
-        const isFound = notionPages.some(element => {
-          if (element.title === todoistTasks.data[j].content) {
+        isFound = notionPages.some(element => {
+          if (element.title == todoistTasks.data[j].content) {
             return true;
           }
-          return false;
         });
       }
       if (!isFound) {
@@ -69,13 +82,14 @@ router.post('/', auth, async (req, res) => {
           {
             "parent": { "database_id": notionDatabaseId },
             "properties": {
-          		"Task": {
-          			"title": [ { "text": { "content": todoistTasks.data[j].content } } ]
-          		 }
+              "Tasks": {
+                "title": [ { "text": { "content": todoistTasks.data[j].content } } ]
+               }
             }
           }, notionRequestHeader);
         } catch (error) {
-          console.log(error.response.data)
+          res.json({'Error': error.response.data.message})
+          return
         }
       }
     }
