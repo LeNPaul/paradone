@@ -30,7 +30,7 @@ router.post('/', auth, async (req, res) => {
         'Notion-Version': '2022-06-28'
       }
     }
-    // Query Notion for database with "paradone" in the title and extract database ID
+    // Query Notion for database with "req.body.notionDatabase" in the title and extract database ID
     let notionDatabaseResults
     try {
       notionDatabaseResults = await axios.post('https://api.notion.com/v1/search', { 'query': req.body.notionDatabase }, notionRequestHeader);
@@ -45,7 +45,7 @@ router.post('/', auth, async (req, res) => {
     } else {
       notionDatabaseId = notionDatabaseResults.data.results[0].id
     }
-    // Query pages from database with "paradone" in the title
+    // Query pages from database with "req.body.notionDatabase" in the title
     const notionDatabasePages = await axios.post('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {}, notionRequestHeader);
     let notionDatabasePageResults = notionDatabasePages.data.results
     // For each Notion page, get the title property and put results in array with page ID
@@ -53,7 +53,11 @@ router.post('/', auth, async (req, res) => {
     for ( let i = 0; i < notionDatabasePageResults.length; i++ ) {
       const notionPageProperties = await axios.get('https://api.notion.com/v1/pages/' + notionDatabasePageResults[i].id + '/properties/title', notionRequestHeader);
       if (notionPageProperties.data.results[0]) {
-        notionPages.push({title: notionPageProperties.data.results[0].title.plain_text, id: notionDatabasePageResults[i].id})
+        notionPages.push({
+          title: notionPageProperties.data.results[0].title.plain_text,
+          id: notionDatabasePageResults[i].id,
+          isCompleted: notionDatabasePageResults[i].properties[''].checkbox
+        })
       }
     }
     // Get label_id for "notion" label in Todoist
