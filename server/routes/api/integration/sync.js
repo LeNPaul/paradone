@@ -73,12 +73,20 @@ router.post('/', auth, async (req, res) => {
     // For each task from Todoist, if it does not already exist as a page in Notion then add as page to Notion database
     for ( let j = 0; j < todoistTasks.data.length; j++ ) {
       let isFound = false
+      let isComplete = false
       if (notionPages.length !== 0) {
         isFound = notionPages.some(element => {
           if (element.title == todoistTasks.data[j].content) {
             return true;
           }
         });
+        if (isFound) {
+          isComplete = notionPages.some(element => {
+            if ((element.title == todoistTasks.data[j].content) && element.isCompleted) {
+              return true;
+            }
+          })
+        }
       }
       if (!isFound) {
         try {
@@ -92,7 +100,16 @@ router.post('/', auth, async (req, res) => {
             }
           }, notionRequestHeader);
         } catch (error) {
-          res.json({'Error': error.response.data.message})
+          res.json({'Error': error})
+          return
+        }
+      }
+      if (isComplete) {
+        // Complete task in Todoist
+        try {
+          const todoistCompleteTaskRes = await axios.post('https://api.todoist.com/rest/v1/tasks/' + todoistTasks.data[j].id + '/close', {}, todoistRequestHeader);
+        } catch (error) {
+          res.json({'Error': error.response.statusText})
           return
         }
       }
