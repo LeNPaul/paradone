@@ -20,17 +20,15 @@ mongoose.connect(db)
   .catch(err => console.log(err));
 
 // Routes
-const tasks = require('./routes/api/tasks');
-const projects = require('./routes/api/projects');
-const labels = require('./routes/api/labels');
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
+const sync = require('./routes/api/integration/sync');
+const settings = require('./routes/api/settings');
 
-app.use('/api/tasks', tasks);
-app.use('/api/projects', projects);
-app.use('/api/labels', labels);
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/sync', sync);
+app.use('/api/settings', settings);
 
 // Static folder
 app.use(express.static(__dirname + '/public/'));
@@ -38,6 +36,6 @@ app.use(express.static(__dirname + '/public/'));
 // Handle production SPA when built
 app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
-const port = process.env.PORT || 4040;
+const port = process.env.PORT || 7070;
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

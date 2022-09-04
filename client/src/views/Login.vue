@@ -49,11 +49,7 @@ export default {
         if (error) {
           this.errorMessage = error.msg
         } else {
-          this.$store.dispatch('fetchLabels').then(() => {
-            this.$store.dispatch('fetchProjects').then(() => {
-              this.$router.push('/')
-            })
-          })
+          this.$router.push('/')
         }
       })
     }

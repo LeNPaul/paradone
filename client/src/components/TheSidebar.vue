@@ -7,53 +7,6 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
 
-        <li class="nav-item">
-          <button @click="toggleAddProject" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Projects</span><i class="fas fa-plus"></i></button>
-          <TheSidebarProjectAdd v-show="showAddProject" @close-add-project="toggleAddProject" @update-projects="updateProjects"/>
-        </li>
-
-        <li :key='project.project_name' v-for="project in projects">
-          <router-link :to="{ name: 'Project', params: { project: project.project_name } }" class="nav-link link-dark">
-            <i class="fas fa-tasks me-1"></i>
-            {{ project.project_name }}
-          </router-link>
-        </li>
-
-        <li class="nav-item">
-          <button @click="toggleAddLabel" class="btn btn-link link-dark text-decoration-none"><span class="fs-6 me-2">Labels</span><i class="fas fa-plus"></i></button>
-          <TheSidebarLabelAdd v-show="showAddLabel" @close-add-label="toggleAddLabel" @update-labels="updateLabels"/>
-        </li>
-
-        <li :key='label.label_name' v-for="label in labels">
-          <router-link :to="{ name: 'Label', params: { label: label.label_name.toLowerCase().replace(/\s/g, '') } }" class="nav-link link-dark">
-            <i class="fas fa-tag me-1"></i>
-            {{ label.label_name }}
-          </router-link>
-        </li>
-
-        <hr>
-
-        <li class="nav-item">
-          <router-link to="/paradigm/eisenhower" class="nav-link link-dark">
-            <i class="fas fa-th-large me-1"></i>
-            Eisenhower Matrix
-          </router-link>
-        </li>
-
-        <li class="nav-item">
-          <router-link to="/paradigm/kanban" class="nav-link link-dark">
-            <i class="fas fa-columns me-1"></i>
-            Kanban
-          </router-link>
-        </li>
-
-        <li class="nav-item">
-          <router-link to="/paradigm/pomodoro" class="nav-link link-dark">
-            <i class="fas fa-clock me-1"></i>
-            Pomodoro
-          </router-link>
-        </li>
-
       </ul>
       <hr>
       <div class="dropdown">
@@ -62,7 +15,7 @@
           <strong>{{ username }}</strong>
         </a>
         <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-          <li><router-link to="/resetpassword" class="dropdown-item"><i class="fas fa-cog me-2"></i>Reset Password</router-link></li>
+          <li><router-link to="/settings" class="dropdown-item"><i class="fas fa-cog me-2"></i>Settings</router-link></li>
           <li><hr class="dropdown-divider"></li>
           <li><router-link to="/" @click="logout" class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Sign out</router-link></li>
         </ul>
@@ -83,56 +36,28 @@ aside {
 </style>
 
 <script>
-import TheSidebarProjectAdd from '../components/TheSidebarProjectAdd'
-import TheSidebarLabelAdd from '../components/TheSidebarLabelAdd'
-
 
 export default {
   name: 'TheSidebar',
   components: {
-    TheSidebarProjectAdd,
-    TheSidebarLabelAdd
   },
   data() {
     return {
-      showAddProject: false,
-      showAddLabel: false,
-      projects: [],
-      labels: [],
       username: ''
     }
   },
   methods: {
-    toggleAddProject() {
-      this.showAddProject = !this.showAddProject
-    },
-    async updateProjects(newProject) {
-      this.projects.push(newProject)
-    },
-    toggleAddLabel() {
-      this.showAddLabel = !this.showAddLabel
-    },
-    async updateLabels(newLabel) {
-      this.labels.push(newLabel)
-    },
     logout: function () {
       this.$store.dispatch('logout')
       this.$router.push('/login')
     }
   },
   async created() {
-    this.projects = this.$store.state.projects
-    this.labels = this.$store.state.labels
     let user = JSON.parse(localStorage.getItem('user') || '')
     this.username = user.username
   },
   watch: {
-    '$store.state.projects': function() {
-      this.projects = this.$store.state.projects
-    },
-    '$store.state.labels': function() {
-      this.labels = this.$store.state.labels
-    }
+
   }
 }
 </script>

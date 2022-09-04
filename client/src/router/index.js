@@ -1,9 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Workspace from '../views/Workspace'
-import WorkspaceParadigmEisenhower from '../views/WorkspaceParadigmEisenhower'
-import WorkspaceParadigmKanban from '../views/WorkspaceParadigmKanban'
-import WorkspaceParadigmPomodoro from '../views/WorkspaceParadigmPomodoro'
+import Settings from '../views/Settings'
 import Register from '../views/Register'
 import Login from '../views/Login'
 import ResetPassword from '../views/ResetPassword'
@@ -18,41 +16,9 @@ const routes = [
     }
   },
   {
-    path: '/project/:project',
-    name: 'Project',
-    component: Workspace,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/label/:label',
-    name: 'Label',
-    component: Workspace,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/paradigm/kanban',
-    name: 'Kanban',
-    component: WorkspaceParadigmKanban,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/paradigm/eisenhower',
-    name: 'Eisenhower',
-    component: WorkspaceParadigmEisenhower,
-    meta: {
-      requiresAuth: true
-    }
-  },
-  {
-    path: '/paradigm/pomodoro',
-    name: 'Pomodoro',
-    component: WorkspaceParadigmPomodoro,
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
     meta: {
       requiresAuth: true
     }
