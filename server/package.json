@@ -6,8 +6,8 @@
   "scripts": {
     "production": "node index.js",
     "server": "nodemon index.js",
-    "startdb": "brew services start mongodb-community@5.0",
-    "stopdb": "brew services stop mongodb-community@5.0"
+    "startdb": "brew services start mongodb-community",
+    "stopdb": "brew services stop mongodb-community"
   },
   "author": "Paul Le",
   "license": "ISC",
