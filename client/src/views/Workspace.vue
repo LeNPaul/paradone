@@ -5,6 +5,7 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
+        <IntegrationAdd/>
         <Sync/>
       </div>
     </div>
@@ -14,6 +15,7 @@
 <script>
 import TheSidebar from '../components/TheSidebar'
 import Sync from '../components/Sync'
+import IntegrationAdd from '../components/IntegrationAdd'
 
 export default {
   name: 'Workspace',
@@ -21,6 +23,7 @@ export default {
   components: {
     TheSidebar,
     Sync,
+    IntegrationAdd
   },
   watch:{
     $route (){
