@@ -37,7 +37,7 @@
 
 <script>
   export default {
-    name: 'Sync',
+    name: 'IntegrationAdd',
     data() {
       return {
         source: '',

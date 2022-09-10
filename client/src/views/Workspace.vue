@@ -9,6 +9,7 @@
             <button @click="toggleAddIntegration()" class="btn btn-link link-dark"><i class="fas fa-plus"></i></button>
           </header>
           <IntegrationAdd v-show="showAddIntegration" @close-add-integration="toggleAddIntegration"/>
+          <IntegrationList/>
       </div>
     </div>
   </div>
@@ -17,13 +18,15 @@
 <script>
 import TheSidebar from '../components/TheSidebar'
 import IntegrationAdd from '../components/IntegrationAdd'
+import IntegrationList from '../components/IntegrationList'
 
 export default {
   name: 'Workspace',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    IntegrationAdd
+    IntegrationAdd,
+    IntegrationList
   },
   data() {
     return {
