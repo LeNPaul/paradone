@@ -48,6 +48,7 @@
         successMessage: ''
       }
     },
+    emits: ['close-add-integration'],
     methods: {
       async onSubmit(e) {
         e.preventDefault()
@@ -66,12 +67,16 @@
           body: JSON.stringify(configuration)
         })
         const data = await res.json()
-        console.log(data)
         if (data.Error) {
           this.errorMessage = data.Error
         } else {
           this.successMessage = data.Success
         }
+        this.source = ''
+        this.destination = ''
+        this.query = ''
+        this.modifier = ''
+        this.$emit('close-add-integration')
       }
     }
   }
