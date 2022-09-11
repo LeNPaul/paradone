@@ -1,5 +1,9 @@
 <template>
   <p class="pb-3 border-bottom">
+
+    <button v-show="integration.is_active" type="button" class="btn btn-success p-1 ms-2" disabled>Enabled</button>
+    <button v-show="!integration.is_active" type="button" class="btn btn-danger p-1 ms-2" disabled>Disabled</button>
+
     <button type="button" class="btn btn-outline-dark p-1 ms-2" disabled>{{ integration.source }}</button>
     <i class="fas fa-arrow-right ps-2"></i>
     <button type="button" class="btn btn-outline-dark p-1 ms-2" disabled>{{ integration.source_query }}</button>
