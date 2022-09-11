@@ -1,6 +1,10 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
     <div class="mb-3">
+      <button v-show="checked" @click="()=>{checked = false}" type="button" class="btn btn-success">Stop Channel</button>
+      <button v-show="!checked" @click="()=>{checked = true}" type="button" class="btn btn-danger">Start Channel</button>
+    </div>
+    <div class="mb-3">
       <h5 class="mb-3">Source</h5>
       <select class="form-select" v-model="source">
         <option selected>Select source component</option>
@@ -39,6 +43,7 @@
     name: 'IntegrationAdd',
     data() {
       return {
+        checked: false,
         source: '',
         destination: '',
         query: '',
@@ -54,10 +59,14 @@
       }
     },
     methods: {
+      test() {
+        console.log('asf')
+      },
       async onSubmit(e) {
         e.preventDefault()
 
         const integration = {
+          isActive: this.checked,
           source: this.source,
           destination: this.destination,
           query: this.query,
@@ -80,6 +89,7 @@
     },
     emits: ['close-edit-integration', 'update-integrations'],
     async created() {
+      this.checked = this.$props.integration.is_active
       this.source = this.$props.integration.source
       this.query = this.$props.integration.source_query
       this.destination = this.$props.integration.destination
