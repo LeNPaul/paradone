@@ -53,9 +53,33 @@
         required: true
       }
     },
-    emits: ['close-add-integration'],
+    methods: {
+      async onSubmit(e) {
+        e.preventDefault()
+
+        const integration = {
+          source: this.source,
+          destination: this.destination,
+          query: this.query,
+          modifier: this.modifier
+        }
+
+        const res = await fetch(`/api/integrations/${this.$props.integration._id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-type': 'application/json',
+            'x-auth-token': localStorage.getItem('token') || ''
+          },
+          body: JSON.stringify(integration),
+        })
+        const data = await res.json()
+        this.$emit('update-integrations')
+        this.$emit('close-edit-integration')
+        return data
+      }
+    },
+    emits: ['close-edit-integration', 'update-integrations'],
     async created() {
-      console.log(this.$props.integration)
       this.source = this.$props.integration.source
       this.query = this.$props.integration.source_query
       this.destination = this.$props.integration.destination

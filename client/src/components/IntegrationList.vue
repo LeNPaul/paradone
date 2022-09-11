@@ -1,6 +1,6 @@
 <template>
   <div :key="integration._id" v-for="integration in integrations">
-    <IntegrationChannel :integration="integration"/>
+    <IntegrationChannel :integration="integration" @update-integrations="fetchIntegrations()"/>
   </div>
 </template>
 
