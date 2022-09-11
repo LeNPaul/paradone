@@ -30,4 +30,24 @@ router.post('/', auth, async (req, res) => {
   res.status(200).send(integration);
 });
 
+// @route  PUT api/integrations/:id
+// @desc   Update existing user integration
+// @access Private
+router.put('/:id', auth, async (req, res) => {
+  const integration = {
+    user_id: req.user.id,
+    source: req.body.source,
+    is_active: req.body.isActive,
+    destination: req.body.destination,
+    source_query: req.body.query,
+    destination_modifier: req.body.modifier
+  }
+  const updatedIntegration = await Integration.findOneAndUpdate(
+    { _id: new mongodb.ObjectID(req.params.id) },
+    { $set: integration }
+  );
+  integration._id = updatedIntegration._id;
+  res.status(200).send(integration);
+});
+
 module.exports = router;
