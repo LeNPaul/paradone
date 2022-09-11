@@ -1,0 +1,65 @@
+<template>
+  <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
+    <div class="mb-3">
+      <h5 class="mb-3">Source</h5>
+      <select class="form-select" v-model="source">
+        <option selected>Select source component</option>
+        <option value="notion">Notion</option>
+        <option value="todoist">Todoist</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <p>Query</p>
+      <input v-model="query" type="text" class="form-control">
+    </div>
+    <div class="mb-3">
+      <h5 class="mb-3">Destination</h5>
+      <select class="form-select" v-model="destination">
+        <option selected>Select destination component</option>
+        <option value="notion">Notion</option>
+        <option value="todoist">Todoist</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <p>Modifier</p>
+      <input v-model="modifier" type="text" class="form-control">
+    </div>
+    <div v-show="errorMessage" class="alert alert-danger mb-3" role="alert">
+      {{ errorMessage }}
+    </div>
+    <div v-show="successMessage" class="alert alert-success mb-3" role="alert">
+      {{ successMessage }}
+    </div>
+    <button type="submit" class="btn btn-dark">Save</button>
+  </form>
+</template>
+
+<script>
+  export default {
+    name: 'IntegrationAdd',
+    data() {
+      return {
+        source: '',
+        destination: '',
+        query: '',
+        modifier: '',
+        errorMessage: '',
+        successMessage: ''
+      }
+    },
+    props: {
+      integration: {
+        type: Object,
+        required: true
+      }
+    },
+    emits: ['close-add-integration'],
+    async created() {
+      console.log(this.$props.integration)
+      this.source = this.$props.integration.source
+      this.query = this.$props.integration.source_query
+      this.destination = this.$props.integration.destination
+      this.modifier = this.$props.integration.destination_modifier
+    }
+  }
+</script>
