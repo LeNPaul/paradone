@@ -66,8 +66,6 @@ const job = nodeCron.schedule("* * * * * *", function sync() {
                 'Notion-Version': '2022-06-28'
               }
             }
-            console.log(todoistRequestHeader)
-            console.log(notionRequestHeader);
             // Query Notion for database with "req.body.notionDatabase" in the title and extract database ID
             let notionDatabaseResults
             try {
@@ -83,7 +81,30 @@ const job = nodeCron.schedule("* * * * * *", function sync() {
             } else {
               notionDatabaseId = notionDatabaseResults.data.results[0].id
             }
-            console.log(notionDatabaseId)
+            // Query pages from database with "req.body.notionDatabase" in the title
+            const notionDatabasePages = await axios.post('https://api.notion.com/v1/databases/' + notionDatabaseId + '/query', {}, notionRequestHeader);
+            let notionDatabasePageResults = notionDatabasePages.data.results
+            // For each Notion page, get the title property and put results in array with page ID
+            var notionPages = []
+            for ( let i = 0; i < notionDatabasePageResults.length; i++ ) {
+              const notionPageProperties = await axios.get('https://api.notion.com/v1/pages/' + notionDatabasePageResults[i].id + '/properties/title', notionRequestHeader);
+              if (notionPageProperties.data.results[0]) {
+                notionPages.push({
+                  title: notionPageProperties.data.results[0].title.plain_text,
+                  id: notionDatabasePageResults[i].id,
+                  isCompleted: notionDatabasePageResults[i].properties[''].checkbox
+                })
+              }
+            }
+            // Get label_id for "notion" label in Todoist
+            const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', todoistRequestHeader);
+            var notionLabelId
+            for ( let k = 0; k < todoistLabels.data.length; k++ ) {
+              if (todoistLabels.data[k].name == settings[0].source_query) {
+                notionLabelId = todoistLabels.data[k].id
+              }
+            }
+            console.log(todoistLabels);
           }
         })
       }
