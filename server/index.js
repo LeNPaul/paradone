@@ -47,7 +47,7 @@ const Integration = require('./models/Integration');
 const Setting = require('./models/Setting');
 const nodeCron = require("node-cron");
 const axios = require('axios');
-const job = nodeCron.schedule("* * * * * *", function sync() {
+const job = nodeCron.schedule("0 * * * * *", function sync() {
   Integration.find({ is_active: true })
     .then(integrations => {
       // For each integration, find user settings using userID
@@ -106,7 +106,72 @@ const job = nodeCron.schedule("* * * * * *", function sync() {
             }
             // Get tasks from Todoist with the "notion" label
             const todoistTasks = await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + notionLabelId, todoistRequestHeader);
-            console.log(todoistTasks);
+            // For each task from Todoist, if it does not already exist as a page in Notion then add as page to Notion database
+            for ( let j = 0; j < todoistTasks.data.length; j++ ) {
+              let isFound = false
+              let isComplete = false
+              if (notionPages.length !== 0) {
+                isFound = notionPages.some(element => {
+                  if (element.title == todoistTasks.data[j].content) {
+                    return true;
+                  }
+                });
+                if (isFound) {
+                  isComplete = notionPages.some(element => {
+                    if ((element.title == todoistTasks.data[j].content) && element.isCompleted) {
+                      return true;
+                    }
+                  })
+                }
+              }
+              if (!isFound) {
+                try {
+                  const notionCreatePageRes = await axios.post('https://api.notion.com/v1/pages',
+                  {
+                    "parent": { "database_id": notionDatabaseId },
+                    "properties": {
+                      "Tasks": {
+                        "title": [ { "text": { "content": todoistTasks.data[j].content } } ]
+                       }
+                    }
+                  }, notionRequestHeader);
+                } catch (error) {
+                  console.log({'Error': error})
+                  return
+                }
+              }
+              if (isComplete) {
+                // Complete task in Todoist
+                try {
+                  const todoistCompleteTaskRes = await axios.post('https://api.todoist.com/rest/v1/tasks/' + todoistTasks.data[j].id + '/close', {}, todoistRequestHeader);
+                } catch (error) {
+                  console.log({'Error': error.response.statusText})
+                  return
+                }
+              }
+            }
+            // For each page in Notion, if task does not exist in Todoist, then remove page
+            for (let i = 0; i < notionPages.length; i++) {
+              let isFound = false
+              if (todoistTasks.data.length !== 0) {
+                isFound = todoistTasks.data.some(element => {
+                  if (element.content == notionPages[i].title) {
+                    return true;
+                  }
+                });
+              }
+              if (!isFound) {
+                try {
+                  const notionUpdatePageRes = await axios.patch('https://api.notion.com/v1/pages/' + notionPages[i].id,
+                  {
+                    "archived": true
+                  }, notionRequestHeader);
+                } catch (error) {
+                  console.log({'Error': error.response.data.message})
+                  return
+                }
+              }
+            }
           }
         })
       }
