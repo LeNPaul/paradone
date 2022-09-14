@@ -100,11 +100,13 @@ const job = nodeCron.schedule("* * * * * *", function sync() {
             const todoistLabels = await axios.get('https://api.todoist.com/rest/v1/labels', todoistRequestHeader);
             var notionLabelId
             for ( let k = 0; k < todoistLabels.data.length; k++ ) {
-              if (todoistLabels.data[k].name == settings[0].source_query) {
+              if (todoistLabels.data[k].name == integrations[0].source_query) {
                 notionLabelId = todoistLabels.data[k].id
               }
             }
-            console.log(todoistLabels);
+            // Get tasks from Todoist with the "notion" label
+            const todoistTasks = await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + notionLabelId, todoistRequestHeader);
+            console.log(todoistTasks);
           }
         })
       }
