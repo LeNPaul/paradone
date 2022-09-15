@@ -1,9 +1,43 @@
-function run() {
-  const Integration = require('../models/Integration');
-  const Setting = require('../models/Setting');
-  const nodeCron = require("node-cron");
-  const axios = require('axios');
+const Integration = require('../models/Integration');
+const Setting = require('../models/Setting');
+const nodeCron = require("node-cron");
+const axios = require('axios');
 
+// TODO: create a class/object for user integration that is initialized based on what the integration is and with methods to get the required information and to work on the integration
+let sync = function() {
+  Integration.find({ is_active: true }).then(activeIntegrations => {
+    // For each integration, find user settings using userID
+    for (let i = 0 ; i < activeIntegrations.length ; i++) {
+      Setting.find({user_id: activeIntegrations[i].user_id}).then(userSettings => {
+        activeIntegrations[i].notion_api_token = userSettings[0].notion_api_token;
+        activeIntegrations[i].todoist_api_token = userSettings[0].todoist_api_token;
+        return activeIntegrations
+      }).then(activeIntegrations =>{
+        if(activeIntegrations[i].notion_api_token && activeIntegrations[i].todoist_api_token) {
+          let todoistRequestHeader = {
+            headers: {
+              'Authorization': 'Bearer ' + activeIntegrations[i].todoist_api_token
+            }
+          }
+          let notionRequestHeader = {
+            headers: {
+              'Authorization': 'Bearer ' + activeIntegrations[i].notion_api_token,
+              'Content-Type': 'application/json',
+              'Notion-Version': '2022-06-28'
+            }
+          }
+          activeIntegrations[i].todoistRequestHeader = todoistRequestHeader
+          activeIntegrations[i].notionRequestHeader = notionRequestHeader
+          return activeIntegrations
+        }
+      }).then(activeIntegrations => {
+        console.log(activeIntegrations)
+      })
+    }
+  })
+}
+
+function run() {
   const job = nodeCron.schedule("0 * * * * *", function sync() {
     Integration.find({ is_active: true })
       .then(integrations => {
@@ -137,3 +171,4 @@ function run() {
 }
 
 exports.run = run;
+exports.sync = sync;
