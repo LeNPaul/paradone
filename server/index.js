@@ -44,6 +44,6 @@ app.listen(port, () => console.log(`Server started on port ${port}`));
 
 // Run integration jobs
 const integration = require('./controllers/integration');
-integration.run()
+//integration.run()
 
 integration.sync()
