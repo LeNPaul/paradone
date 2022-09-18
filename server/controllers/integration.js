@@ -3,18 +3,6 @@ const Setting = require('../models/Setting');
 const nodeCron = require("node-cron");
 const axios = require('axios');
 
-let getTodoistTasks = function() {
-
-}
-
-class ActiveIntegration {
-  constructor(userId, source, destination) {
-    this.userId = userId
-    this.source = source
-    this.destination = destination
-  }
-}
-
 // Get integration settings
 // Get user settings
 // Prepare source integration (i.e. get the right resources and call the right endpoints)
@@ -26,7 +14,7 @@ let sync = function() {
     // For each integration, find user settings using userID
     for (let i = 0 ; i < activeIntegrations.length ; i++) {
       // Create object for each active integration
-      let activeIntegration = new ActiveIntegration()
+      let activeIntegration = {}
       // Populate object with integration settings for active integration
       activeIntegration.userId = activeIntegrations[i].user_id
       activeIntegration.source = activeIntegrations[i].source
@@ -79,8 +67,8 @@ let sync = function() {
             if (notionPageProperties.data.results[0]) {
               activeIntegration.notionPages.push({
                 title: notionPageProperties.data.results[0].title.plain_text,
-                id: activeIntegration.notionDatabasePageResults[0].id,
-                isCompleted: activeIntegration.notionDatabasePageResults[0].properties[''].checkbox
+                id: activeIntegration.notionDatabasePageResults[j].id,
+                isCompleted: activeIntegration.notionDatabasePageResults[j].properties[''].checkbox
               })
             }
           })
