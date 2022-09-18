@@ -146,6 +146,9 @@ function run() {
                   return true;
                 }
               });
+              if (activeIntegration.notionPages[k].isCompleted) {
+                isFound = false
+              }
               if (!isFound) {
                 try {
                   await axios.patch('https://api.notion.com/v1/pages/' + activeIntegration.notionPages[k].id,
