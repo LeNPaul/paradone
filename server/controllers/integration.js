@@ -1,6 +1,7 @@
 const Integration = require('../models/Integration');
 const Setting = require('../models/Setting');
 const Todoist = require('./todoist')
+const Notion = require('./notion')
 const nodeCron = require("node-cron");
 const axios = require('axios');
 
@@ -18,6 +19,7 @@ let run = function() {
         // Create object for each active integration
         let activeIntegration = {}
         let todoist = new Todoist()
+        let notion = new Notion()
         // Populate object with integration settings for active integration
         activeIntegration.userId = activeIntegrations[i].user_id
         activeIntegration.source = activeIntegrations[i].source
@@ -42,12 +44,12 @@ let run = function() {
               }
             }
             todoist.initialize(userSettings[0].todoist_api_token)
+            notion.initialize(userSettings[0].notion_api_token)
           }
         })
         .then(async () => {
           // Query Notion for database with "req.body.notionDatabase" in the title and extract database ID
-          await axios.post('https://api.notion.com/v1/search', { 'query': activeIntegration.destination_modifier }, activeIntegration.notionRequestHeader)
-          .then(notionDatabaseResults => {
+          await notion.getDatabaseByName(activeIntegration.destination_modifier).then(notionDatabaseResults => {
             if (notionDatabaseResults.data.results.length == 0) {
               console.log({'Error': 'Notion - Database with name ' + activeIntegration.destination_modifier + ' not found.' })
               return
@@ -58,8 +60,7 @@ let run = function() {
         })
         .then(async () => {
           // Query pages from database with "req.body.notionDatabase" in the title
-          await axios.post('https://api.notion.com/v1/databases/' + activeIntegration.notionDatabaseId + '/query', {}, activeIntegration.notionRequestHeader)
-          .then(notionDatabasePages => {
+          await notion.getPagesFromDatabaseId(activeIntegration.notionDatabaseId).then(notionDatabasePages => {
             activeIntegration.notionDatabasePageResults = notionDatabasePages.data.results
           })
         })
@@ -67,7 +68,7 @@ let run = function() {
           // For each Notion page, get the title property and put results in array with page ID
           activeIntegration.notionPages = []
           for ( let j = 0; j < activeIntegration.notionDatabasePageResults.length; j++ ) {
-              await axios.get('https://api.notion.com/v1/pages/' + activeIntegration.notionDatabasePageResults[j].id + '/properties/title', activeIntegration.notionRequestHeader).then(notionPageProperties => {
+              await notion.getPageProperties(activeIntegration.notionDatabasePageResults[j].id).then(notionPageProperties => {
               if (notionPageProperties.data.results[0]) {
                 activeIntegration.notionPages.push({
                   title: notionPageProperties.data.results[0].title.plain_text,
@@ -92,6 +93,7 @@ let run = function() {
         }).then(async () => {
           // Get tasks from Todoist with the "notion" label
           await todoist.getTasksByLabel(activeIntegration.notionLabelId).then(async todoistTasks => {
+            console.log(todoistTasks);
             activeIntegration.todoistTasks = todoistTasks
           })
         }).then(async () => {
@@ -114,20 +116,7 @@ let run = function() {
               }
             }
             if (!isFound) {
-              try {
-                await axios.post('https://api.notion.com/v1/pages',
-                {
-                  "parent": { "database_id": activeIntegration.notionDatabaseId },
-                  "properties": {
-                    "Tasks": {
-                      "title": [ { "text": { "content": activeIntegration.todoistTasks.data[j].content } } ]
-                     }
-                  }
-                }, activeIntegration.notionRequestHeader)
-              } catch (error) {
-                console.log({'Error': error})
-                return
-              }
+              notion.createPage(activeIntegration.notionDatabaseId, activeIntegration.todoistTasks.data[j].content)
             }
             if (isComplete) {
               todoist.completeTask(activeIntegration.todoistTasks.data[j].id)
@@ -147,15 +136,7 @@ let run = function() {
                 isFound = false
               }
               if (!isFound) {
-                try {
-                  await axios.patch('https://api.notion.com/v1/pages/' + activeIntegration.notionPages[k].id,
-                  {
-                    "archived": true
-                  }, activeIntegration.notionRequestHeader);
-                } catch (error) {
-                  console.log({'Error': error.response.data.message})
-                  return
-                }
+                notion.markPageComplete(activeIntegration.notionPages[k].id)
               }
             }
           }
