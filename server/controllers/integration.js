@@ -1,5 +1,6 @@
 const Integration = require('../models/Integration');
 const Setting = require('../models/Setting');
+const Todoist = require('./todoist')
 const nodeCron = require("node-cron");
 const axios = require('axios');
 
@@ -9,13 +10,14 @@ const axios = require('axios');
 // Prepare destination integration (i.e. get the right resources and call the right endpoints)
 
 // TODO: create a class/object for user integration that is initialized based on what the integration is and with methods to get the required information and to work on the integration
-function run() {
+let run = function() {
   const job = nodeCron.schedule("0 * * * * *", () => {
     Integration.find({ is_active: true }).then(activeIntegrations => {
       // For each integration, find user settings using userID
       for (let i = 0 ; i < activeIntegrations.length ; i++) {
         // Create object for each active integration
         let activeIntegration = {}
+        let todoist = new Todoist()
         // Populate object with integration settings for active integration
         activeIntegration.userId = activeIntegrations[i].user_id
         activeIntegration.source = activeIntegrations[i].source
@@ -39,6 +41,7 @@ function run() {
                 'Notion-Version': '2022-06-28'
               }
             }
+            todoist.initialize(userSettings[0].todoist_api_token)
           }
         })
         .then(async () => {
@@ -77,7 +80,7 @@ function run() {
         })
         .then(async () => {
           // Get label_id for "notion" label in Todoist
-          await axios.get('https://api.todoist.com/rest/v1/labels', activeIntegration.todoistRequestHeader).then(todoistLabels => {
+          await todoist.getLabels().then(todoistLabels => {
             var notionLabelId
             for ( let k = 0; k < todoistLabels.data.length; k++ ) {
               if (todoistLabels.data[k].name == activeIntegration.source_query) {
@@ -88,7 +91,7 @@ function run() {
           })
         }).then(async () => {
           // Get tasks from Todoist with the "notion" label
-          await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + activeIntegration.notionLabelId, activeIntegration.todoistRequestHeader).then(async todoistTasks => {
+          await todoist.getTasksByLabel(activeIntegration.notionLabelId).then(async todoistTasks => {
             activeIntegration.todoistTasks = todoistTasks
           })
         }).then(async () => {
@@ -127,13 +130,7 @@ function run() {
               }
             }
             if (isComplete) {
-              // Complete task in Todoist
-              try {
-                await axios.post('https://api.todoist.com/rest/v1/tasks/' + activeIntegration.todoistTasks.data[j].id + '/close', {}, activeIntegration.todoistRequestHeader);
-              } catch (error) {
-                console.log({'Error': error.response.statusText})
-                return
-              }
+              todoist.completeTask(activeIntegration.todoistTasks.data[j].id)
             }
           }
         }).then(async () => {
