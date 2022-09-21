@@ -12,7 +12,7 @@ const axios = require('axios');
 
 // TODO: create a class/object for user integration that is initialized based on what the integration is and with methods to get the required information and to work on the integration
 let run = function() {
-  const job = nodeCron.schedule("0 * * * * *", () => {
+  const job = nodeCron.schedule("* * * * * *", () => {
     Integration.find({ is_active: true }).then(activeIntegrations => {
       // For each integration, find user settings using userID
       for (let i = 0 ; i < activeIntegrations.length ; i++) {
@@ -80,23 +80,13 @@ let run = function() {
           }
         })
         .then(async () => {
-          // Get label_id for "notion" label in Todoist
-          await todoist.getLabels().then(todoistLabels => {
-            var notionLabelId
-            for ( let k = 0; k < todoistLabels.data.length; k++ ) {
-              if (todoistLabels.data[k].name == activeIntegration.source_query) {
-                notionLabelId = todoistLabels.data[k].id
-              }
-            }
-            activeIntegration.notionLabelId = notionLabelId
-          })
-        }).then(async () => {
-          // Get tasks from Todoist with the "notion" label
-          await todoist.getTasksByLabel(activeIntegration.notionLabelId).then(async todoistTasks => {
-            console.log(todoistTasks);
+          // Get tasks with {{ source_query }} label in Todoist
+          return await todoist.getTasksByLabelName(activeIntegration.source_query)
+          .then(todoistTasks => {
             activeIntegration.todoistTasks = todoistTasks
           })
-        }).then(async () => {
+        })
+        .then(async () => {
           // For each task from Todoist, if it does not already exist as a page in Notion then add as page to Notion database
           for ( let j = 0; j < activeIntegration.todoistTasks.data.length; j++ ) {
             let isFound = false

@@ -15,16 +15,19 @@ class Todoist {
       return {'Error': error.response.statusText}
     }
   }
-  async getLabels() {
+  async getTasksByLabelName(labelName) {
     try {
       return await axios.get('https://api.todoist.com/rest/v1/labels', this.todoistRequestHeader)
-    } catch(error) {
-      return {'Error': error.response.statusText}
-    }
-  }
-  async getTasksByLabel(labelId) {
-    try {
-      return await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + labelId, this.todoistRequestHeader)
+      .then(todoistLabels => {
+        for ( let k = 0; k < todoistLabels.data.length; k++ ) {
+          if (todoistLabels.data[k].name == labelName) {
+            return todoistLabels.data[k].id
+          }
+        }
+      })
+      .then(async labelId => {
+        return await axios.get('https://api.todoist.com/rest/v1/tasks?label_id=' + labelId, this.todoistRequestHeader)
+      })
     } catch(error) {
       return {'Error': error.response.statusText}
     }
