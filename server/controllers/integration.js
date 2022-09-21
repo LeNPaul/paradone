@@ -12,7 +12,7 @@ const axios = require('axios');
 
 // TODO: create a class/object for user integration that is initialized based on what the integration is and with methods to get the required information and to work on the integration
 let run = function() {
-  const job = nodeCron.schedule("* * * * * *", () => {
+  const job = nodeCron.schedule("0 * * * * *", () => {
     Integration.find({ is_active: true }).then(activeIntegrations => {
       // For each integration, find user settings using userID
       for (let i = 0 ; i < activeIntegrations.length ; i++) {
@@ -26,26 +26,11 @@ let run = function() {
         activeIntegration.source_query = activeIntegrations[i].source_query
         activeIntegration.destination = activeIntegrations[i].destination
         activeIntegration.destination_modifier = activeIntegrations[i].destination_modifier
-
         // Populate object with user settings
         Setting.find({user_id: activeIntegration.userId})
-        .then(userSettings => {;
-          if(userSettings[0].notion_api_token && userSettings[0].todoist_api_token) {
-            activeIntegration.todoistRequestHeader = {
-              headers: {
-                'Authorization': 'Bearer ' + userSettings[0].todoist_api_token
-              }
-            }
-            activeIntegration.notionRequestHeader = {
-              headers: {
-                'Authorization': 'Bearer ' + userSettings[0].notion_api_token,
-                'Content-Type': 'application/json',
-                'Notion-Version': '2022-06-28'
-              }
-            }
-            todoist.initialize(userSettings[0].todoist_api_token)
-            notion.initialize(userSettings[0].notion_api_token)
-          }
+        .then(userSettings => {
+          todoist.initialize(userSettings[0].todoist_api_token)
+          notion.initialize(userSettings[0].notion_api_token)
         })
         .then(async () => {
           // Query Notion for database with "req.body.notionDatabase" in the title and extract database ID
