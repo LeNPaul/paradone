@@ -33,26 +33,10 @@ let run = function() {
           notion.initialize(userSettings[0].notion_api_token)
         })
         .then(async () => {
-          await notion.getPagesFromDatabaseByName(activeIntegration.destination_modifier)
-          .then(databaseResults => {
-            activeIntegration.notionDatabaseId = databaseResults.databaseId
-            activeIntegration.notionDatabasePageResults = databaseResults.databasePages
+          return await notion.getPagesFromDatabaseByName(activeIntegration.destination_modifier).then(async notionPages => {
+            // For each Notion page, get the title property and put results in array with page ID
+            activeIntegration.notionPages = notionPages
           })
-        })
-        .then(async () => {
-          // For each Notion page, get the title property and put results in array with page ID
-          activeIntegration.notionPages = []
-          for ( let j = 0; j < activeIntegration.notionDatabasePageResults.length; j++ ) {
-              await notion.getPageProperties(activeIntegration.notionDatabasePageResults[j].id).then(notionPageProperties => {
-              if (notionPageProperties.data.results[0]) {
-                activeIntegration.notionPages.push({
-                  title: notionPageProperties.data.results[0].title.plain_text,
-                  id: activeIntegration.notionDatabasePageResults[j].id,
-                  isCompleted: activeIntegration.notionDatabasePageResults[j].properties[''].checkbox
-                })
-              }
-            })
-          }
         })
         .then(async () => {
           // Get tasks with {{ source_query }} label in Todoist
