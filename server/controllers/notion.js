@@ -25,6 +25,18 @@ class Notion {
       .then(notionDatabasePages => {
         return {databaseId:databaseId, databasePages:notionDatabasePages.data.results}
       })
+    }).then(async databaseResults => {
+      let pages = []
+      for (let i = 0; i < databaseResults.databasePages.length; i++) {
+        await axios.get('https://api.notion.com/v1/pages/' + databaseResults.databasePages[i].id + '/properties/title', this.notionRequestHeader).then(pageProperties => {
+          pages.push({
+            title: pageProperties.data.results[0].title.plain_text,
+            id: databaseResults.databasePages[i].id,
+            isCompleted: databaseResults.databasePages[i].properties[''].checkbox
+          })
+        })
+      }
+      return pages
     })
   }
   async getPageProperties(pageId) {
