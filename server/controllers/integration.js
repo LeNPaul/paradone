@@ -33,20 +33,10 @@ let run = function() {
           notion.initialize(userSettings[0].notion_api_token)
         })
         .then(async () => {
-          // Query Notion for database with "req.body.notionDatabase" in the title and extract database ID
-          await notion.getDatabaseByName(activeIntegration.destination_modifier).then(notionDatabaseResults => {
-            if (notionDatabaseResults.data.results.length == 0) {
-              console.log({'Error': 'Notion - Database with name ' + activeIntegration.destination_modifier + ' not found.' })
-              return
-            } else {
-              activeIntegration.notionDatabaseId = notionDatabaseResults.data.results[0].id
-            }
-          })
-        })
-        .then(async () => {
-          // Query pages from database with "req.body.notionDatabase" in the title
-          await notion.getPagesFromDatabaseId(activeIntegration.notionDatabaseId).then(notionDatabasePages => {
-            activeIntegration.notionDatabasePageResults = notionDatabasePages.data.results
+          await notion.getPagesFromDatabaseByName(activeIntegration.destination_modifier)
+          .then(databaseResults => {
+            activeIntegration.notionDatabaseId = databaseResults.databaseId
+            activeIntegration.notionDatabasePageResults = databaseResults.databasePages
           })
         })
         .then(async () => {
