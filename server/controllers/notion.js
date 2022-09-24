@@ -11,33 +11,36 @@ class Notion {
     }
   }
   async getPagesFromDatabaseByName(databaseName) {
-    return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
-    .then(databaseResults => {
-      if (databaseResults.data.results.length == 0) {
-        console.log({'Error': 'Notion - Database with name ' + databaseName + ' not found.' })
-        return
-      } else {
-        return databaseResults.data.results[0].id
-      }
-    })
-    .then(async databaseId => {
-      return await axios.post('https://api.notion.com/v1/databases/' + databaseId + '/query', {}, this.notionRequestHeader)
-      .then(notionDatabasePages => {
-        return {databaseId:databaseId, databasePages:notionDatabasePages.data.results}
+    try {
+      return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
+      .then(databaseResults => {
+        if (databaseResults.data.results.length == 0) {
+          return {'Error': 'Notion - Database with name ' + databaseName + ' not found.'}
+        } else {
+          return databaseResults.data.results[0].id
+        }
       })
-    }).then(async databaseResults => {
-      let pages = []
-      for (let i = 0; i < databaseResults.databasePages.length; i++) {
-        await axios.get('https://api.notion.com/v1/pages/' + databaseResults.databasePages[i].id + '/properties/title', this.notionRequestHeader).then(pageProperties => {
-          pages.push({
-            title: pageProperties.data.results[0].title.plain_text,
-            id: databaseResults.databasePages[i].id,
-            isCompleted: databaseResults.databasePages[i].properties[''].checkbox
-          })
+      .then(async databaseId => {
+        return await axios.post('https://api.notion.com/v1/databases/' + databaseId + '/query', {}, this.notionRequestHeader)
+        .then(notionDatabasePages => {
+          return {databaseId:databaseId, databasePages:notionDatabasePages.data.results}
         })
-      }
-      return pages
-    })
+      }).then(async databaseResults => {
+        let pages = []
+        for (let i = 0; i < databaseResults.databasePages.length; i++) {
+          await axios.get('https://api.notion.com/v1/pages/' + databaseResults.databasePages[i].id + '/properties/title', this.notionRequestHeader).then(pageProperties => {
+            pages.push({
+              title: pageProperties.data.results[0].title.plain_text,
+              id: databaseResults.databasePages[i].id,
+              isCompleted: databaseResults.databasePages[i].properties[''].checkbox
+            })
+          })
+        }
+        return pages
+      })
+    } catch(error) {
+      return {'Error': error.response.data.message}
+    }
   }
   async getPageProperties(pageId) {
     try {
