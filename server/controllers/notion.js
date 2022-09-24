@@ -13,28 +13,19 @@ class Notion {
   async getPagesFromDatabaseByName(databaseName) {
     return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
     .then(databaseResults => {
-      return databaseResults.data.results[0].id
+      if (databaseResults.data.results.length == 0) {
+        console.log({'Error': 'Notion - Database with name ' + databaseName + ' not found.' })
+        return
+      } else {
+        return databaseResults.data.results[0].id
+      }
     })
     .then(async databaseId => {
       return await axios.post('https://api.notion.com/v1/databases/' + databaseId + '/query', {}, this.notionRequestHeader)
       .then(notionDatabasePages => {
-        return notionDatabasePages.data.results
+        return {databaseId:databaseId, databasePages:notionDatabasePages.data.results}
       })
     })
-  }
-  async getDatabaseByName(databaseName) {
-    try {
-      return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
-    } catch(error) {
-      return {'Error': error.response.data.message}
-    }
-  }
-  async getPagesFromDatabaseId(databaseId) {
-    try {
-      return await axios.post('https://api.notion.com/v1/databases/' + databaseId + '/query', {}, this.notionRequestHeader)
-    } catch(error) {
-      return {'Error': error.response.data.message}
-    }
   }
   async getPageProperties(pageId) {
     try {
@@ -44,7 +35,6 @@ class Notion {
     }
   }
   async createPage(databaseId, content) {
-    console.log('create page in notion');
     try {
       await axios.post('https://api.notion.com/v1/pages',
       {
@@ -56,7 +46,6 @@ class Notion {
         }
       }, this.notionRequestHeader)
     } catch(error) {
-      console.log(error.response.data.message);
       return {'Error': error.response.data.message}
     }
   }
