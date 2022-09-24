@@ -10,6 +10,18 @@ class Notion {
       }
     }
   }
+  async getPagesFromDatabaseByName(databaseName) {
+    return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
+    .then(databaseResults => {
+      return databaseResults.data.results[0].id
+    })
+    .then(async databaseId => {
+      return await axios.post('https://api.notion.com/v1/databases/' + databaseId + '/query', {}, this.notionRequestHeader)
+      .then(notionDatabasePages => {
+        return notionDatabasePages.data.results
+      })
+    })
+  }
   async getDatabaseByName(databaseName) {
     try {
       return await axios.post('https://api.notion.com/v1/search', { 'query': databaseName }, this.notionRequestHeader)
