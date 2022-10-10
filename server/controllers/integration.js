@@ -33,7 +33,7 @@ let run = function() {
           notion.initialize(userSettings[0].notion_api_token)
         })
         .then(async () => {
-          return await notion.getPagesFromDatabaseByName(activeIntegration.destination_modifier).then(async notionPages => {
+          return await notion.getPages(activeIntegration.destination_modifier).then(async notionPages => {
             // For each Notion page, get the title property and put results in array with page ID
             activeIntegration.notionPages = notionPages
           })
@@ -65,7 +65,7 @@ let run = function() {
               }
             }
             if (!isFound) {
-              notion.createPage(activeIntegration.notionDatabaseId, activeIntegration.todoistTasks.data[j].content)
+              notion.createPage(activeIntegration.destination_modifier, activeIntegration.todoistTasks.data[j].content)
             }
             if (isComplete) {
               todoist.completeTask(activeIntegration.todoistTasks.data[j].id)
