@@ -22,13 +22,11 @@ mongoose.connect(db)
 // Routes
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
-const sync = require('./routes/api/integration/sync');
 const settings = require('./routes/api/settings');
 const integrations = require('./routes/api/integrations');
 
 app.use('/api/auth', auth);
 app.use('/api/users', users);
-app.use('/api/sync', sync);
 app.use('/api/settings', settings);
 app.use('/api/integrations', integrations);
 
