@@ -1,0 +1,11 @@
+.template ul li {
+  padding-bottom: 1rem;
+}
+
+.template ol li {
+  padding-bottom: 1rem;
+}
+
+a {
+  color: black;
+}
