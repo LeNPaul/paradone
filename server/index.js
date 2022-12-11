@@ -22,9 +22,11 @@ mongoose.connect(db)
 // Routes
 const auth = require('./routes/api/auth');
 const users = require('./routes/api/users');
+const tasks = require('./routes/api/tasks');
 
 app.use('/api/auth', auth);
 app.use('/api/users', users);
+app.use('/api/tasks', tasks);
 
 // Static folder
 app.use(express.static(__dirname + '/public/'));
