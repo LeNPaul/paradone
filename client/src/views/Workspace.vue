@@ -5,7 +5,7 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-
+        <TheWorkspaceHeaderTaskAdd @update-tasks="$emit('update-tasks')"/>
       </div>
     </div>
   </div>
@@ -13,23 +13,14 @@
 
 <script>
 import TheSidebar from '../components/TheSidebar'
+import TheWorkspaceHeaderTaskAdd from '../components/TheWorkspaceHeaderTaskAdd'
 
 export default {
   name: 'Workspace',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-  },
-  data() {
-    return {
-
-    }
-  },
-  methods: {
-
-  },
-  async created() {
-
+    TheWorkspaceHeaderTaskAdd
   },
   watch:{
     $route (){
