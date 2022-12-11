@@ -5,7 +5,12 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <TheWorkspaceHeaderTaskAdd @update-tasks="$emit('update-tasks')"/>
+        <TheWorkspaceHeaderTaskAdd @update-tasks="updateTasks()"/>
+        <TheWorkspaceTasks
+          @delete-task="updateTasks()"
+          @update-task="updateTasks()"
+          :tasks="tasks"
+        />
       </div>
     </div>
   </div>
@@ -14,13 +19,33 @@
 <script>
 import TheSidebar from '../components/TheSidebar'
 import TheWorkspaceHeaderTaskAdd from '../components/TheWorkspaceHeaderTaskAdd'
+import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
 
 export default {
   name: 'Workspace',
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    TheWorkspaceHeaderTaskAdd
+    TheWorkspaceHeaderTaskAdd,
+    TheWorkspaceTasks
+  },
+  data() {
+    return {
+      tasks: []
+    }
+  },
+  methods: {
+    async updateTasks() {
+      const res = await fetch('/api/tasks', {
+        headers: {
+          'x-auth-token': localStorage.getItem('token') || ''
+        }
+      })
+      this.tasks = await res.json()
+    }
+  },
+  async created() {
+    this.updateTasks()
   },
   watch:{
     $route (){
