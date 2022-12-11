@@ -6,6 +6,13 @@ const auth = require('../../middleware/auth');
 // Task model
 const Task = require('../../models/Task');
 
+// @route  GET api/tasks
+// @desc   Get user tasks
+// @access Private
+router.get('/', auth, async (req, res) => {
+  res.send(await Task.find({user_id: req.user.id}));
+});
+
 // @route  POST api/tasks
 // @desc   Create a new task
 // @access Private
