@@ -40,21 +40,25 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   const task = {
     user_id:    req.user.id,
-    content:    req.body.content
+    content:    req.body.content,
+    completed:  req.body.completed
   }
   const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
     { $set: task }
   );
   task._id = updatedTask._id;
-  res.status(204).send(task);
+  res.send(task);
 });
 
 // @route  DELETE api/tasks/:id
 // @desc   Delete an existing task
 // @access Private
 router.delete('/:id', auth, async (req, res) => {
-  res.status(204).send(await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) }));
+  res.send(await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) }));
 });
 
 module.exports = router;
+
+// TODO: Find best way to do error handling with HTTP response codes, and what should be returned from db query
+//       Set the await to a variable, and depending on the response, send back correct code - test this with incorrect values
