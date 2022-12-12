@@ -30,16 +30,7 @@ export default {
   methods: {
     toggleEditTask() {
       this.showEditTask = !this.showEditTask
-    },
-    async fetchLabel(id) {
-      const res = await fetch(`/api/labels/${id}`, {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      const data = await res.json()
-      return data
-    },
+    }
   }
 }
 </script>

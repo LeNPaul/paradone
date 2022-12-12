@@ -27,3 +27,5 @@ const TaskSchema = new Schema({
 });
 
 module.exports = Task = mongoose.model('task', TaskSchema);
+
+// TODO: Update schema to have title and content, and then is_completed
