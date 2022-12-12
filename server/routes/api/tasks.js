@@ -51,4 +51,12 @@ router.put('/:id', auth, async (req, res) => {
   res.status(200).send(task);
 });
 
+// @route  DELETE api/tasks/:id
+// @desc   Delete an existing task
+// @access Private
+router.delete('/:id', auth, async (req, res) => {
+  await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
+  res.status(200).send({});
+});
+
 module.exports = router;
