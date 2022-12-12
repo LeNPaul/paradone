@@ -1,5 +1,5 @@
 <template>
-  <p class="pb-3 border-bottom">
+  <p class="pb-3 border-bottom" v-show=!task.completed>
     <button class="btn btn-link link-dark" type="submit"><i @click="$emit('delete-task', task._id)" class="far fa-circle"></i></button>
     {{ task.content }}
     <button class="btn btn-link link-dark float-end" type="submit"><i @click="toggleEditTask()" class="fas fa-edit"></i></button>
