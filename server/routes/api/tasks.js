@@ -17,8 +17,7 @@ router.get('/', auth, async (req, res) => {
 // @desc   Get a user task by id
 // @access Private
 router.get('/:id', auth, async (req, res) => {
-  const task = await Task.findOne({ _id: new mongodb.ObjectID(req.params.id) });
-  res.status(200).send(task);
+  res.send(await Task.findOne({ _id: new mongodb.ObjectID(req.params.id) }));
 });
 
 // @route  POST api/tasks
@@ -48,15 +47,14 @@ router.put('/:id', auth, async (req, res) => {
     { $set: task }
   );
   task._id = updatedTask._id;
-  res.status(200).send(task);
+  res.status(204).send(task);
 });
 
 // @route  DELETE api/tasks/:id
 // @desc   Delete an existing task
 // @access Private
 router.delete('/:id', auth, async (req, res) => {
-  await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) });
-  res.status(200).send({});
+  res.status(204).send(await Task.deleteOne({ _id: new mongodb.ObjectID(req.params.id) }));
 });
 
 module.exports = router;
