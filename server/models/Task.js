@@ -4,9 +4,12 @@ const Schema = mongoose.Schema;
 // Create Schema
 // Use the document ID as the task_id
 const TaskSchema = new Schema({
-  content: {
+  title: {
     type: String,
     required: true
+  },
+  content: {
+    type: String
   },
   user_id: {
     type: String,
