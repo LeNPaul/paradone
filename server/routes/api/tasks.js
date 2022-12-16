@@ -26,8 +26,9 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
     // TODO: Can you pass req.body directly into the database?
     const task = {
-      user_id:    req.user.id,
-      content:    req.body.content
+      user_id: req.user.id,
+      title:   req.body.title,
+      content: req.body.content
     }
     const insertedTask = await Task.create(task);
     task._id = insertedTask._id;
