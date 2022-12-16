@@ -41,7 +41,7 @@ router.post('/', auth, async (req, res) => {
 router.put('/:id', auth, async (req, res) => {
   const task = {
     user_id:   req.user.id,
-    title:     req.title,
+    title:     req.body.title,
     content:   req.body.content,
     completed: req.body.completed
   }

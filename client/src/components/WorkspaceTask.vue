@@ -1,7 +1,7 @@
 <template>
   <p class="pb-3 border-bottom" v-show=!task.completed>
     <button class="btn btn-link link-dark" type="submit"><i @click="$emit('delete-task', task._id)" class="far fa-circle"></i></button>
-    {{ task.content }}
+    {{ task.title }}
     <button class="btn btn-link link-dark float-end" type="submit"><i @click="toggleEditTask()" class="fas fa-edit"></i></button>
     <WorkspaceTaskEdit @update-task="$emit('update-task')" @close-edit-task="toggleEditTask()" v-show="showEditTask" :task="task"/>
   </p>

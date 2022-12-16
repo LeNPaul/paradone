@@ -1,7 +1,7 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 mt-3 p-3">
     <div class="mb-3">
-      <input type="text" v-model="content" name="content" placeholder="Task content" class="form-control">
+      <input type="text" v-model="title" name="title" placeholder="Task name" class="form-control">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
@@ -12,7 +12,7 @@
     name: 'WorkspaceTaskEdit',
     data() {
       return {
-        content: '',
+        title: '',
       }
     },
     props: {
@@ -24,14 +24,14 @@
     methods: {
       async onSubmit(e) {
         e.preventDefault()
-        if(!this.content) {
+        if(!this.title) {
           alert('Please add a task')
           return
         }
         const taskToUpdate = await this.fetchTask(this.$props.task._id)
         const updTask = {
           ...taskToUpdate,
-          content: this.content
+          title: this.title
         }
         const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
           method: 'PUT',
@@ -57,7 +57,7 @@
       },
     },
     async created() {
-      this.content = this.$props.task.content
+      this.title = this.$props.task.title
     }
   }
 </script>
