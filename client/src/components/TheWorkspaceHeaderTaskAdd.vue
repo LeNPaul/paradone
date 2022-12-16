@@ -1,7 +1,8 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 p-3">
     <div class="mb-3">
-      <input type="text" v-model="title" name="title" placeholder="Task name" class="form-control">
+      <input type="text" v-model="title" name="title" placeholder="Title" class="form-control border-0 shadow-none">
+      <input type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
@@ -12,7 +13,8 @@
     name: 'TheWorkspaceHeaderTaskAdd',
     data() {
       return {
-        title: '',
+        title: null,
+        content: null
       }
     },
     emits: ['update-tasks', 'close-add-task'],
@@ -25,6 +27,7 @@
         }
         const newTask = {
           title: this.title,
+          content: this.content
         }
         const res = await fetch('/api/tasks', {
           method: 'POST',
@@ -36,7 +39,8 @@
         })
         const data = await res.json()
         this.$emit('update-tasks')
-        this.title = ''
+        this.title = null
+        this.content = null
         return data
       }
     }
