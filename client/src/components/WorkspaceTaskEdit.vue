@@ -2,7 +2,7 @@
   <form @submit="onSubmit" class="form-control add-form mb-3 mt-3 p-3">
     <div class="mb-3">
       <input type="text" v-model="title" name="title" placeholder="Title" class="form-control border-0 shadow-none">
-      <input type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none">
+      <textarea type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none" rows="3"></textarea>
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
