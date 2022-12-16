@@ -1,11 +1,13 @@
 <template>
   <form @submit="onSubmit" class="form-control add-form mb-3 mt-3 p-3">
     <div class="mb-3">
-      <input type="text" v-model="title" name="title" placeholder="Task name" class="form-control">
+      <input type="text" v-model="title" name="title" placeholder="Title" class="form-control border-0 shadow-none">
+      <input type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none">
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
   </form>
 </template>
+// TODO: refactor so that add and edit components use the same code
 
 <script>
   export default {
@@ -13,6 +15,7 @@
     data() {
       return {
         title: '',
+        content: ''
       }
     },
     props: {
@@ -31,7 +34,8 @@
         const taskToUpdate = await this.fetchTask(this.$props.task._id)
         const updTask = {
           ...taskToUpdate,
-          title: this.title
+          title: this.title,
+          content: this.content
         }
         const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
           method: 'PUT',
@@ -58,6 +62,7 @@
     },
     async created() {
       this.title = this.$props.task.title
+      this.content = this.$props.task.content
     }
   }
 </script>
