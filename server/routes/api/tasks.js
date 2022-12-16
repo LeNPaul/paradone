@@ -40,9 +40,10 @@ router.post('/', auth, async (req, res) => {
 // @access Private
 router.put('/:id', auth, async (req, res) => {
   const task = {
-    user_id:    req.user.id,
-    content:    req.body.content,
-    completed:  req.body.completed
+    user_id:   req.user.id,
+    title:     req.title,
+    content:   req.body.content,
+    completed: req.body.completed
   }
   const updatedTask = await Task.findOneAndUpdate(
     { _id: new mongodb.ObjectID(req.params.id) },
