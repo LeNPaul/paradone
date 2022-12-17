@@ -5,6 +5,7 @@
       <textarea type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none" rows="3"></textarea>
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
+    <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
   </form>
 </template>
 // TODO: refactor so that add and edit components use the same code
@@ -15,7 +16,8 @@
     data() {
       return {
         title: '',
-        content: ''
+        content: '',
+        parentTasks: []
       }
     },
     props: {
@@ -35,7 +37,8 @@
         const updTask = {
           ...taskToUpdate,
           title: this.title,
-          content: this.content
+          content: this.content,
+          parent_ids: this.parentTasks.map(task=>task._id)
         }
         const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
           method: 'PUT',
@@ -63,6 +66,9 @@
     async created() {
       this.title = this.$props.task.title
       this.content = this.$props.task.content
+      this.parentTasks = await Promise.all(this.$props.task.parent_ids.map(async(parentId)=>{
+        return await this.fetchTask(parentId)
+      }))
     }
   }
 </script>
