@@ -3,7 +3,7 @@
     <button class="btn btn-link link-dark" type="submit"><i @click="$emit('delete-task', task._id)" class="far fa-circle"></i></button>
     {{ task.title }}
     <button class="btn btn-link link-dark float-end" type="submit"><i @click="toggleEditTask()" class="fas fa-edit"></i></button>
-    <WorkspaceTaskEdit @update-task="$emit('update-task')" @close-edit-task="toggleEditTask()" v-show="showEditTask" :task="task"/>
+    <WorkspaceTaskEdit @update-task="$emit('update-task')" @close-edit-task="toggleEditTask()" v-show="showEditTask" :task="task" :tasks="tasks"/>
   </p>
 </template>
 
@@ -15,6 +15,10 @@ export default {
   props: {
     task: {
       type: Object,
+      required: true
+    },
+    tasks: {
+      type: Array,
       required: true
     }
   },

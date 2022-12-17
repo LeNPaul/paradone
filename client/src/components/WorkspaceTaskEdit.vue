@@ -6,6 +6,10 @@
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
     <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
+    <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-list"></i></button>
+    <ul class="dropdown-menu">
+        <li :key='task.title' v-for="task in tasks" v-show="!this.parentTasks.some(parentTask=>parentTask._id==task._id)" @click="this.parentTasks.push({_id: task._id, title: task.title})"><a class="dropdown-item">{{ task.title }}</a></li>
+    </ul>
   </form>
 </template>
 // TODO: refactor so that add and edit components use the same code
@@ -23,6 +27,10 @@
     props: {
       task: {
         type: Object,
+        required: true
+      },
+      tasks: {
+        type: Array,
         required: true
       }
     },
