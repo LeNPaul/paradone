@@ -5,7 +5,10 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <TheWorkspaceHeaderTaskAdd @update-tasks="updateTasks()"/>
+        <TheWorkspaceHeaderTaskAdd 
+          @update-tasks="updateTasks()" 
+          :tasks="tasks"
+        />
         <TheWorkspaceTasks
           @delete-task="updateTasks()"
           @update-task="updateTasks()"
