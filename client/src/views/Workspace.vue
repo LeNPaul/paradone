@@ -5,7 +5,7 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <TheWorkspaceHeaderTaskAdd 
+        <TheWorkspaceTaskAdd 
           @update-tasks="updateTasks()" 
           :tasks="tasks"
         />
@@ -21,7 +21,7 @@
 
 <script>
 import TheSidebar from '../components/TheSidebar'
-import TheWorkspaceHeaderTaskAdd from '../components/TheWorkspaceHeaderTaskAdd'
+import TheWorkspaceTaskAdd from '../components/TheWorkspaceTaskAdd'
 import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
 
 export default {
@@ -29,7 +29,7 @@ export default {
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    TheWorkspaceHeaderTaskAdd,
+    TheWorkspaceTaskAdd,
     TheWorkspaceTasks
   },
   data() {
