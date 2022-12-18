@@ -18,24 +18,32 @@ let fetchTasks = async function() {
 }
 
 let createTask = async function(newTask) {
-  const res = await fetch('/api/tasks', {
+  return await fetch('/api/tasks', {
     method: 'POST',
     headers: header,
     body: JSON.stringify(newTask),
   })
-  return await res.json()
 }
 
 let updateTask = async function(id, updTask) {
-  const res = await fetch(`/api/tasks/${id}`, {
+  return await fetch(`/api/tasks/${id}`, {
     method: 'PUT',
     headers: header,
     body: JSON.stringify(updTask),
   })
-  return await res.json()
+}
+
+let deleteTask = async function(id) {
+  return await fetch(`/api/tasks/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'x-auth-token': localStorage.getItem('token') || ''
+    }
+  })
 }
 
 exports.fetchTask = fetchTask;
 exports.fetchTasks = fetchTasks;
 exports.createTask = createTask;
 exports.updateTask = updateTask;
+exports.deleteTask = deleteTask;
