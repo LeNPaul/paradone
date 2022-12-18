@@ -6,6 +6,7 @@
 
 <script>
 import WorkspaceTask from './WorkspaceTask'
+const requests = require('../assets/js/requests')
 
 export default {
   name: 'TheWorkspaceTasks',
@@ -21,7 +22,7 @@ export default {
   emits: ['delete-task', 'update-task'],
   methods: {
     async completeTask(id) {
-      const taskToUpdate = await this.fetchTask(id)
+      const taskToUpdate = await requests.fetchTask(id)
         const updTask = {
           ...taskToUpdate,
           completed: true
@@ -48,17 +49,7 @@ export default {
       res.status === 200
         ? this.$emit('delete-task')
         : alert('Error deleting task')
-    },
-    // TODO: Move this to a shared module
-    async fetchTask(id) {
-        const res = await fetch(`/api/tasks/${id}`, {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
-      },
+    }
   }
 }
 </script>

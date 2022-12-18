@@ -19,6 +19,8 @@
 // TODO: refactor so that add and edit components use the same code
 
 <script>
+  const requests = require('../assets/js/requests')
+
   export default {
     name: 'WorkspaceTaskEdit',
     data() {
@@ -45,7 +47,7 @@
           alert('Please add a task')
           return
         }
-        const taskToUpdate = await this.fetchTask(this.$props.task._id)
+        const taskToUpdate = await requests.fetchTask(this.$props.task._id)
         const updTask = {
           ...taskToUpdate,
           title: this.title,
@@ -64,16 +66,7 @@
         this.$emit('update-task')
         this.$emit('close-edit-task')
         return data
-      },
-      async fetchTask(id) {
-        const res = await fetch(`/api/tasks/${id}`, {
-          headers: {
-            'x-auth-token': localStorage.getItem('token') || ''
-          }
-        })
-        const data = await res.json()
-        return data
-      },
+      }
     },
     async created() {
       this.title = this.$props.task.title
