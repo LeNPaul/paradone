@@ -23,6 +23,7 @@
 import TheSidebar from '../components/TheSidebar'
 import TheWorkspaceTaskAdd from '../components/TheWorkspaceTaskAdd'
 import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
+const requests = require('../assets/js/requests')
 
 export default {
   name: 'Workspace',
@@ -39,12 +40,7 @@ export default {
   },
   methods: {
     async updateTasks() {
-      const res = await fetch('/api/tasks', {
-        headers: {
-          'x-auth-token': localStorage.getItem('token') || ''
-        }
-      })
-      this.tasks = await res.json()
+      this.tasks = await requests.fetchTasks()
     }
   },
   async created() {

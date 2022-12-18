@@ -14,6 +14,8 @@
 </template>
 
 <script>
+  const requests = require('../assets/js/requests')
+
   export default {
     name: 'TheWorkspaceTaskAdd',
     data() {
@@ -42,20 +44,11 @@
           content: this.content,
           parent_ids: this.parentTasks.map((task)=>task._id)
         }
-        const res = await fetch('/api/tasks', {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-            'x-auth-token': localStorage.getItem('token') || ''
-          },
-          body: JSON.stringify(newTask),
-        })
-        const data = await res.json()
+        requests.createTask(newTask)
         this.$emit('update-tasks')
         this.title = null
         this.content = null
         this.parentTasks = []
-        return data
       }
     }
   }
