@@ -26,6 +26,16 @@ let createTask = async function(newTask) {
   return await res.json()
 }
 
+let updateTask = async function(id, updTask) {
+  const res = await fetch(`/api/tasks/${id}`, {
+    method: 'PUT',
+    headers: header,
+    body: JSON.stringify(updTask),
+  })
+  return await res.json()
+}
+
 exports.fetchTask = fetchTask;
 exports.fetchTasks = fetchTasks;
 exports.createTask = createTask;
+exports.updateTask = updateTask;

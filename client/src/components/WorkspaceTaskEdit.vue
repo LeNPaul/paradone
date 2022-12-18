@@ -54,25 +54,16 @@
           content: this.content,
           parent_ids: this.parentTasks.map(task=>task._id)
         }
-        const res = await fetch(`/api/tasks/${this.$props.task._id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-type': 'application/json',
-            'x-auth-token': localStorage.getItem('token') || ''
-          },
-          body: JSON.stringify(updTask),
-        })
-        const data = await res.json()
+        requests.updateTask(this.$props.task._id, updTask)
         this.$emit('update-task')
         this.$emit('close-edit-task')
-        return data
       }
     },
     async created() {
       this.title = this.$props.task.title
       this.content = this.$props.task.content
       this.parentTasks = await Promise.all(this.$props.task.parent_ids.map(async(parentId)=>{
-        return await this.fetchTask(parentId)
+        return await requests.fetchTask(parentId)
       }))
     }
   }
