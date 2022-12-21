@@ -14,6 +14,7 @@
           @update-task="updateTasks()"
           :tasks="tasks"
         />
+        <TheWorkspaceTaskModal/>
       </div>
     </div>
   </div>
@@ -22,6 +23,7 @@
 <script>
 import TheSidebar from '../components/TheSidebar'
 import TheWorkspaceTaskAdd from '../components/TheWorkspaceTaskAdd'
+import TheWorkspaceTaskModal from '../components/TheWorkspaceTaskModal'
 import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
 const requests = require('../assets/js/requests')
 
@@ -31,6 +33,7 @@ export default {
   components: {
     TheSidebar,
     TheWorkspaceTaskAdd,
+    TheWorkspaceTaskModal,
     TheWorkspaceTasks
   },
   data() {
