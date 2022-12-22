@@ -5,6 +5,7 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
+        <TheWorkspaceTaskModal/>
         <TheWorkspaceTaskAdd 
           @update-tasks="updateTasks()" 
           :tasks="tasks"
@@ -14,7 +15,6 @@
           @update-task="updateTasks()"
           :tasks="tasks"
         />
-        <TheWorkspaceTaskModal/>
       </div>
     </div>
   </div>
