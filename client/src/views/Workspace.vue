@@ -10,7 +10,7 @@
           <i class="fas fa-plus"></i>
         </button>
         <TheWorkspaceTaskModal
-          :show="showModal" @close="showModal=false"
+          :show="showModal" @close-modal="showModal=false"
           @delete-task="updateTasks()"
           @update-tasks="updateTasks()"
           :tasks="tasks"

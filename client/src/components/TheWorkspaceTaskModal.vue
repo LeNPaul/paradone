@@ -9,10 +9,10 @@
                 <textarea type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none" rows="3"></textarea>
                 </div>
                 <button type="submit" class="btn btn-dark">Save</button>
-                <button type="submit" class="btn btn-outline" @click="$emit('close')">Close</button>
+                <button type="button" class="btn btn-outline" @click="$emit('close-modal')">Close</button>
                 <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
                 <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-list"></i></button>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu" v-show="this.tasks.length!==0">
                     <li :key='task.title' v-for="task in tasks" v-show="!this.parentTasks.some(parentTask=>parentTask._id==task._id) && !task.completed" @click="this.parentTasks.push({_id: task._id, title: task.title})"><a class="dropdown-item">{{ task.title }}</a></li>
                 </ul>
             </form>
@@ -26,7 +26,7 @@
   const requests = require('../assets/js/requests')
 
   export default {
-    name: 'TheWorkspaceTaskAdd',
+    name: 'TheWorkspaceTaskModal',
     data() {
       return {
         title: null,
@@ -41,7 +41,7 @@
     },
     show: Boolean
   },
-    emits: ['update-tasks', 'close'],
+    emits: ['update-tasks', 'close-modal'],
     methods: {
       async onSubmit(e) {
         e.preventDefault()
@@ -56,7 +56,7 @@
         }
         await requests.createTask(newTask)
         this.$emit('update-tasks')
-        this.$emit('close')
+        this.$emit('close-modal')
         this.title = null
         this.content = null
         this.parentTasks = []
