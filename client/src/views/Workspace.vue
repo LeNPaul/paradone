@@ -5,11 +5,12 @@
     </div>
     <div class="col-6 offset-4 pt-3 mt-3">
       <div class="mx-auto py-md-5">
-        <TheWorkspaceTaskModal/>
-        <TheWorkspaceTaskAdd 
-          @update-tasks="updateTasks()" 
-          :tasks="tasks"
-        />
+
+        <button type="button" class="btn btn-outline mb-3"  id="show-modal" @click="showModal = true">
+          <i class="fas fa-plus"></i>
+        </button>
+        <TheWorkspaceTaskModal :show="showModal" @close="showModal=false"/>
+
         <TheWorkspaceTasks
           @delete-task="updateTasks()"
           @update-task="updateTasks()"
@@ -38,7 +39,8 @@ export default {
   },
   data() {
     return {
-      tasks: []
+      tasks: [],
+      showModal: false
     }
   },
   methods: {
