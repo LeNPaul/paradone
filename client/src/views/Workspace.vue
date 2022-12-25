@@ -9,7 +9,12 @@
         <button type="button" class="btn btn-outline mb-3"  id="show-modal" @click="showModal = true">
           <i class="fas fa-plus"></i>
         </button>
-        <TheWorkspaceTaskModal :show="showModal" @close="showModal=false"/>
+        <TheWorkspaceTaskModal
+          :show="showModal" @close="showModal=false"
+          @delete-task="updateTasks()"
+          @update-tasks="updateTasks()"
+          :tasks="tasks"
+        />
 
         <TheWorkspaceTasks
           @delete-task="updateTasks()"
@@ -23,7 +28,6 @@
 
 <script>
 import TheSidebar from '../components/TheSidebar'
-import TheWorkspaceTaskAdd from '../components/TheWorkspaceTaskAdd'
 import TheWorkspaceTaskModal from '../components/TheWorkspaceTaskModal'
 import TheWorkspaceTasks from '../components/TheWorkspaceTasks'
 const requests = require('../assets/js/requests')
@@ -33,7 +37,6 @@ export default {
   inheritAttrs: false, // disable 'non-props' warning
   components: {
     TheSidebar,
-    TheWorkspaceTaskAdd,
     TheWorkspaceTaskModal,
     TheWorkspaceTasks
   },
