@@ -5,6 +5,7 @@
       <textarea type="text" v-model="content" name="content" placeholder="Content" class="form-control border-0 shadow-none" rows="3"></textarea>
     </div>
     <button type="submit" class="btn btn-dark">Save</button>
+    <button type="button" class="btn btn-outline" @click="$emit('close-edit-task')">Close</button>
     <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
     <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-list"></i></button>
     <ul v-show="(this.parentTasks.length+1) !== this.$props.tasks.length && this.$props.tasks.filter(task=> task.completed !== true).length !== 1" class="dropdown-menu">
