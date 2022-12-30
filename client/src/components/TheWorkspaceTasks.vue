@@ -1,5 +1,5 @@
 <template>
-  <div :key="task._id" v-for="task in tasks">
+  <div :key="task._id" v-for="task in tasks" v-show="!task.completed">
     <WorkspaceTask @update-task="$emit('update-task')" @delete-task="completeTask(task._id)" :task="task" :tasks="tasks"/>
   </div>
 </template>
