@@ -13,7 +13,7 @@
                 <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
                 <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-list"></i></button>
                 <ul class="dropdown-menu" v-show="this.tasks.length!==0">
-                    <li :key='task.title' v-for="task in this.taskDropdownList" @click="this.parentTasks.push({_id: task._id, title: task.title}), this.resetTaskDropdown()"><a class="dropdown-item">{{ task.title }}</a></li>
+                    <li :key='task.title' v-for="task in this.taskDropdownList" @click="this.parentTasks.push({_id: task._id, title: task.title}), this.populateDropdown()"><a class="dropdown-item">{{ task.title }}</a></li>
                 </ul>
             </form>
         </div>
@@ -64,7 +64,7 @@
       },
       populateDropdown() {
         this.taskDropdownList = this.$props.tasks.filter((task) => {
-          if(!task.completed) {
+          if(!task.completed && !this.parentTasks.some(parentTask=>parentTask._id==task._id)) {
             return true
           }
         })
