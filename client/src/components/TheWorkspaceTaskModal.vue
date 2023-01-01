@@ -76,11 +76,17 @@
       },
       populateDropdown() {
         this.taskDropdownList = this.$props.tasks.filter((task) => {
-          if(!task.completed && !this.parentTasks.some(parentTask=>parentTask._id==task._id) && this.$props.task._id!==task._id) {
-            return true
+          if(!task.completed && !this.parentTasks.some(parentTask=>parentTask._id==task._id)) {
+            if(this.$props.task) {
+              if(this.$props.task._id!==task._id) {
+                return true
+              }
+            } else {
+              return true
+            }
           }
         })
-      }
+      } 
     },
     watch: {
       async show() {
