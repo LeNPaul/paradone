@@ -76,7 +76,7 @@
       },
       populateDropdown() {
         this.taskDropdownList = this.$props.tasks.filter((task) => {
-          if(!task.completed && !this.parentTasks.some(parentTask=>parentTask._id==task._id)) {
+          if(!task.completed && !this.parentTasks.some(parentTask=>parentTask._id==task._id) && this.$props.task._id!==task._id) {
             return true
           }
         })
