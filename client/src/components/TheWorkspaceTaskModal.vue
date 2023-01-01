@@ -83,9 +83,6 @@
       }
     },
     watch: {
-      tasks() {
-        this.populateDropdown()
-      },
       async show() {
         if(this.$props.task) {
           this.title = this.$props.task.title
@@ -94,6 +91,7 @@
             return await requests.fetchTask(parentId)
           }))
         }
+        this.populateDropdown()
       }
     }
   }
