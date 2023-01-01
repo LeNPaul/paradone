@@ -10,7 +10,7 @@
                 </div>
                 <button type="submit" class="btn btn-dark">Save</button>
                 <button type="button" class="btn btn-outline" @click="$emit('close-modal'),this.title=null,this.content=null,this.parentTasks=[]">Close</button>
-                <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id)">{{ task.title }}</button>
+                <button :key='task.title' v-for="task in parentTasks" type="button" class="btn btn-outline-dark p-1 ms-2 px-2" @click="this.parentTasks=this.parentTasks.filter(parentTask=>parentTask._id!=task._id),this.populateDropdown()">{{ task.title }}</button>
                 <button class="btn btn-outline-dark btn-sm float-end" type="button" data-bs-toggle="dropdown"><i class="fas fa-list"></i></button>
                 <ul class="dropdown-menu" v-show="this.taskDropdownList.length!==0">
                     <li :key='task.title' v-for="task in this.taskDropdownList" @click="this.parentTasks.push({_id: task._id, title: task.title}), this.populateDropdown()"><a class="dropdown-item">{{ task.title }}</a></li>
