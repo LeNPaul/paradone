@@ -36,11 +36,14 @@
       }
     },
     props: {
-    tasks: {
-      type: Array,
-      required: true
-    },
-    show: Boolean
+      task: {
+        type: Object
+      },
+      tasks: {
+        type: Array,
+        required: true
+      },
+      show: Boolean
   },
     emits: ['update-tasks', 'close-modal'],
     methods: {
@@ -73,6 +76,15 @@
     watch: {
       tasks() {
         this.populateDropdown()
+      },
+      async show() {
+        if(this.$props.task) {
+          this.title = this.$props.task.title
+          this.content = this.$props.task.content
+          this.parentTasks = await Promise.all(this.$props.task.parent_ids.map(async(parentId)=>{
+            return await requests.fetchTask(parentId)
+          }))
+        }
       }
     }
   }
