@@ -53,12 +53,21 @@
           alert('Please add a task')
           return 
         }
-        const newTask = {
-          title: this.title,
-          content: this.content,
-          parent_ids: this.parentTasks.map((task)=>task._id)
+        if(this.$props.task) {
+          const taskToUpdate = await requests.fetchTask(this.$props.task._id)
+          await requests.updateTask(this.$props.task._id, {
+            ...taskToUpdate,
+            title: this.title,
+            content: this.content,
+            parent_ids: this.parentTasks.map(task=>task._id)
+          })
+        } else {
+          await requests.createTask({
+            title: this.title,
+            content: this.content,
+            parent_ids: this.parentTasks.map((task)=>task._id)
+          })
         }
-        await requests.createTask(newTask)
         this.$emit('update-tasks')
         this.$emit('close-modal')
         this.title = null
