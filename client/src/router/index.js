@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import store from '../store/index.js'
 import Workspace from '../views/Workspace'
+import Graph from '../views/Graph'
 import Register from '../views/Register'
 import Login from '../views/Login'
 import ResetPassword from '../views/ResetPassword'
@@ -10,6 +11,14 @@ const routes = [
     path: '/',
     name: 'Dashboard',
     component: Workspace,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/graph',
+    name: 'Graph',
+    component: Graph,
     meta: {
       requiresAuth: true
     }
