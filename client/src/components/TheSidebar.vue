@@ -6,7 +6,12 @@
       </router-link>
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
-
+        <li class="nav-item">
+          <router-link to="/graph" class="nav-link link-dark">
+            <i class="fas fa-th-large me-1"></i>
+            Graph View
+          </router-link>
+        </li>
       </ul>
       <hr>
       <div class="dropdown">
