@@ -15,13 +15,23 @@
           @update-tasks="updateTasks()"
           :tasks="tasks"
         />
-
-        <h1>Graph route placeholder</h1>
-
+        <v-network-graph
+          id="graph-view"
+          class="graph"
+          :nodes="nodes"
+          :edges="edges"
+          :configs="configs"
+        />
       </div>
     </div>
   </div>
 </template>
+
+<style>
+  #graph-view {
+    height: 75vh;
+  }
+</style>
 
 <script>
 import TheSidebar from '../components/TheSidebar'
@@ -38,7 +48,36 @@ export default {
   data() {
     return {
       tasks: [],
-      showModal: false
+      showModal: false,
+      nodes: {
+        node1: { name: "Node 1" },
+        node2: { name: "Node 2" },
+        node3: { name: "Node 3" },
+        node4: { name: "Node 4" },
+      },
+      edges: {
+        edge1: { source: "node1", target: "node2" },
+        edge2: { source: "node2", target: "node3" },
+        edge3: { source: "node3", target: "node4" },
+      },
+      configs: {
+        node: {
+          normal: {
+            color: "black"
+          },
+          hover: {
+            color: "grey"
+          }
+        },
+        edge: {
+          normal: {
+            color: "black"
+          },
+          hover: {
+            color: "grey"
+          }
+        }
+      }
     }
   },
   methods: {
