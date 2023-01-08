@@ -75,14 +75,16 @@ export default {
     async updateTasks() {
       this.tasks = await requests.fetchTasks()
       this.tasks.forEach((task)=>{
-        this.nodes[task._id] = {name: task.title}
-        task.parent_ids.forEach(async (parentId)=>{
-          const parentTask = await requests.fetchTask(parentId)
-          this.edges[parentTask._id+task._id] = {
-            source: parentTask._id,
-            target: task._id
-          }
-        })
+        if(!task.completed) {
+          this.nodes[task._id] = {name: task.title}
+          task.parent_ids.forEach(async (parentId)=>{
+            const parentTask = await requests.fetchTask(parentId)
+            this.edges[parentTask._id+task._id] = {
+              source: parentTask._id,
+              target: task._id
+            }
+          })
+        }
       })
     }
   },
