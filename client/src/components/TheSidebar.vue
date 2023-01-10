@@ -7,6 +7,10 @@
       <hr>
       <ul class="nav nav-pills flex-column mb-auto">
         <li class="nav-item">
+          <router-link to="/" class="nav-link link-dark">
+            <i class="fas fa-list me-1"></i>
+            List View
+          </router-link>
           <router-link to="/graph" class="nav-link link-dark">
             <i class="fas fa-th-large me-1"></i>
             Graph View
