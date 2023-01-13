@@ -66,7 +66,7 @@ export default {
         },
         edge: {
           normal: {
-            color: "black"
+            color: "#D3D3D3"
           },
           hover: {
             color: "grey"
@@ -95,6 +95,10 @@ export default {
           })
         }
       })
+      for(const task in this.tasks) {
+        const count = this.tasks[task].parent_ids.length
+        this.layouts.nodes[this.tasks[task]._id] = { x: ((count*150)-200), y: (task*75-500) }
+      }
     }
   },
   async created() { 
