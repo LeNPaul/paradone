@@ -20,6 +20,7 @@
           class="graph"
           :nodes="nodes"
           :edges="edges"
+          :layouts="layouts"
           :configs="configs"
         />
       </div>
@@ -51,6 +52,9 @@ export default {
       showModal: false,
       nodes: {},
       edges: {},
+      layouts: {
+        nodes: {}
+      },
       configs: {
         node: {
           normal: {
@@ -93,7 +97,7 @@ export default {
       })
     }
   },
-  async created() {
+  async created() { 
     this.updateTasks()
   },
   watch:{
