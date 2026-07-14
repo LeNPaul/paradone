@@ -1,5 +1,0 @@
-{
-  "mongoURI": "mongodb://localhost/paradone",
-  "jwtSecret": "keyboard_cat_secret",
-  "expiresIn": "30d"
-}
