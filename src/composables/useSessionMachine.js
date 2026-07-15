@@ -4,7 +4,7 @@
 // doesn't lose it.
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { createTimer, start, getRemainingMs, isFinished } from '../lib/timer.js'
-import { getPrefs, getActiveSession, setActiveSession } from '../lib/storage.js'
+import { getPrefs, getActiveSession, setActiveSession, getSessions, setSessions } from '../lib/storage.js'
 
 const PRIMER_DURATION_MINUTES = 2
 
@@ -15,6 +15,11 @@ export function useSessionMachine() {
   const state = ref(stored?.state ?? 'setup')
   const sessionGoalText = ref(stored?.sessionGoalText ?? '')
   const timer = ref(stored?.timer ?? null)
+  const captures = ref(stored?.captures ?? [])
+  const usedPrimer = ref(stored?.usedPrimer ?? false)
+  const auditProductive = ref(stored?.auditProductive ?? '')
+  const auditNotes = ref(stored?.auditNotes ?? '')
+  const sessionStartedAt = ref(stored?.sessionStartedAt ?? null)
   const now = ref(Date.now())
   const primerSkipped = ref(false)
 
@@ -33,6 +38,8 @@ export function useSessionMachine() {
 
   function startSession(at = Date.now()) {
     timer.value = start(createTimer(prefs.workDuration), at)
+    sessionStartedAt.value = at
+    usedPrimer.value = false
     state.value = 'active'
   }
 
@@ -48,11 +55,14 @@ export function useSessionMachine() {
 
   function commitFullSession(at = Date.now()) {
     timer.value = start(createTimer(prefs.workDuration), at)
+    sessionStartedAt.value = at
+    usedPrimer.value = true
     state.value = 'active'
   }
 
   function stopPrimer() {
     timer.value = null
+    captures.value = []
     state.value = 'setup'
   }
 
@@ -65,11 +75,57 @@ export function useSessionMachine() {
     state.value = 'audit'
   }
 
-  watch([state, sessionGoalText, timer], () => {
+  function addCapture(text, at = Date.now()) {
+    const trimmed = text.trim()
+    if (!trimmed) return
+    captures.value = [...captures.value, { text: trimmed, timestamp: new Date(at).toISOString() }]
+  }
+
+  function submitAudit(answers) {
+    auditProductive.value = answers.auditProductive
+    auditNotes.value = answers.auditNotes ?? ''
+    state.value = 'summary'
+  }
+
+  function startNewSession() {
+    const sessions = getSessions()
+    sessions.push({
+      id: crypto.randomUUID(),
+      date: new Date(sessionStartedAt.value).toISOString(),
+      sessionGoalText: sessionGoalText.value,
+      plannedDuration: prefs.workDuration,
+      actualDuration: prefs.workDuration,
+      captures: captures.value,
+      usedPrimer: usedPrimer.value,
+      auditProductive: auditProductive.value,
+      auditNotes: auditNotes.value,
+    })
+    setSessions(sessions)
+
+    state.value = 'setup'
+    sessionGoalText.value = ''
+    timer.value = null
+    captures.value = []
+    usedPrimer.value = false
+    auditProductive.value = ''
+    auditNotes.value = ''
+    sessionStartedAt.value = null
+  }
+
+  watch([state, sessionGoalText, timer, captures, usedPrimer, auditProductive, auditNotes, sessionStartedAt], () => {
     setActiveSession(
       state.value === 'setup'
         ? null
-        : { state: state.value, sessionGoalText: sessionGoalText.value, timer: timer.value },
+        : {
+            state: state.value,
+            sessionGoalText: sessionGoalText.value,
+            timer: timer.value,
+            captures: captures.value,
+            usedPrimer: usedPrimer.value,
+            auditProductive: auditProductive.value,
+            auditNotes: auditNotes.value,
+            sessionStartedAt: sessionStartedAt.value,
+          },
     )
   })
 
@@ -85,6 +141,10 @@ export function useSessionMachine() {
     remainingMs,
     showPrimerChoice,
     prefs,
+    captures,
+    usedPrimer,
+    auditProductive,
+    auditNotes,
     startSession,
     startPrimer,
     skipPrimerCountdown,
@@ -92,6 +152,9 @@ export function useSessionMachine() {
     stopPrimer,
     takeBreak,
     keepGoing,
+    addCapture,
+    submitAudit,
+    startNewSession,
     tick,
   }
 }

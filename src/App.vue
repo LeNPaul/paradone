@@ -2,6 +2,9 @@
 import { ref } from 'vue'
 import MarkdownChecklist from './components/MarkdownChecklist.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
+import CaptureBox from './components/CaptureBox.vue'
+import AuditPrompt from './components/AuditPrompt.vue'
+import SessionSummary from './components/SessionSummary.vue'
 import { getGoalsList, setGoalsList } from './lib/storage.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 
@@ -17,6 +20,9 @@ const {
   remainingMs,
   showPrimerChoice,
   prefs,
+  captures,
+  auditProductive,
+  auditNotes,
   startSession,
   startPrimer,
   skipPrimerCountdown,
@@ -24,6 +30,9 @@ const {
   stopPrimer,
   takeBreak,
   keepGoing,
+  addCapture,
+  submitAudit,
+  startNewSession,
 } = useSessionMachine()
 </script>
 
@@ -74,6 +83,30 @@ const {
     <section v-if="state === 'break'" aria-labelledby="break-heading">
       <h2 id="break-heading">Break</h2>
       <TimerDisplay :remaining-ms="remainingMs" variant="session" />
+    </section>
+
+    <section
+      v-if="state === 'primer' || state === 'active' || state === 'break'"
+      aria-labelledby="capture-heading"
+    >
+      <h2 id="capture-heading">Capture</h2>
+      <CaptureBox :captures="captures" @add="addCapture" />
+    </section>
+
+    <section v-if="state === 'audit'" aria-labelledby="audit-heading">
+      <h2 id="audit-heading">Audit</h2>
+      <AuditPrompt :session-goal-text="sessionGoalText" @submit="submitAudit" />
+    </section>
+
+    <section v-if="state === 'summary'" aria-labelledby="summary-heading">
+      <h2 id="summary-heading">Summary</h2>
+      <SessionSummary
+        :session-goal-text="sessionGoalText"
+        :captures="captures"
+        :audit-productive="auditProductive"
+        :audit-notes="auditNotes"
+        @start-new-session="startNewSession"
+      />
     </section>
   </div>
 </template>
