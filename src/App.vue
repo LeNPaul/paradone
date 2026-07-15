@@ -5,6 +5,7 @@ import TimerDisplay from './components/TimerDisplay.vue'
 import CaptureBox from './components/CaptureBox.vue'
 import AuditPrompt from './components/AuditPrompt.vue'
 import SessionSummary from './components/SessionSummary.vue'
+import SettingsPanel from './components/SettingsPanel.vue'
 import { getGoalsList, setGoalsList } from './lib/storage.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 
@@ -23,6 +24,7 @@ const {
   captures,
   auditProductive,
   auditNotes,
+  updatePrefs,
   startSession,
   startPrimer,
   skipPrimerCountdown,
@@ -50,7 +52,7 @@ const {
 
     <section v-if="state === 'setup'" aria-labelledby="start-heading">
       <h2 id="start-heading">Start</h2>
-      <p>Work: {{ prefs.workDuration }} min · Break: {{ prefs.breakDuration }} min</p>
+      <SettingsPanel :prefs="prefs" @update="updatePrefs" />
       <button type="button" @click="startPrimer()">Need help starting? Try a 2-minute primer</button>
       <button type="button" @click="startSession()">Start</button>
     </section>

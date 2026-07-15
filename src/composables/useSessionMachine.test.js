@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { nextTick } from 'vue'
 import { useSessionMachine } from './useSessionMachine.js'
-import { getActiveSession, setActiveSession, setPrefs, getSessions } from '../lib/storage.js'
+import { getActiveSession, setActiveSession, getPrefs, setPrefs, getSessions } from '../lib/storage.js'
 
 beforeEach(() => {
   localStorage.clear()
@@ -124,6 +124,25 @@ describe('primer', () => {
   })
 })
 
+describe('updatePrefs', () => {
+  it('updates prefs reactively and persists the change', () => {
+    const machine = useSessionMachine()
+    machine.updatePrefs({ workDuration: 40, breakDuration: 0 })
+    expect(machine.prefs.workDuration).toBe(40)
+    expect(machine.prefs.breakDuration).toBe(0)
+    expect(getPrefs()).toEqual({ workDuration: 40, breakDuration: 0 })
+  })
+
+  it('a session started after updating prefs uses the new work duration', () => {
+    const machine = useSessionMachine()
+    machine.updatePrefs({ workDuration: 40, breakDuration: 5 })
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now)
+    expect(machine.remainingMs.value).toBe(40 * 60 * 1000)
+  })
+})
+
 describe('captures', () => {
   it('addCapture appends a timestamped entry', () => {
     const machine = useSessionMachine()
@@ -223,6 +242,7 @@ describe('activeSession persistence', () => {
       auditProductive: '',
       auditNotes: '',
       sessionStartedAt: 1000,
+      primerSkipped: false,
     })
   })
 
@@ -283,5 +303,18 @@ describe('rehydration', () => {
     expect(machine.usedPrimer.value).toBe(true)
     expect(machine.auditProductive.value).toBe('mixed')
     expect(machine.auditNotes.value).toBe('tabbed out twice')
+  })
+
+  it('restores a skipped primer so the commit/stop choice survives a reload, instead of reverting to waiting out the countdown', () => {
+    const startedAt = Date.now() - 30 * 1000 // 30s into the 2-minute primer, well before it finishes
+    setActiveSession({
+      state: 'primer',
+      sessionGoalText: '',
+      timer: { durationMs: 2 * 60 * 1000, startedAt, elapsedMs: 0, running: true },
+      primerSkipped: true,
+    })
+    const machine = useSessionMachine()
+    expect(machine.state.value).toBe('primer')
+    expect(machine.showPrimerChoice.value).toBe(true)
   })
 })

@@ -2,14 +2,14 @@
 // | active | blockEnd | break | audit | summary), ticking timer.js countdowns
 // and persisting the in-progress block to paradone:activeSession so a reload
 // doesn't lose it.
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { createTimer, start, getRemainingMs, isFinished } from '../lib/timer.js'
-import { getPrefs, getActiveSession, setActiveSession, getSessions, setSessions } from '../lib/storage.js'
+import { getPrefs, setPrefs, getActiveSession, setActiveSession, getSessions, setSessions } from '../lib/storage.js'
 
 const PRIMER_DURATION_MINUTES = 2
 
 export function useSessionMachine() {
-  const prefs = getPrefs()
+  const prefs = reactive(getPrefs())
   const stored = getActiveSession()
 
   const state = ref(stored?.state ?? 'setup')
@@ -21,7 +21,7 @@ export function useSessionMachine() {
   const auditNotes = ref(stored?.auditNotes ?? '')
   const sessionStartedAt = ref(stored?.sessionStartedAt ?? null)
   const now = ref(Date.now())
-  const primerSkipped = ref(false)
+  const primerSkipped = ref(stored?.primerSkipped ?? false)
 
   const remainingMs = computed(() => (timer.value ? getRemainingMs(timer.value, now.value) : 0))
   const showPrimerChoice = computed(
@@ -35,6 +35,11 @@ export function useSessionMachine() {
     else if (state.value === 'break' && isFinished(timer.value, at)) state.value = 'audit'
   }
   tick(now.value) // correct immediately on rehydration, don't wait for the first interval tick
+
+  function updatePrefs(newPrefs) {
+    Object.assign(prefs, newPrefs)
+    setPrefs({ ...prefs })
+  }
 
   function startSession(at = Date.now()) {
     timer.value = start(createTimer(prefs.workDuration), at)
@@ -112,22 +117,26 @@ export function useSessionMachine() {
     sessionStartedAt.value = null
   }
 
-  watch([state, sessionGoalText, timer, captures, usedPrimer, auditProductive, auditNotes, sessionStartedAt], () => {
-    setActiveSession(
-      state.value === 'setup'
-        ? null
-        : {
-            state: state.value,
-            sessionGoalText: sessionGoalText.value,
-            timer: timer.value,
-            captures: captures.value,
-            usedPrimer: usedPrimer.value,
-            auditProductive: auditProductive.value,
-            auditNotes: auditNotes.value,
-            sessionStartedAt: sessionStartedAt.value,
-          },
-    )
-  })
+  watch(
+    [state, sessionGoalText, timer, captures, usedPrimer, auditProductive, auditNotes, sessionStartedAt, primerSkipped],
+    () => {
+      setActiveSession(
+        state.value === 'setup'
+          ? null
+          : {
+              state: state.value,
+              sessionGoalText: sessionGoalText.value,
+              timer: timer.value,
+              captures: captures.value,
+              usedPrimer: usedPrimer.value,
+              auditProductive: auditProductive.value,
+              auditNotes: auditNotes.value,
+              sessionStartedAt: sessionStartedAt.value,
+              primerSkipped: primerSkipped.value,
+            },
+      )
+    },
+  )
 
   let intervalId
   onMounted(() => {
@@ -145,6 +154,7 @@ export function useSessionMachine() {
     usedPrimer,
     auditProductive,
     auditNotes,
+    updatePrefs,
     startSession,
     startPrimer,
     skipPrimerCountdown,

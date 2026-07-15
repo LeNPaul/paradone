@@ -10,9 +10,10 @@ beforeEach(() => {
 })
 
 describe('setup', () => {
-  it('shows the Setup screen with duration text, primer button, and Start button', () => {
+  it('shows the Setup screen with duration inputs, primer button, and Start button', () => {
     const wrapper = mount(App)
-    expect(wrapper.text()).toContain('Work: 25 min · Break: 5 min')
+    expect(wrapper.get('#work-duration').element.value).toBe('25')
+    expect(wrapper.get('#break-duration').element.value).toBe('5')
     expect(wrapper.text()).toContain('2-minute primer')
     expect(wrapper.get('button[type="button"]').exists()).toBe(true)
   })
