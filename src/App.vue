@@ -1,11 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import MarkdownChecklist from './components/MarkdownChecklist.vue'
+import TimerDisplay from './components/TimerDisplay.vue'
 import { getGoalsList, setGoalsList } from './lib/storage.js'
-
-// Drives the single-page state machine from spec.md §3:
-// setup | primer | active | blockEnd | break | audit | summary
-const state = ref('setup')
+import { useSessionMachine } from './composables/useSessionMachine.js'
 
 const goalsListText = ref(getGoalsList().text)
 function onGoalsListUpdate(text) {
@@ -13,9 +11,20 @@ function onGoalsListUpdate(text) {
   setGoalsList({ text, updatedAt: new Date().toISOString() })
 }
 
-// Session Goal is blank at the start of every session — plain local
-// state, deliberately never written to storage.
-const sessionGoalText = ref('')
+const {
+  state,
+  sessionGoalText,
+  remainingMs,
+  showPrimerChoice,
+  prefs,
+  startSession,
+  startPrimer,
+  skipPrimerCountdown,
+  commitFullSession,
+  stopPrimer,
+  takeBreak,
+  keepGoing,
+} = useSessionMachine()
 </script>
 
 <template>
@@ -28,6 +37,43 @@ const sessionGoalText = ref('')
     <section v-if="state === 'setup'" aria-labelledby="session-goal-heading">
       <h2 id="session-goal-heading">Session Goal</h2>
       <MarkdownChecklist v-model="sessionGoalText" />
+    </section>
+
+    <section v-if="state === 'setup'" aria-labelledby="start-heading">
+      <h2 id="start-heading">Start</h2>
+      <p>Work: {{ prefs.workDuration }} min · Break: {{ prefs.breakDuration }} min</p>
+      <button type="button" @click="startPrimer()">Need help starting? Try a 2-minute primer</button>
+      <button type="button" @click="startSession()">Start</button>
+    </section>
+
+    <section v-if="state === 'primer'" aria-labelledby="primer-heading">
+      <h2 id="primer-heading">Primer</h2>
+      <TimerDisplay :remaining-ms="remainingMs" variant="primer" />
+      <button v-if="!showPrimerChoice" type="button" @click="skipPrimerCountdown()">Skip ahead</button>
+      <div v-else>
+        <p>Ready for a full session, or stop here?</p>
+        <button type="button" @click="commitFullSession()">Start full session</button>
+        <button type="button" @click="stopPrimer()">Stop here</button>
+      </div>
+    </section>
+
+    <section v-if="state === 'active'" aria-labelledby="active-heading">
+      <h2 id="active-heading">Focus block</h2>
+      <TimerDisplay :remaining-ms="remainingMs" variant="session" />
+      <h3 id="active-session-goal-heading">Session Goal</h3>
+      <MarkdownChecklist v-model="sessionGoalText" />
+    </section>
+
+    <section v-if="state === 'blockEnd'" aria-labelledby="block-end-heading">
+      <h2 id="block-end-heading">Block complete</h2>
+      <p>Take the break, or keep going?</p>
+      <button v-if="prefs.breakDuration > 0" type="button" @click="takeBreak()">Take a break</button>
+      <button type="button" @click="keepGoing()">Keep going</button>
+    </section>
+
+    <section v-if="state === 'break'" aria-labelledby="break-heading">
+      <h2 id="break-heading">Break</h2>
+      <TimerDisplay :remaining-ms="remainingMs" variant="session" />
     </section>
   </div>
 </template>
