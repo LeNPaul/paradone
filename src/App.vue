@@ -72,7 +72,7 @@ const {
       <h2 id="active-heading">Focus block</h2>
       <TimerDisplay :remaining-ms="remainingMs" variant="session" />
       <h3 id="active-session-goal-heading">Session Goal</h3>
-      <MarkdownChecklist v-model="sessionGoalText" />
+      <MarkdownChecklist v-model="sessionGoalText" :editable="false" />
     </section>
 
     <section v-if="state === 'blockEnd'" aria-labelledby="block-end-heading">

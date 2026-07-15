@@ -24,7 +24,7 @@ function onSubmit() {
   <div class="audit-prompt">
     <section aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading">What you set out to do</h3>
-      <MarkdownChecklist :model-value="sessionGoalText" />
+      <MarkdownChecklist :model-value="sessionGoalText" :editable="false" />
     </section>
 
     <div>

@@ -27,6 +27,38 @@ describe('setup', () => {
   })
 })
 
+describe('typing into checklists', () => {
+  it('typing into the Session Goal textarea at Setup renders it as a clickable checkbox', async () => {
+    const wrapper = mount(App)
+    const sessionGoalSection = wrapper.get('section[aria-labelledby="session-goal-heading"]')
+    await sessionGoalSection.find('textarea').setValue('- [ ] draft outline')
+
+    expect(sessionGoalSection.find('input[type="checkbox"]').exists()).toBe(true)
+    expect(sessionGoalSection.text()).toContain('draft outline')
+  })
+
+  it('typing into the Goals List textarea persists across a remount (reload)', async () => {
+    const wrapper = mount(App)
+    const goalsListTextarea = wrapper.findAll('textarea')[0]
+    await goalsListTextarea.setValue('- [ ] draft outline')
+
+    const reloaded = mount(App)
+    expect(reloaded.findAll('textarea')[0].element.value).toBe('- [ ] draft outline')
+  })
+
+  it('Active state renders the Session Goal without a textarea (checkbox-toggle only)', () => {
+    setActiveSession({
+      state: 'active',
+      sessionGoalText: '- [ ] draft outline',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    const wrapper = mount(App)
+    expect(wrapper.find('#active-heading').exists()).toBe(true)
+    expect(wrapper.find('textarea').exists()).toBe(false)
+    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true)
+  })
+})
+
 describe('block end', () => {
   it('hides "Take a break" when breakDuration is 0', () => {
     setPrefs({ workDuration: 25, breakDuration: 0 })

@@ -11,6 +11,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  editable: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -26,9 +30,21 @@ function displayText(item) {
 function onToggle(hash) {
   emit('update:modelValue', toggleItem(props.modelValue, hash))
 }
+
+function onInput(event) {
+  emit('update:modelValue', event.target.value)
+}
 </script>
 
 <template>
+  <textarea
+    v-if="editable"
+    class="markdown-checklist__textarea"
+    aria-label="Checklist markdown text"
+    placeholder="- [ ] task"
+    :value="modelValue"
+    @input="onInput"
+  ></textarea>
   <ul class="markdown-checklist">
     <li v-for="item in items" :key="item.hash" class="markdown-checklist__item">
       <label v-if="item.checkbox">
@@ -41,6 +57,15 @@ function onToggle(hash) {
 </template>
 
 <style scoped>
+.markdown-checklist__textarea {
+  display: block;
+  width: 100%;
+  min-height: 4rem;
+  box-sizing: border-box;
+  font: inherit;
+  margin-bottom: 0.5rem;
+}
+
 .markdown-checklist {
   list-style: none;
   margin: 0;

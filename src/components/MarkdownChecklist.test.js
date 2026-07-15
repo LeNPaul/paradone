@@ -60,4 +60,27 @@ describe('MarkdownChecklist', () => {
 
     expect(wrapper.find('input[type="checkbox"]').element.checked).toBe(true)
   })
+
+  it('renders a textarea reflecting modelValue by default', () => {
+    const wrapper = mount(MarkdownChecklist, {
+      props: { modelValue: '- [ ] draft outline' },
+    })
+    expect(wrapper.find('textarea').element.value).toBe('- [ ] draft outline')
+  })
+
+  it('emits update:modelValue with the typed text on textarea input', async () => {
+    const wrapper = mount(MarkdownChecklist, { props: { modelValue: '' } })
+    await wrapper.find('textarea').setValue('- [ ] draft outline')
+    expect(wrapper.emitted('update:modelValue')).toEqual([['- [ ] draft outline']])
+  })
+
+  it('hides the textarea when editable is false, while checkbox toggling still works', async () => {
+    const wrapper = mount(MarkdownChecklist, {
+      props: { modelValue: '- [ ] draft outline', editable: false },
+    })
+    expect(wrapper.find('textarea').exists()).toBe(false)
+
+    await wrapper.find('input[type="checkbox"]').setValue(true)
+    expect(wrapper.emitted('update:modelValue')).toEqual([['- [x] draft outline']])
+  })
 })
