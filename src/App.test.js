@@ -59,6 +59,40 @@ describe('typing into checklists', () => {
   })
 })
 
+describe('pausing and stopping an active session', () => {
+  function mountActive() {
+    setActiveSession({
+      state: 'active',
+      sessionGoalText: '- [ ] draft outline',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    return mount(App)
+  }
+
+  it('Active state renders Pause and Stop buttons', () => {
+    const wrapper = mountActive()
+    const buttonText = wrapper.findAll('button').map((b) => b.text())
+    expect(buttonText).toContain('Pause')
+    expect(buttonText).toContain('Stop & log session')
+  })
+
+  it('clicking Pause swaps the button to Resume', async () => {
+    const wrapper = mountActive()
+    const pauseButton = wrapper.findAll('button').find((b) => b.text() === 'Pause')
+    await pauseButton.trigger('click')
+    const buttonText = wrapper.findAll('button').map((b) => b.text())
+    expect(buttonText).toContain('Resume')
+    expect(buttonText).not.toContain('Pause')
+  })
+
+  it('clicking Stop transitions to the Audit screen', async () => {
+    const wrapper = mountActive()
+    const stopButton = wrapper.findAll('button').find((b) => b.text() === 'Stop & log session')
+    await stopButton.trigger('click')
+    expect(wrapper.find('#audit-heading').exists()).toBe(true)
+  })
+})
+
 describe('block end', () => {
   it('hides "Take a break" when breakDuration is 0', () => {
     setPrefs({ workDuration: 25, breakDuration: 0 })

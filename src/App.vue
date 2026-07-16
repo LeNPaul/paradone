@@ -19,6 +19,7 @@ const {
   state,
   sessionGoalText,
   remainingMs,
+  isPaused,
   showPrimerChoice,
   prefs,
   captures,
@@ -30,6 +31,9 @@ const {
   skipPrimerCountdown,
   commitFullSession,
   stopPrimer,
+  pauseSession,
+  resumeSession,
+  stopSession,
   takeBreak,
   keepGoing,
   addCapture,
@@ -71,6 +75,9 @@ const {
     <section v-if="state === 'active'" aria-labelledby="active-heading">
       <h2 id="active-heading">Focus block</h2>
       <TimerDisplay :remaining-ms="remainingMs" variant="session" />
+      <button v-if="!isPaused" type="button" @click="pauseSession()">Pause</button>
+      <button v-else type="button" @click="resumeSession()">Resume</button>
+      <button type="button" @click="stopSession()">Stop &amp; log session</button>
       <h3 id="active-session-goal-heading">Session Goal</h3>
       <MarkdownChecklist v-model="sessionGoalText" :editable="false" />
     </section>

@@ -3,7 +3,7 @@
 // and persisting the in-progress block to paradone:activeSession so a reload
 // doesn't lose it.
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
-import { createTimer, start, getRemainingMs, isFinished } from '../lib/timer.js'
+import { createTimer, start, pause, resume, getRemainingMs, isFinished } from '../lib/timer.js'
 import { getPrefs, setPrefs, getActiveSession, setActiveSession, getSessions, setSessions } from '../lib/storage.js'
 
 const PRIMER_DURATION_MINUTES = 2
@@ -22,8 +22,11 @@ export function useSessionMachine() {
   const sessionStartedAt = ref(stored?.sessionStartedAt ?? null)
   const now = ref(Date.now())
   const primerSkipped = ref(stored?.primerSkipped ?? false)
+  const stoppedEarly = ref(stored?.stoppedEarly ?? false)
+  const actualDurationMs = ref(stored?.actualDurationMs ?? null)
 
   const remainingMs = computed(() => (timer.value ? getRemainingMs(timer.value, now.value) : 0))
+  const isPaused = computed(() => !!timer.value && !timer.value.running)
   const showPrimerChoice = computed(
     () => state.value === 'primer' && (primerSkipped.value || isFinished(timer.value, now.value)),
   )
@@ -31,8 +34,10 @@ export function useSessionMachine() {
   function tick(at = Date.now()) {
     now.value = at
     if (!timer.value) return
-    if (state.value === 'active' && isFinished(timer.value, at)) state.value = 'blockEnd'
-    else if (state.value === 'break' && isFinished(timer.value, at)) state.value = 'audit'
+    if (state.value === 'active' && isFinished(timer.value, at)) {
+      actualDurationMs.value = timer.value.durationMs - getRemainingMs(timer.value, at)
+      state.value = 'blockEnd'
+    } else if (state.value === 'break' && isFinished(timer.value, at)) state.value = 'audit'
   }
   tick(now.value) // correct immediately on rehydration, don't wait for the first interval tick
 
@@ -71,6 +76,23 @@ export function useSessionMachine() {
     state.value = 'setup'
   }
 
+  function pauseSession(at = Date.now()) {
+    if (state.value !== 'active') return
+    timer.value = pause(timer.value, at)
+  }
+
+  function resumeSession(at = Date.now()) {
+    if (state.value !== 'active') return
+    timer.value = resume(timer.value, at)
+  }
+
+  function stopSession(at = Date.now()) {
+    if (state.value !== 'active') return
+    actualDurationMs.value = timer.value.durationMs - getRemainingMs(timer.value, at)
+    stoppedEarly.value = true
+    state.value = 'audit'
+  }
+
   function takeBreak(at = Date.now()) {
     timer.value = start(createTimer(prefs.breakDuration), at)
     state.value = 'break'
@@ -99,11 +121,12 @@ export function useSessionMachine() {
       date: new Date(sessionStartedAt.value).toISOString(),
       sessionGoalText: sessionGoalText.value,
       plannedDuration: prefs.workDuration,
-      actualDuration: prefs.workDuration,
+      actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       captures: captures.value,
       usedPrimer: usedPrimer.value,
       auditProductive: auditProductive.value,
       auditNotes: auditNotes.value,
+      completed: !stoppedEarly.value,
     })
     setSessions(sessions)
 
@@ -115,10 +138,24 @@ export function useSessionMachine() {
     auditProductive.value = ''
     auditNotes.value = ''
     sessionStartedAt.value = null
+    stoppedEarly.value = false
+    actualDurationMs.value = null
   }
 
   watch(
-    [state, sessionGoalText, timer, captures, usedPrimer, auditProductive, auditNotes, sessionStartedAt, primerSkipped],
+    [
+      state,
+      sessionGoalText,
+      timer,
+      captures,
+      usedPrimer,
+      auditProductive,
+      auditNotes,
+      sessionStartedAt,
+      primerSkipped,
+      stoppedEarly,
+      actualDurationMs,
+    ],
     () => {
       setActiveSession(
         state.value === 'setup'
@@ -133,6 +170,8 @@ export function useSessionMachine() {
               auditNotes: auditNotes.value,
               sessionStartedAt: sessionStartedAt.value,
               primerSkipped: primerSkipped.value,
+              stoppedEarly: stoppedEarly.value,
+              actualDurationMs: actualDurationMs.value,
             },
       )
     },
@@ -148,6 +187,7 @@ export function useSessionMachine() {
     state,
     sessionGoalText,
     remainingMs,
+    isPaused,
     showPrimerChoice,
     prefs,
     captures,
@@ -160,6 +200,9 @@ export function useSessionMachine() {
     skipPrimerCountdown,
     commitFullSession,
     stopPrimer,
+    pauseSession,
+    resumeSession,
+    stopSession,
     takeBreak,
     keepGoing,
     addCapture,

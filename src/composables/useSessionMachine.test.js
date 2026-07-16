@@ -35,6 +35,51 @@ describe('starting a session', () => {
   })
 })
 
+describe('pausing and stopping an active session', () => {
+  it('pauseSession freezes remainingMs, resumeSession continues counting down from there', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 60 * 1000) // 1 minute in
+    machine.pauseSession(now + 60 * 1000)
+    expect(machine.isPaused.value).toBe(true)
+
+    machine.tick(now + 5 * 60 * 1000) // time passes while paused
+    expect(machine.remainingMs.value).toBe(24 * 60 * 1000)
+
+    machine.resumeSession(now + 5 * 60 * 1000)
+    expect(machine.isPaused.value).toBe(false)
+    machine.tick(now + 6 * 60 * 1000) // 1 more minute after resuming
+    expect(machine.remainingMs.value).toBe(23 * 60 * 1000)
+  })
+
+  it('stopSession moves active -> audit directly, preserving captures and goal text', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.sessionGoalText.value = '- [ ] draft outline'
+    machine.startSession(now)
+    machine.addCapture('distracted by email', now + 1000)
+    machine.stopSession(now + 5 * 60 * 1000)
+    expect(machine.state.value).toBe('audit')
+    expect(machine.sessionGoalText.value).toBe('- [ ] draft outline')
+    expect(machine.captures.value).toEqual([{ text: 'distracted by email', timestamp: new Date(now + 1000).toISOString() }])
+  })
+
+  it('a stopped-early session is logged as not completed, with actualDuration less than plannedDuration', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.stopSession(now + 5 * 60 * 1000)
+    machine.submitAudit({ auditProductive: 'distracted', auditNotes: '' })
+    machine.startNewSession()
+
+    const sessions = getSessions()
+    expect(sessions[0].completed).toBe(false)
+    expect(sessions[0].plannedDuration).toBe(25)
+    expect(sessions[0].actualDuration).toBe(5)
+  })
+})
+
 describe('block end', () => {
   it('takeBreak moves blockEnd -> break with a break-duration timer, auto-ending to audit', () => {
     const machine = useSessionMachine()
@@ -200,7 +245,9 @@ describe('audit and summary', () => {
       usedPrimer: false,
       auditProductive: 'focused',
       auditNotes: 'done',
+      completed: true,
     })
+    expect(sessions[0].actualDuration).toBe(sessions[0].plannedDuration)
 
     expect(machine.state.value).toBe('setup')
     expect(machine.sessionGoalText.value).toBe('')
@@ -243,6 +290,8 @@ describe('activeSession persistence', () => {
       auditNotes: '',
       sessionStartedAt: 1000,
       primerSkipped: false,
+      stoppedEarly: false,
+      actualDurationMs: null,
     })
   })
 
