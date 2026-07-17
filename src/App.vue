@@ -9,15 +9,14 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import { getGoalsList, setGoalsList } from './lib/storage.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 
-const goalsListText = ref(getGoalsList().text)
-function onGoalsListUpdate(text) {
-  goalsListText.value = text
+const taskListText = ref(getGoalsList().text)
+function onTaskListUpdate(text) {
+  taskListText.value = text
   setGoalsList({ text, updatedAt: new Date().toISOString() })
 }
 
 const {
   state,
-  sessionGoalText,
   remainingMs,
   isPaused,
   showPrimerChoice,
@@ -44,14 +43,9 @@ const {
 
 <template>
   <div class="app">
-    <section v-if="state === 'setup'" aria-labelledby="goals-list-heading">
-      <h2 id="goals-list-heading">Goals List</h2>
-      <MarkdownChecklist :model-value="goalsListText" @update:model-value="onGoalsListUpdate" />
-    </section>
-
-    <section v-if="state === 'setup'" aria-labelledby="session-goal-heading">
-      <h2 id="session-goal-heading">Session Goal</h2>
-      <MarkdownChecklist v-model="sessionGoalText" />
+    <section v-if="state === 'setup'" aria-labelledby="task-list-heading">
+      <h2 id="task-list-heading">Task List</h2>
+      <MarkdownChecklist :model-value="taskListText" @update:model-value="onTaskListUpdate" />
     </section>
 
     <section v-if="state === 'setup'" aria-labelledby="start-heading">
@@ -78,8 +72,12 @@ const {
       <button v-if="!isPaused" type="button" @click="pauseSession()">Pause</button>
       <button v-else type="button" @click="resumeSession()">Resume</button>
       <button type="button" @click="stopSession()">Stop &amp; log session</button>
-      <h3 id="active-session-goal-heading">Session Goal</h3>
-      <MarkdownChecklist v-model="sessionGoalText" :editable="false" />
+      <h3 id="active-task-list-heading">Task List</h3>
+      <MarkdownChecklist
+        :model-value="taskListText"
+        :editable="false"
+        @update:model-value="onTaskListUpdate"
+      />
     </section>
 
     <section v-if="state === 'blockEnd'" aria-labelledby="block-end-heading">
@@ -104,13 +102,13 @@ const {
 
     <section v-if="state === 'audit'" aria-labelledby="audit-heading">
       <h2 id="audit-heading">Audit</h2>
-      <AuditPrompt :session-goal-text="sessionGoalText" @submit="submitAudit" />
+      <AuditPrompt :task-list-text="taskListText" @submit="submitAudit" />
     </section>
 
     <section v-if="state === 'summary'" aria-labelledby="summary-heading">
       <h2 id="summary-heading">Summary</h2>
       <SessionSummary
-        :session-goal-text="sessionGoalText"
+        :task-list-text="taskListText"
         :captures="captures"
         :audit-productive="auditProductive"
         :audit-notes="auditNotes"

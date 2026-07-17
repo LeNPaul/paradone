@@ -51,7 +51,7 @@ describe('sessions', () => {
     const sessions = [{
       id: 'abc-123',
       date: '2026-07-13T09:15:00Z',
-      sessionGoalText: '- [ ] draft outline',
+      taskListText: '- [ ] draft outline',
       plannedDuration: 25,
       actualDuration: 25,
       captures: [{ text: 'reply to Mai re: weekend', timestamp: '2026-07-13T09:20:00Z' }],

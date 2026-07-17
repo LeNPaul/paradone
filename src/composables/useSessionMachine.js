@@ -4,7 +4,15 @@
 // doesn't lose it.
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { createTimer, start, pause, resume, getRemainingMs, isFinished } from '../lib/timer.js'
-import { getPrefs, setPrefs, getActiveSession, setActiveSession, getSessions, setSessions } from '../lib/storage.js'
+import {
+  getPrefs,
+  setPrefs,
+  getActiveSession,
+  setActiveSession,
+  getSessions,
+  setSessions,
+  getGoalsList,
+} from '../lib/storage.js'
 
 const PRIMER_DURATION_MINUTES = 2
 
@@ -13,7 +21,6 @@ export function useSessionMachine() {
   const stored = getActiveSession()
 
   const state = ref(stored?.state ?? 'setup')
-  const sessionGoalText = ref(stored?.sessionGoalText ?? '')
   const timer = ref(stored?.timer ?? null)
   const captures = ref(stored?.captures ?? [])
   const usedPrimer = ref(stored?.usedPrimer ?? false)
@@ -119,7 +126,7 @@ export function useSessionMachine() {
     sessions.push({
       id: crypto.randomUUID(),
       date: new Date(sessionStartedAt.value).toISOString(),
-      sessionGoalText: sessionGoalText.value,
+      taskListText: getGoalsList().text,
       plannedDuration: prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       captures: captures.value,
@@ -131,7 +138,6 @@ export function useSessionMachine() {
     setSessions(sessions)
 
     state.value = 'setup'
-    sessionGoalText.value = ''
     timer.value = null
     captures.value = []
     usedPrimer.value = false
@@ -145,7 +151,6 @@ export function useSessionMachine() {
   watch(
     [
       state,
-      sessionGoalText,
       timer,
       captures,
       usedPrimer,
@@ -162,7 +167,6 @@ export function useSessionMachine() {
           ? null
           : {
               state: state.value,
-              sessionGoalText: sessionGoalText.value,
               timer: timer.value,
               captures: captures.value,
               usedPrimer: usedPrimer.value,
@@ -185,7 +189,6 @@ export function useSessionMachine() {
 
   return {
     state,
-    sessionGoalText,
     remainingMs,
     isPaused,
     showPrimerChoice,

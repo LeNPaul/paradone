@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { nextTick } from 'vue'
 import { useSessionMachine } from './useSessionMachine.js'
-import { getActiveSession, setActiveSession, getPrefs, setPrefs, getSessions } from '../lib/storage.js'
+import { getActiveSession, setActiveSession, getPrefs, setPrefs, getSessions, setGoalsList } from '../lib/storage.js'
 
 beforeEach(() => {
   localStorage.clear()
@@ -12,7 +12,6 @@ describe('initial state', () => {
   it('starts in setup with no stored session', () => {
     const machine = useSessionMachine()
     expect(machine.state.value).toBe('setup')
-    expect(machine.sessionGoalText.value).toBe('')
   })
 })
 
@@ -53,15 +52,13 @@ describe('pausing and stopping an active session', () => {
     expect(machine.remainingMs.value).toBe(23 * 60 * 1000)
   })
 
-  it('stopSession moves active -> audit directly, preserving captures and goal text', () => {
+  it('stopSession moves active -> audit directly, preserving captures', () => {
     const machine = useSessionMachine()
     const now = 1000
-    machine.sessionGoalText.value = '- [ ] draft outline'
     machine.startSession(now)
     machine.addCapture('distracted by email', now + 1000)
     machine.stopSession(now + 5 * 60 * 1000)
     expect(machine.state.value).toBe('audit')
-    expect(machine.sessionGoalText.value).toBe('- [ ] draft outline')
     expect(machine.captures.value).toEqual([{ text: 'distracted by email', timestamp: new Date(now + 1000).toISOString() }])
   })
 
@@ -139,13 +136,11 @@ describe('primer', () => {
     expect(machine.remainingMs.value).toBe(25 * 60 * 1000)
   })
 
-  it('stopPrimer moves primer -> setup and leaves sessionGoalText untouched', () => {
+  it('stopPrimer moves primer -> setup', () => {
     const machine = useSessionMachine()
-    machine.sessionGoalText.value = '- [ ] draft outline'
     machine.startPrimer(1000)
     machine.stopPrimer()
     expect(machine.state.value).toBe('setup')
-    expect(machine.sessionGoalText.value).toBe('- [ ] draft outline')
   })
 
   it('stopPrimer clears captures added during the aborted primer', () => {
@@ -222,9 +217,9 @@ describe('audit and summary', () => {
   })
 
   it('startNewSession appends a session matching the data-model shape, then resets to setup', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     const machine = useSessionMachine()
     const now = 1000
-    machine.sessionGoalText.value = '- [ ] draft outline'
     machine.startSession(now)
     machine.addCapture('reply to Mai', now + 1000)
     machine.tick(now + 25 * 60 * 1000)
@@ -238,7 +233,7 @@ describe('audit and summary', () => {
     expect(sessions[0]).toEqual({
       id: expect.any(String),
       date: new Date(now).toISOString(),
-      sessionGoalText: '- [ ] draft outline',
+      taskListText: '- [ ] draft outline',
       plannedDuration: 25,
       actualDuration: 25,
       captures: [{ text: 'reply to Mai', timestamp: new Date(now + 1000).toISOString() }],
@@ -250,11 +245,26 @@ describe('audit and summary', () => {
     expect(sessions[0].actualDuration).toBe(sessions[0].plannedDuration)
 
     expect(machine.state.value).toBe('setup')
-    expect(machine.sessionGoalText.value).toBe('')
     expect(machine.captures.value).toEqual([])
     expect(machine.auditProductive.value).toBe('')
     expect(machine.auditNotes.value).toBe('')
     expect(getActiveSession()).toBeNull()
+  })
+
+  it('startNewSession reads the live Task List at finalization time, not a value cached at session start', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    setGoalsList({ text: '- [x] draft outline\n- [ ] send invoice', updatedAt: null })
+    machine.startNewSession()
+
+    const sessions = getSessions()
+    expect(sessions[0].taskListText).toBe('- [x] draft outline\n- [ ] send invoice')
   })
 
   it('records the work block\'s own start time and duration, not the break\'s, when a break was taken', () => {
@@ -275,14 +285,12 @@ describe('audit and summary', () => {
 })
 
 describe('activeSession persistence', () => {
-  it('persists state, sessionGoalText, and timer on transition', async () => {
+  it('persists state and timer on transition', async () => {
     const machine = useSessionMachine()
-    machine.sessionGoalText.value = '- [ ] draft outline'
     machine.startSession(1000)
     await nextTick()
     expect(getActiveSession()).toEqual({
       state: 'active',
-      sessionGoalText: '- [ ] draft outline',
       timer: expect.objectContaining({ running: true }),
       captures: [],
       usedPrimer: false,
@@ -309,16 +317,14 @@ describe('rehydration', () => {
   // startedAt values are relative to real Date.now() (not a small fake epoch)
   // because the composable runs one synchronous, real-time tick() at
   // construction to correct a stale reload — see next test.
-  it('restores state and sessionGoalText from a stored activeSession', () => {
+  it('restores state from a stored activeSession', () => {
     const startedAt = Date.now() - 60 * 1000 // 1 minute into a 25-minute block
     setActiveSession({
       state: 'active',
-      sessionGoalText: '- [ ] draft outline',
       timer: { durationMs: 25 * 60 * 1000, startedAt, elapsedMs: 0, running: true },
     })
     const machine = useSessionMachine()
     expect(machine.state.value).toBe('active')
-    expect(machine.sessionGoalText.value).toBe('- [ ] draft outline')
     machine.tick(startedAt + 60 * 1000)
     expect(machine.remainingMs.value).toBe(24 * 60 * 1000)
   })
@@ -327,7 +333,6 @@ describe('rehydration', () => {
     const startedAt = Date.now() - 30 * 60 * 1000 // a 25-minute block that ended 5 minutes ago
     setActiveSession({
       state: 'active',
-      sessionGoalText: '',
       timer: { durationMs: 25 * 60 * 1000, startedAt, elapsedMs: 0, running: true },
     })
     const machine = useSessionMachine()
@@ -338,7 +343,6 @@ describe('rehydration', () => {
     const sessionStartedAt = Date.now() - 60 * 1000
     setActiveSession({
       state: 'summary',
-      sessionGoalText: '- [x] draft outline',
       timer: null,
       captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:20:00Z' }],
       usedPrimer: true,
@@ -358,7 +362,6 @@ describe('rehydration', () => {
     const startedAt = Date.now() - 30 * 1000 // 30s into the 2-minute primer, well before it finishes
     setActiveSession({
       state: 'primer',
-      sessionGoalText: '',
       timer: { durationMs: 2 * 60 * 1000, startedAt, elapsedMs: 0, running: true },
       primerSkipped: true,
     })

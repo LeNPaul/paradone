@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs } from './lib/storage.js'
+import { setActiveSession, setPrefs, setGoalsList, getGoalsList } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 
 beforeEach(() => {
@@ -27,29 +27,29 @@ describe('setup', () => {
   })
 })
 
-describe('typing into checklists', () => {
-  it('typing into the Session Goal textarea at Setup renders it as a clickable checkbox', async () => {
+describe('typing into the Task List', () => {
+  it('typing into the Task List textarea at Setup renders it as a clickable checkbox', async () => {
     const wrapper = mount(App)
-    const sessionGoalSection = wrapper.get('section[aria-labelledby="session-goal-heading"]')
-    await sessionGoalSection.find('textarea').setValue('- [ ] draft outline')
+    const taskListSection = wrapper.get('section[aria-labelledby="task-list-heading"]')
+    await taskListSection.find('textarea').setValue('- [ ] draft outline')
 
-    expect(sessionGoalSection.find('input[type="checkbox"]').exists()).toBe(true)
-    expect(sessionGoalSection.text()).toContain('draft outline')
+    expect(taskListSection.find('input[type="checkbox"]').exists()).toBe(true)
+    expect(taskListSection.text()).toContain('draft outline')
   })
 
-  it('typing into the Goals List textarea persists across a remount (reload)', async () => {
+  it('typing into the Task List textarea persists across a remount (reload)', async () => {
     const wrapper = mount(App)
-    const goalsListTextarea = wrapper.findAll('textarea')[0]
-    await goalsListTextarea.setValue('- [ ] draft outline')
+    const taskListTextarea = wrapper.get('textarea')
+    await taskListTextarea.setValue('- [ ] draft outline')
 
     const reloaded = mount(App)
-    expect(reloaded.findAll('textarea')[0].element.value).toBe('- [ ] draft outline')
+    expect(reloaded.get('textarea').element.value).toBe('- [ ] draft outline')
   })
 
-  it('Active state renders the Session Goal without a textarea (checkbox-toggle only)', () => {
+  it('Active state renders the Task List without a textarea (checkbox-toggle only)', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     setActiveSession({
       state: 'active',
-      sessionGoalText: '- [ ] draft outline',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     const wrapper = mount(App)
@@ -57,13 +57,24 @@ describe('typing into checklists', () => {
     expect(wrapper.find('textarea').exists()).toBe(false)
     expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true)
   })
+
+  it('toggling a checkbox during an active session persists to the Task List storage', async () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    setActiveSession({
+      state: 'active',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    const wrapper = mount(App)
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+
+    expect(getGoalsList().text).toBe('- [x] draft outline')
+  })
 })
 
 describe('pausing and stopping an active session', () => {
   function mountActive() {
     setActiveSession({
       state: 'active',
-      sessionGoalText: '- [ ] draft outline',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     return mount(App)
@@ -98,7 +109,6 @@ describe('block end', () => {
     setPrefs({ workDuration: 25, breakDuration: 0 })
     setActiveSession({
       state: 'blockEnd',
-      sessionGoalText: '',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 25 * 60 * 1000, running: false },
     })
     const wrapper = mount(App)
@@ -110,7 +120,6 @@ describe('block end', () => {
   it('shows "Take a break" when breakDuration is greater than 0', () => {
     setActiveSession({
       state: 'blockEnd',
-      sessionGoalText: '',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 25 * 60 * 1000, running: false },
     })
     const wrapper = mount(App)
@@ -123,7 +132,6 @@ describe('capture box', () => {
   it.each(['primer', 'active', 'break'])('is shown while state is %s', (state) => {
     setActiveSession({
       state,
-      sessionGoalText: '',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     const wrapper = mount(App)
@@ -136,7 +144,6 @@ describe('capture box', () => {
         ? null
         : {
             state,
-            sessionGoalText: '',
             timer: null,
             captures: [],
             usedPrimer: false,
@@ -152,7 +159,6 @@ describe('capture box', () => {
   it('typing and submitting a capture during an active block shows it in the rendered list', async () => {
     setActiveSession({
       state: 'active',
-      sessionGoalText: '',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     const wrapper = mount(App)
@@ -163,10 +169,10 @@ describe('capture box', () => {
 })
 
 describe('audit and summary', () => {
-  it('shows the audit prompt with the original session goal when state is audit', () => {
+  it('shows the audit prompt with the current Task List when state is audit', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     setActiveSession({
       state: 'audit',
-      sessionGoalText: '- [ ] draft outline',
       timer: null,
       captures: [],
       usedPrimer: false,
@@ -182,7 +188,6 @@ describe('audit and summary', () => {
   it('submitting the audit prompt transitions to the summary screen', async () => {
     setActiveSession({
       state: 'audit',
-      sessionGoalText: '- [ ] draft outline',
       timer: null,
       captures: [],
       usedPrimer: false,
@@ -197,10 +202,10 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
-  it('rendering the summary screen shows the goal, captures, and audit answers as markdown', () => {
+  it('rendering the summary screen shows the task list, captures, and audit answers as markdown', () => {
+    setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({
       state: 'summary',
-      sessionGoalText: '- [x] draft outline',
       timer: null,
       captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:15:00Z' }],
       usedPrimer: false,
@@ -215,10 +220,10 @@ describe('audit and summary', () => {
     expect(text).toContain('got it done')
   })
 
-  it('clicking "Start new session" returns to a blank Setup screen', async () => {
+  it('clicking "Start new session" returns to Setup with the Task List preserved (not reset)', async () => {
+    setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({
       state: 'summary',
-      sessionGoalText: '- [x] draft outline',
       timer: null,
       captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:15:00Z' }],
       usedPrimer: false,
@@ -230,8 +235,8 @@ describe('audit and summary', () => {
     const startNewButton = wrapper.findAll('button').find((b) => b.text() === 'Start new session')
     await startNewButton.trigger('click')
 
-    expect(wrapper.find('#session-goal-heading').exists()).toBe(true)
-    expect(wrapper.find('.markdown-checklist').text()).toBe('')
+    expect(wrapper.find('#task-list-heading').exists()).toBe(true)
+    expect(wrapper.get('textarea').element.value).toBe('- [x] draft outline')
   })
 })
 
@@ -242,7 +247,6 @@ describe('interval wiring', () => {
       const startedAt = Date.now()
       setActiveSession({
         state: 'active',
-        sessionGoalText: '',
         timer: { durationMs: 25 * 60 * 1000, startedAt, elapsedMs: 0, running: true },
       })
       const wrapper = mount(App)

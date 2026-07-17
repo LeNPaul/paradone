@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import SessionSummary from './SessionSummary.vue'
 
 const baseProps = {
-  sessionGoalText: '- [x] draft outline',
+  taskListText: '- [x] draft outline',
   captures: [{ text: 'reply to Mai re: weekend', timestamp: '2026-07-13T09:15:00Z' }],
   auditProductive: 'focused',
   auditNotes: 'got the outline done',
@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('SessionSummary', () => {
-  it('renders markdown containing the goal, each capture, and the audit answers', () => {
+  it('renders markdown containing the task list, each capture, and the audit answers', () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
     const text = wrapper.text()
     expect(text).toContain('draft outline')

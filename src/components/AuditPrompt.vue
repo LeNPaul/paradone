@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 
 defineProps({
-  sessionGoalText: {
+  taskListText: {
     type: String,
     default: '',
   },
@@ -23,8 +23,8 @@ function onSubmit() {
 <template>
   <div class="audit-prompt">
     <section aria-labelledby="audit-goal-heading">
-      <h3 id="audit-goal-heading">What you set out to do</h3>
-      <MarkdownChecklist :model-value="sessionGoalText" :editable="false" />
+      <h3 id="audit-goal-heading">Task list</h3>
+      <MarkdownChecklist :model-value="taskListText" :editable="false" />
     </section>
 
     <div>

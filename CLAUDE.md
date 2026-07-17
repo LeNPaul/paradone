@@ -85,9 +85,9 @@ Hard rules. Do not plan or write anything that violates them — flag the confli
 
 ## Scope fences
 
-The Goals List is a **flat markdown checklist**. It does not get due dates, projects, priority levels, tags, or sorting. If a request would add any of those, stop and flag it — that functionality belongs in a different product, not here.
+The Task List is a **flat markdown checklist**. It does not get due dates, projects, priority levels, tags, or sorting. If a request would add any of those, stop and flag it — that functionality belongs in a different product, not here.
 
-The Goals List and the Session Goal field are **independent**. There is no linking, no "pull into session," no write-back sync. They share a screen and nothing else.
+There is a single persistent Task List (the former Goals List and Session Goal field are merged). It's editable at Setup, checkbox-toggle-only during an active session, and shown read-only at Audit and Summary.
 
 v1 is **countdown only**. No stopwatch/flowtime mode. That is v1.1.
 
@@ -98,7 +98,7 @@ v1 is **countdown only**. No stopwatch/flowtime mode. That is v1.1.
 - Keep parsing/timer/storage logic in **plain `.js` modules**, not buried inside components. That is what stays unit-testable without mounting anything.
 - Storage keys are namespaced: `paradone:prefs`, `paradone:goalsList`, `paradone:sessions`, `paradone:activeSession`.
 - The markdown checklist source of truth is a **raw string**, parsed on render. Item identity keys on a content hash of the line, never on line index.
-- One component (`MarkdownChecklist.vue`) serves both the Goals List and the Session Goal field. Do not write two.
+- One component (`MarkdownChecklist.vue`) serves the single persistent Task List everywhere it's shown (Setup, Active, Audit, Summary). Do not write two.
 - Use Pinia only if cross-component state genuinely needs it. For a single-view app, a couple of composables may be enough — don't add Pinia reflexively.
 
 ## Planning requirements

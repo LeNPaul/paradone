@@ -1,9 +1,9 @@
 <script setup>
-// SessionSummary: assembles markdown (goal, checklist state, captures, audit), copy + download
+// SessionSummary: assembles markdown (task list, captures, audit), copy + download
 import { computed } from 'vue'
 
 const props = defineProps({
-  sessionGoalText: {
+  taskListText: {
     type: String,
     default: '',
   },
@@ -38,8 +38,8 @@ const markdown = computed(() => {
 
   return `# Session Summary
 
-## Goal
-${props.sessionGoalText}
+## Tasks
+${props.taskListText}
 
 ## Captures
 ${captureLines}

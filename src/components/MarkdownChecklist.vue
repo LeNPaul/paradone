@@ -1,6 +1,6 @@
 <script setup>
 // MarkdownChecklist: parse -> render -> toggle -> write-back.
-// Used twice: bound to the Goals List and to the per-session Session Goal.
+// Bound to the single persistent Task List, reused across every state that shows it.
 // Controlled component — the raw markdown string is owned by the parent,
 // which is the only thing allowed to touch storage.js.
 import { computed } from 'vue'
