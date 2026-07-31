@@ -35,3 +35,33 @@ export function toggleItem(text, hash) {
   lines[idx] = `- [${flipped}] ${match[2]}`
   return lines.join('\n')
 }
+
+// Append a new unchecked task line. Empty input is a no-op; an empty list
+// yields just the one line, so we never introduce a leading blank line.
+export function addItem(text, taskText) {
+  const trimmed = taskText.trim()
+  if (trimmed === '') return text
+  const line = `- [ ] ${trimmed}`
+  return text === '' ? line : `${text}\n${line}`
+}
+
+export function removeItem(text, hash) {
+  const lines = text.split('\n')
+  const idx = lines.findIndex((line) => hashLine(line) === hash)
+  if (idx === -1) return text
+  lines.splice(idx, 1)
+  return lines.join('\n')
+}
+
+// Replace a line's text by hash. Checkbox lines keep their marker (and thus
+// their checked state); plain lines are replaced whole. Empty input is a no-op.
+export function editItem(text, hash, newText) {
+  const trimmed = newText.trim()
+  if (trimmed === '') return text
+  const lines = text.split('\n')
+  const idx = lines.findIndex((line) => hashLine(line) === hash)
+  if (idx === -1) return text
+  const match = lines[idx].match(CHECKBOX_RE)
+  lines[idx] = match ? `- [${match[1]}] ${trimmed}` : trimmed
+  return lines.join('\n')
+}

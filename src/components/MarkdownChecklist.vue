@@ -3,8 +3,9 @@
 // Bound to the single persistent Task List, reused across every state that shows it.
 // Controlled component — the raw markdown string is owned by the parent,
 // which is the only thing allowed to touch storage.js.
-import { computed } from 'vue'
-import { parseChecklist, toggleItem } from '../lib/checklist.js'
+import { computed, ref } from 'vue'
+import { parseChecklist, toggleItem, addItem, removeItem, editItem } from '../lib/checklist.js'
+import TaskModal from './TaskModal.vue'
 
 const props = defineProps({
   modelValue: {
@@ -19,7 +20,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const items = computed(() => parseChecklist(props.modelValue))
+// An empty string parses to a single blank line; render nothing for it so the
+// list shows no phantom row (and no stray edit/delete controls) when empty.
+const items = computed(() => (props.modelValue === '' ? [] : parseChecklist(props.modelValue)))
 
 // checklist.js already confirmed the marker is present before item.checkbox
 // is true, so this is a safe strip, not a re-detection of checkbox lines.
@@ -31,20 +34,38 @@ function onToggle(hash) {
   emit('update:modelValue', toggleItem(props.modelValue, hash))
 }
 
-function onInput(event) {
-  emit('update:modelValue', event.target.value)
+// Ephemeral UI state for the add/edit modal. editingHash === null means "add".
+const modalOpen = ref(false)
+const editingHash = ref(null)
+const modalDraft = ref('')
+
+function openAdd() {
+  editingHash.value = null
+  modalDraft.value = ''
+  modalOpen.value = true
+}
+
+function openEdit(item) {
+  editingHash.value = item.hash
+  modalDraft.value = displayText(item)
+  modalOpen.value = true
+}
+
+function onDelete(hash) {
+  emit('update:modelValue', removeItem(props.modelValue, hash))
+}
+
+function onModalSubmit(text) {
+  const next =
+    editingHash.value === null
+      ? addItem(props.modelValue, text)
+      : editItem(props.modelValue, editingHash.value, text)
+  emit('update:modelValue', next)
+  modalOpen.value = false
 }
 </script>
 
 <template>
-  <textarea
-    v-if="editable"
-    class="markdown-checklist__textarea"
-    aria-label="Checklist markdown text"
-    placeholder="- [ ] task"
-    :value="modelValue"
-    @input="onInput"
-  ></textarea>
   <ul class="markdown-checklist">
     <li v-for="item in items" :key="item.hash" class="markdown-checklist__item">
       <label v-if="item.checkbox">
@@ -52,20 +73,26 @@ function onInput(event) {
         <span>{{ displayText(item) }}</span>
       </label>
       <span v-else>{{ displayText(item) }}</span>
+      <span v-if="editable" class="markdown-checklist__controls">
+        <button type="button" @click="openEdit(item)">Edit</button>
+        <button type="button" aria-label="Delete task" @click="onDelete(item.hash)">✕</button>
+      </span>
     </li>
   </ul>
+  <button v-if="editable" type="button" class="markdown-checklist__add" @click="openAdd">
+    + Add Task
+  </button>
+  <TaskModal
+    v-if="editable"
+    :open="modalOpen"
+    :initial-text="modalDraft"
+    :title="editingHash === null ? 'Add Task' : 'Edit Task'"
+    @submit="onModalSubmit"
+    @close="modalOpen = false"
+  />
 </template>
 
 <style scoped>
-.markdown-checklist__textarea {
-  display: block;
-  width: 100%;
-  min-height: 4rem;
-  box-sizing: border-box;
-  font: inherit;
-  margin-bottom: 0.5rem;
-}
-
 .markdown-checklist {
   list-style: none;
   margin: 0;
@@ -75,10 +102,25 @@ function onInput(event) {
   gap: var(--markdown-checklist-gap, 0.25rem);
 }
 
+.markdown-checklist__item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+}
+
 .markdown-checklist__item label {
   display: flex;
   align-items: baseline;
   gap: 0.5em;
+}
+
+.markdown-checklist__controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.markdown-checklist__add {
+  margin-top: 0.5rem;
 }
 
 .markdown-checklist__item input[type='checkbox'] {

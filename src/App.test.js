@@ -28,23 +28,32 @@ describe('setup', () => {
   })
 })
 
-describe('typing into the Task List', () => {
-  it('typing into the Task List textarea at Setup renders it as a clickable checkbox', async () => {
-    const wrapper = mount(App)
-    const taskListSection = wrapper.get('section[aria-labelledby="task-list-heading"]')
-    await taskListSection.find('textarea').setValue('- [ ] draft outline')
+// Add a task at Setup through the Add-Task modal.
+async function addTaskViaModal(wrapper, text) {
+  const addButton = wrapper.findAll('button').find((b) => b.text().includes('Add Task'))
+  await addButton.trigger('click')
+  await wrapper.find('dialog input[type="text"]').setValue(text)
+  await wrapper.find('dialog form').trigger('submit')
+}
 
+describe('adding to the Task List', () => {
+  it('adding a task via the modal at Setup renders it as a clickable checkbox', async () => {
+    const wrapper = mount(App)
+    await addTaskViaModal(wrapper, 'draft outline')
+
+    const taskListSection = wrapper.get('section[aria-labelledby="task-list-heading"]')
     expect(taskListSection.find('input[type="checkbox"]').exists()).toBe(true)
     expect(taskListSection.text()).toContain('draft outline')
   })
 
-  it('typing into the Task List textarea persists across a remount (reload)', async () => {
+  it('an added task persists across a remount (reload)', async () => {
     const wrapper = mount(App)
-    const taskListTextarea = wrapper.get('textarea')
-    await taskListTextarea.setValue('- [ ] draft outline')
+    await addTaskViaModal(wrapper, 'draft outline')
 
     const reloaded = mount(App)
-    expect(reloaded.get('textarea').element.value).toBe('- [ ] draft outline')
+    const reloadedSection = reloaded.get('section[aria-labelledby="task-list-heading"]')
+    expect(reloadedSection.find('input[type="checkbox"]').exists()).toBe(true)
+    expect(reloadedSection.text()).toContain('draft outline')
   })
 
   it('Active state renders the Task List without a textarea (checkbox-toggle only)', () => {
@@ -239,7 +248,9 @@ describe('audit and summary', () => {
     await startNewButton.trigger('click')
 
     expect(wrapper.find('#task-list-heading').exists()).toBe(true)
-    expect(wrapper.get('textarea').element.value).toBe('- [x] draft outline')
+    const taskListSection = wrapper.get('section[aria-labelledby="task-list-heading"]')
+    expect(taskListSection.find('input[type="checkbox"]').element.checked).toBe(true)
+    expect(taskListSection.text()).toContain('draft outline')
   })
 })
 

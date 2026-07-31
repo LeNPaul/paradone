@@ -23,7 +23,7 @@ There is no routing. One page, seven states.
 
 | State | Purpose |
 |---|---|
-| **Setup** | Task List (persistent, editable, checkbox-aware) + duration settings + optional 2-minute primer link + Start |
+| **Setup** | Task List (persistent, editable, checkbox-aware) — add/edit/delete tasks + duration settings + optional 2-minute primer link + Start |
 | **Primer** *(optional)* | 2-minute timer, then: commit to a full session, or stop here |
 | **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea), capture scratchpad always available |
 | **Block end** | Bell → "take the break, or keep going?" |
@@ -33,7 +33,7 @@ There is no routing. One page, seven states.
 
 ### Screen behaviours
 
-- **Task List** is a single freeform markdown checklist, persistent across sessions. It's editable via textarea at Setup; during Active it's checkbox-toggle-only (no textarea). The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, not a per-session diff.
+- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, not a per-session diff.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable. Surfaced as a "need help starting?" affordance, never a required gate.
 
@@ -70,11 +70,11 @@ There is no routing. One page, seven states.
 
 ### Markdown parsing (the fiddly part)
 
-The **source of truth is a raw markdown string**, not a structured array. Parse it into line-items on render so `- [ ]` lines become clickable checkboxes; clicking one rewrites the underlying string and re-saves.
+The **source of truth is a raw markdown string**, not a structured array. Parse it into line-items on render so `- [ ]` lines become clickable checkboxes; clicking one rewrites the underlying string and re-saves. The Setup add/edit/delete controls are just string operations too — adding appends a `- [ ]` line, editing rewrites one line's text, deleting drops a line — so the string stays the single source of truth.
 
-- Item identity keys on a **content hash of the line**, not line index — so hand-editing the raw text doesn't attach a checked box to the wrong line.
-- Non-checkbox lines (plain bullets, free text) render as-is and are simply not clickable.
-- This same component is instantiated across every state that shows the Task List (Setup, Active, Audit, Summary), always bound to the one persistent `paradone:goalsList` store — editable at Setup, toggle-only at Active, read-only at Audit/Summary.
+- Item identity keys on a **content hash of the line**, not line index — so add/edit/delete (and any reorder) don't attach a checked box to the wrong line.
+- Non-checkbox lines (plain bullets, free text) render as-is and are simply not clickable. New tasks are always added as `- [ ]` checkbox lines; plain lines only arise from pre-existing stored data.
+- This same component is instantiated across every state that shows the Task List (Setup, Active, Audit, Summary), always bound to the one persistent `paradone:goalsList` store — editable (add/edit/delete + toggle) at Setup, toggle-only at Active, read-only at Audit/Summary.
 
 ## 5. Constraints
 
@@ -127,6 +127,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Timer defaults to 25/5; both durations editable and persisted
 - [ ] Break duration of 0 skips the break state entirely
 - [ ] Task List persists across page reloads and across sessions
+- [ ] At Setup, tasks can be added via the Add-Task modal, edited, and deleted, and each change persists to `paradone:goalsList`
 - [ ] Checkboxes in the Task List are clickable and persist their state, both at Setup and during an active session
 - [ ] Capture box is reachable in every active state without leaving the timer
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
@@ -134,7 +135,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Audit prompt shows the current Task List alongside the questions
 - [ ] Summary exports valid markdown containing the Task List snapshot, capture notes, and audit answers
 - [ ] App functions with zero network requests after initial page load
-- [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, hash stability across line reorder
+- [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, add/remove/edit-item, hash stability across line reorder
 - [ ] `storage.js` has a round-trip test (write → read → deep-equal) for each entity
 - [ ] `vite build` produces a `dist/` that runs correctly when served as static files
 - [ ] CI runs `vitest run` and blocks deploy on failure
