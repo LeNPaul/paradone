@@ -36,6 +36,7 @@ const {
   takeBreak,
   keepGoing,
   submitAudit,
+  skipAudit,
   startNewSession,
 } = useSessionMachine()
 </script>
@@ -101,7 +102,7 @@ const {
 
     <section v-if="state === 'audit'" aria-labelledby="audit-heading">
       <h2 id="audit-heading">Audit</h2>
-      <AuditPrompt :task-list-text="taskListText" @submit="submitAudit" />
+      <AuditPrompt :task-list-text="taskListText" @submit="submitAudit" @skip="skipAudit" />
     </section>
 
     <section v-if="state === 'summary'" aria-labelledby="summary-heading">

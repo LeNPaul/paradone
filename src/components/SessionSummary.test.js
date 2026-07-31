@@ -26,6 +26,15 @@ describe('SessionSummary', () => {
     expect(text).toContain('got the outline done')
   })
 
+  it('omits the entire Audit section when the audit was skipped', () => {
+    const wrapper = mount(SessionSummary, {
+      props: { ...baseProps, auditProductive: '', auditNotes: '' },
+    })
+    const text = wrapper.text()
+    expect(text).not.toContain('## Audit')
+    expect(text).not.toContain('Focus:')
+  })
+
   it('renders a fallback message when the capture is empty', () => {
     const wrapper = mount(SessionSummary, { props: { ...baseProps, capture: '   ' } })
     expect(wrapper.text()).toContain('No captures recorded.')

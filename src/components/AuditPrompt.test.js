@@ -42,4 +42,14 @@ describe('AuditPrompt', () => {
 
     expect(wrapper.emitted('submit')).toEqual([[{ auditProductive: 'focused', auditNotes: '' }]])
   })
+
+  it('offers a Skip button that emits skip without requiring a quick-select choice', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
+    const skip = wrapper.findAll('button').find((b) => b.text() === 'Skip')
+    expect(skip).toBeDefined()
+    expect(skip.attributes('disabled')).toBeUndefined()
+
+    await skip.trigger('click')
+    expect(wrapper.emitted('skip')).toHaveLength(1)
+  })
 })

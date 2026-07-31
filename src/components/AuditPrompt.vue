@@ -10,7 +10,7 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['submit'])
+const emit = defineEmits(['submit', 'skip'])
 
 const auditProductive = ref('')
 const auditNotes = ref('')
@@ -40,5 +40,6 @@ function onSubmit() {
     </fieldset>
 
     <button type="button" :disabled="!auditProductive" @click="onSubmit">Continue</button>
+    <button type="button" @click="emit('skip')">Skip</button>
   </div>
 </template>

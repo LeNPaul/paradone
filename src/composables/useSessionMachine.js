@@ -115,6 +115,11 @@ export function useSessionMachine() {
     state.value = 'summary'
   }
 
+  function skipAudit() {
+    if (state.value !== 'audit') return
+    state.value = 'summary'
+  }
+
   function startNewSession() {
     const sessions = getSessions()
     sessions.push({
@@ -203,6 +208,7 @@ export function useSessionMachine() {
     takeBreak,
     keepGoing,
     submitAudit,
+    skipAudit,
     startNewSession,
     tick,
   }

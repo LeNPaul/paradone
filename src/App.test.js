@@ -214,6 +214,22 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
+  it('skipping the audit prompt transitions to the summary screen', async () => {
+    setActiveSession({
+      state: 'audit',
+      timer: null,
+      capture: '',
+      usedPrimer: false,
+      auditProductive: '',
+      auditNotes: '',
+      sessionStartedAt: Date.now(),
+    })
+    const wrapper = mount(App)
+    const skipButton = wrapper.findAll('button').find((b) => b.text() === 'Skip')
+    await skipButton.trigger('click')
+    expect(wrapper.find('#summary-heading').exists()).toBe(true)
+  })
+
   it('rendering the summary screen shows the task list, capture text, and audit answers as markdown', () => {
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({

@@ -205,6 +205,32 @@ describe('audit and summary', () => {
     expect(machine.auditNotes.value).toBe('got the outline done')
   })
 
+  it('skipAudit moves to summary without recording any audit answers', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.stopSession(now + 5 * 60 * 1000)
+    expect(machine.state.value).toBe('audit')
+    machine.skipAudit()
+    expect(machine.state.value).toBe('summary')
+    expect(machine.auditProductive.value).toBe('')
+    expect(machine.auditNotes.value).toBe('')
+  })
+
+  it('a skipped audit is logged with empty audit fields', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.stopSession(now + 5 * 60 * 1000)
+    machine.skipAudit()
+    machine.startNewSession()
+
+    const sessions = getSessions()
+    expect(sessions[0].auditProductive).toBe('')
+    expect(sessions[0].auditNotes).toBe('')
+    expect(sessions[0].completed).toBe(false)
+  })
+
   it('startNewSession appends a session matching the data-model shape, then resets to setup', () => {
     setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     const machine = useSessionMachine()

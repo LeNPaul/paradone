@@ -28,7 +28,17 @@ const PRODUCTIVE_LABELS = { focused: 'Focused', distracted: 'Distracted', mixed:
 const markdown = computed(() => {
   const captureText = props.capture.trim() || '_No captures recorded._'
 
+  // A skipped audit leaves auditProductive empty; a submitted one always has a
+  // Focus value (the audit prompt requires one), so empty here means skipped —
+  // in which case the whole Audit section is omitted.
   const productiveLabel = PRODUCTIVE_LABELS[props.auditProductive] ?? props.auditProductive
+  const auditSection = props.auditProductive
+    ? `
+
+## Audit
+- **Focus:** ${productiveLabel}
+- **What actually got done:** ${props.auditNotes || '_(none noted)_'}`
+    : ''
 
   return `# Session Summary
 
@@ -36,11 +46,7 @@ const markdown = computed(() => {
 ${props.taskListText}
 
 ## Captures
-${captureText}
-
-## Audit
-- **Focus:** ${productiveLabel}
-- **What actually got done:** ${props.auditNotes || '_(none noted)_'}
+${captureText}${auditSection}
 `
 })
 
