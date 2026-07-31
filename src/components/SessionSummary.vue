@@ -7,9 +7,9 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  captures: {
-    type: Array,
-    default: () => [],
+  capture: {
+    type: String,
+    default: '',
   },
   auditProductive: {
     type: String,
@@ -23,16 +23,10 @@ const props = defineProps({
 
 const emit = defineEmits(['start-new-session'])
 
-function formatTime(timestamp) {
-  return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-}
-
 const PRODUCTIVE_LABELS = { focused: 'Focused', distracted: 'Distracted', mixed: 'Mixed' }
 
 const markdown = computed(() => {
-  const captureLines = props.captures.length
-    ? props.captures.map((c) => `- **${formatTime(c.timestamp)}** — ${c.text}`).join('\n')
-    : '_No captures recorded._'
+  const captureText = props.capture.trim() || '_No captures recorded._'
 
   const productiveLabel = PRODUCTIVE_LABELS[props.auditProductive] ?? props.auditProductive
 
@@ -42,7 +36,7 @@ const markdown = computed(() => {
 ${props.taskListText}
 
 ## Captures
-${captureLines}
+${captureText}
 
 ## Audit
 - **Focus:** ${productiveLabel}

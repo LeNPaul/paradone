@@ -25,16 +25,16 @@ There is no routing. One page, seven states.
 |---|---|
 | **Setup** | Task List (persistent, editable, checkbox-aware) + duration settings + optional 2-minute primer link + Start |
 | **Primer** *(optional)* | 2-minute timer, then: commit to a full session, or stop here |
-| **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea), capture box always available |
+| **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea), capture scratchpad always available |
 | **Block end** | Bell → "take the break, or keep going?" |
 | **Break** *(skippable)* | Break countdown |
 | **Audit** | What actually got done? Focused or distracted? Shown alongside the current task list |
-| **Summary** | Compiled markdown (task list, captures, audit), copy or download, start new session |
+| **Summary** | Compiled markdown (task list, capture notes, audit), copy or download, start new session |
 
 ### Screen behaviours
 
 - **Task List** is a single freeform markdown checklist, persistent across sessions. It's editable via textarea at Setup; during Active it's checkbox-toggle-only (no textarea). The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, not a per-session diff.
-- **Capture box** is pinned and available in every active state. Entries are timestamped and queue for review at audit time — never triaged mid-block.
+- **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable. Surfaced as a "need help starting?" affordance, never a required gate.
 
 ## 4. Data model
@@ -59,7 +59,7 @@ There is no routing. One page, seven states.
   taskListText: "- [ ] draft outline\n- [x] send invoice",   // full Task List snapshot at session end
   plannedDuration: 25,
   actualDuration: 25,
-  captures: [{ text: "reply to Mai re: weekend", timestamp: "..." }],
+  capture: "reply to Mai re: weekend\ncheck the deploy logs",   // freeform scratchpad text
   usedPrimer: false,
   auditProductive: "focused" | "distracted" | "mixed",
   auditNotes: "got the outline done, tabbed out twice"
@@ -107,7 +107,7 @@ The **source of truth is a raw markdown string**, not a structured array. Parse 
 |---|---|
 | `TimerDisplay.vue` | Countdown render (mm:ss), visually distinct primer vs. session states |
 | `MarkdownChecklist.vue` | Parse → render → toggle → write-back. Bound to the single persistent Task List, reused across Setup/Active/Audit/Summary |
-| `CaptureBox.vue` | Persistent input + timestamped running list |
+| `CaptureBox.vue` | Freeform scratchpad textarea |
 | `AuditPrompt.vue` | Two questions: what got done, focused/distracted/mixed. Quick-select + optional free text |
 | `SessionSummary.vue` | Assembles markdown, copy + download |
 | `SettingsPanel.vue` | Work/break durations; stored separately from session data |
@@ -132,7 +132,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break or continue
 - [ ] Audit prompt shows the current Task List alongside the questions
-- [ ] Summary exports valid markdown containing the Task List snapshot, captures, and audit answers
+- [ ] Summary exports valid markdown containing the Task List snapshot, capture notes, and audit answers
 - [ ] App functions with zero network requests after initial page load
 - [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, hash stability across line reorder
 - [ ] `storage.js` has a round-trip test (write → read → deep-equal) for each entity

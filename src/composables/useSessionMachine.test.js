@@ -52,14 +52,14 @@ describe('pausing and stopping an active session', () => {
     expect(machine.remainingMs.value).toBe(23 * 60 * 1000)
   })
 
-  it('stopSession moves active -> audit directly, preserving captures', () => {
+  it('stopSession moves active -> audit directly, preserving the capture text', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
-    machine.addCapture('distracted by email', now + 1000)
+    machine.capture.value = 'distracted by email'
     machine.stopSession(now + 5 * 60 * 1000)
     expect(machine.state.value).toBe('audit')
-    expect(machine.captures.value).toEqual([{ text: 'distracted by email', timestamp: new Date(now + 1000).toISOString() }])
+    expect(machine.capture.value).toBe('distracted by email')
   })
 
   it('a stopped-early session is logged as not completed, with actualDuration less than plannedDuration', () => {
@@ -143,13 +143,12 @@ describe('primer', () => {
     expect(machine.state.value).toBe('setup')
   })
 
-  it('stopPrimer clears captures added during the aborted primer', () => {
+  it('stopPrimer clears the capture written during the aborted primer', () => {
     const machine = useSessionMachine()
     machine.startPrimer(1000)
-    machine.addCapture('distracted by email', 1000)
-    expect(machine.captures.value).toHaveLength(1)
+    machine.capture.value = 'distracted by email'
     machine.stopPrimer()
-    expect(machine.captures.value).toEqual([])
+    expect(machine.capture.value).toBe('')
   })
 
   it('tracks usedPrimer: false for a direct session, true after committing from a primer', () => {
@@ -183,23 +182,13 @@ describe('updatePrefs', () => {
   })
 })
 
-describe('captures', () => {
-  it('addCapture appends a timestamped entry', () => {
-    const machine = useSessionMachine()
-    const now = 1000
-    machine.startSession(now)
-    machine.addCapture('reply to Mai re: weekend', now + 5000)
-    expect(machine.captures.value).toEqual([
-      { text: 'reply to Mai re: weekend', timestamp: new Date(now + 5000).toISOString() },
-    ])
-  })
-
-  it('is a no-op for empty or whitespace-only text', () => {
+describe('capture', () => {
+  it('starts empty and holds the freeform text written during a session', () => {
     const machine = useSessionMachine()
     machine.startSession(1000)
-    machine.addCapture('')
-    machine.addCapture('   ')
-    expect(machine.captures.value).toEqual([])
+    expect(machine.capture.value).toBe('')
+    machine.capture.value = 'reply to Mai re: weekend\ncheck the deploy logs'
+    expect(machine.capture.value).toBe('reply to Mai re: weekend\ncheck the deploy logs')
   })
 })
 
@@ -221,7 +210,7 @@ describe('audit and summary', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
-    machine.addCapture('reply to Mai', now + 1000)
+    machine.capture.value = 'reply to Mai'
     machine.tick(now + 25 * 60 * 1000)
     machine.keepGoing()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
@@ -236,7 +225,7 @@ describe('audit and summary', () => {
       taskListText: '- [ ] draft outline',
       plannedDuration: 25,
       actualDuration: 25,
-      captures: [{ text: 'reply to Mai', timestamp: new Date(now + 1000).toISOString() }],
+      capture: 'reply to Mai',
       usedPrimer: false,
       auditProductive: 'focused',
       auditNotes: 'done',
@@ -245,7 +234,7 @@ describe('audit and summary', () => {
     expect(sessions[0].actualDuration).toBe(sessions[0].plannedDuration)
 
     expect(machine.state.value).toBe('setup')
-    expect(machine.captures.value).toEqual([])
+    expect(machine.capture.value).toBe('')
     expect(machine.auditProductive.value).toBe('')
     expect(machine.auditNotes.value).toBe('')
     expect(getActiveSession()).toBeNull()
@@ -292,7 +281,7 @@ describe('activeSession persistence', () => {
     expect(getActiveSession()).toEqual({
       state: 'active',
       timer: expect.objectContaining({ running: true }),
-      captures: [],
+      capture: '',
       usedPrimer: false,
       auditProductive: '',
       auditNotes: '',
@@ -339,12 +328,12 @@ describe('rehydration', () => {
     expect(machine.state.value).toBe('blockEnd')
   })
 
-  it('restores captures, usedPrimer, audit answers, and sessionStartedAt from a stored activeSession', () => {
+  it('restores capture, usedPrimer, audit answers, and sessionStartedAt from a stored activeSession', () => {
     const sessionStartedAt = Date.now() - 60 * 1000
     setActiveSession({
       state: 'summary',
       timer: null,
-      captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:20:00Z' }],
+      capture: 'reply to Mai',
       usedPrimer: true,
       auditProductive: 'mixed',
       auditNotes: 'tabbed out twice',
@@ -352,7 +341,7 @@ describe('rehydration', () => {
     })
     const machine = useSessionMachine()
     expect(machine.state.value).toBe('summary')
-    expect(machine.captures.value).toEqual([{ text: 'reply to Mai', timestamp: '2026-07-13T09:20:00Z' }])
+    expect(machine.capture.value).toBe('reply to Mai')
     expect(machine.usedPrimer.value).toBe(true)
     expect(machine.auditProductive.value).toBe('mixed')
     expect(machine.auditNotes.value).toBe('tabbed out twice')

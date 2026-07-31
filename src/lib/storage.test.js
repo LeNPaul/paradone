@@ -54,7 +54,7 @@ describe('sessions', () => {
       taskListText: '- [ ] draft outline',
       plannedDuration: 25,
       actualDuration: 25,
-      captures: [{ text: 'reply to Mai re: weekend', timestamp: '2026-07-13T09:20:00Z' }],
+      capture: 'reply to Mai re: weekend',
       usedPrimer: false,
       auditProductive: 'focused',
       auditNotes: 'got the outline done, tabbed out twice',

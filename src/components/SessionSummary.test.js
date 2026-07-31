@@ -4,7 +4,7 @@ import SessionSummary from './SessionSummary.vue'
 
 const baseProps = {
   taskListText: '- [x] draft outline',
-  captures: [{ text: 'reply to Mai re: weekend', timestamp: '2026-07-13T09:15:00Z' }],
+  capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
   auditNotes: 'got the outline done',
 }
@@ -17,7 +17,7 @@ beforeEach(() => {
 })
 
 describe('SessionSummary', () => {
-  it('renders markdown containing the task list, each capture, and the audit answers', () => {
+  it('renders markdown containing the task list, the capture text, and the audit answers', () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
     const text = wrapper.text()
     expect(text).toContain('draft outline')
@@ -26,8 +26,8 @@ describe('SessionSummary', () => {
     expect(text).toContain('got the outline done')
   })
 
-  it('renders a fallback message when there are no captures', () => {
-    const wrapper = mount(SessionSummary, { props: { ...baseProps, captures: [] } })
+  it('renders a fallback message when the capture is empty', () => {
+    const wrapper = mount(SessionSummary, { props: { ...baseProps, capture: '   ' } })
     expect(wrapper.text()).toContain('No captures recorded.')
   })
 

@@ -22,7 +22,7 @@ export function useSessionMachine() {
 
   const state = ref(stored?.state ?? 'setup')
   const timer = ref(stored?.timer ?? null)
-  const captures = ref(stored?.captures ?? [])
+  const capture = ref(stored?.capture ?? '')
   const usedPrimer = ref(stored?.usedPrimer ?? false)
   const auditProductive = ref(stored?.auditProductive ?? '')
   const auditNotes = ref(stored?.auditNotes ?? '')
@@ -79,7 +79,7 @@ export function useSessionMachine() {
 
   function stopPrimer() {
     timer.value = null
-    captures.value = []
+    capture.value = ''
     state.value = 'setup'
   }
 
@@ -109,12 +109,6 @@ export function useSessionMachine() {
     state.value = 'audit'
   }
 
-  function addCapture(text, at = Date.now()) {
-    const trimmed = text.trim()
-    if (!trimmed) return
-    captures.value = [...captures.value, { text: trimmed, timestamp: new Date(at).toISOString() }]
-  }
-
   function submitAudit(answers) {
     auditProductive.value = answers.auditProductive
     auditNotes.value = answers.auditNotes ?? ''
@@ -129,7 +123,7 @@ export function useSessionMachine() {
       taskListText: getGoalsList().text,
       plannedDuration: prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
-      captures: captures.value,
+      capture: capture.value,
       usedPrimer: usedPrimer.value,
       auditProductive: auditProductive.value,
       auditNotes: auditNotes.value,
@@ -139,7 +133,7 @@ export function useSessionMachine() {
 
     state.value = 'setup'
     timer.value = null
-    captures.value = []
+    capture.value = ''
     usedPrimer.value = false
     auditProductive.value = ''
     auditNotes.value = ''
@@ -152,7 +146,7 @@ export function useSessionMachine() {
     [
       state,
       timer,
-      captures,
+      capture,
       usedPrimer,
       auditProductive,
       auditNotes,
@@ -168,7 +162,7 @@ export function useSessionMachine() {
           : {
               state: state.value,
               timer: timer.value,
-              captures: captures.value,
+              capture: capture.value,
               usedPrimer: usedPrimer.value,
               auditProductive: auditProductive.value,
               auditNotes: auditNotes.value,
@@ -193,7 +187,7 @@ export function useSessionMachine() {
     isPaused,
     showPrimerChoice,
     prefs,
-    captures,
+    capture,
     usedPrimer,
     auditProductive,
     auditNotes,
@@ -208,7 +202,6 @@ export function useSessionMachine() {
     stopSession,
     takeBreak,
     keepGoing,
-    addCapture,
     submitAudit,
     startNewSession,
     tick,

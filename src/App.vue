@@ -21,7 +21,7 @@ const {
   isPaused,
   showPrimerChoice,
   prefs,
-  captures,
+  capture,
   auditProductive,
   auditNotes,
   updatePrefs,
@@ -35,7 +35,6 @@ const {
   stopSession,
   takeBreak,
   keepGoing,
-  addCapture,
   submitAudit,
   startNewSession,
 } = useSessionMachine()
@@ -97,7 +96,7 @@ const {
       aria-labelledby="capture-heading"
     >
       <h2 id="capture-heading">Capture</h2>
-      <CaptureBox :captures="captures" @add="addCapture" />
+      <CaptureBox v-model="capture" />
     </section>
 
     <section v-if="state === 'audit'" aria-labelledby="audit-heading">
@@ -109,7 +108,7 @@ const {
       <h2 id="summary-heading">Summary</h2>
       <SessionSummary
         :task-list-text="taskListText"
-        :captures="captures"
+        :capture="capture"
         :audit-productive="auditProductive"
         :audit-notes="auditNotes"
         @start-new-session="startNewSession"

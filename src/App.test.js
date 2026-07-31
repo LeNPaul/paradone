@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs, setGoalsList, getGoalsList } from './lib/storage.js'
+import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 
 beforeEach(() => {
@@ -53,9 +54,11 @@ describe('typing into the Task List', () => {
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     const wrapper = mount(App)
-    expect(wrapper.find('#active-heading').exists()).toBe(true)
-    expect(wrapper.find('textarea').exists()).toBe(false)
-    expect(wrapper.find('input[type="checkbox"]').exists()).toBe(true)
+    const activeSection = wrapper.find('[aria-labelledby="active-heading"]')
+    expect(activeSection.exists()).toBe(true)
+    // The Task List is checkbox-toggle only here; the capture textarea lives in its own section.
+    expect(activeSection.find('textarea').exists()).toBe(false)
+    expect(activeSection.find('input[type="checkbox"]').exists()).toBe(true)
   })
 
   it('toggling a checkbox during an active session persists to the Task List storage', async () => {
@@ -145,7 +148,7 @@ describe('capture box', () => {
         : {
             state,
             timer: null,
-            captures: [],
+            capture: '',
             usedPrimer: false,
             auditProductive: state === 'summary' ? 'focused' : '',
             auditNotes: '',
@@ -156,15 +159,15 @@ describe('capture box', () => {
     expect(wrapper.find('#capture-heading').exists()).toBe(false)
   })
 
-  it('typing and submitting a capture during an active block shows it in the rendered list', async () => {
+  it('typing into the capture textarea during an active block persists to the session', async () => {
     setActiveSession({
       state: 'active',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
     })
     const wrapper = mount(App)
-    await wrapper.find('input[aria-label="Capture a distraction"]').setValue('reply to Mai')
-    await wrapper.find('form').trigger('submit')
-    expect(wrapper.text()).toContain('reply to Mai')
+    await wrapper.find('textarea[aria-label="Capture"]').setValue('reply to Mai')
+    await nextTick()
+    expect(getActiveSession().capture).toBe('reply to Mai')
   })
 })
 
@@ -174,7 +177,7 @@ describe('audit and summary', () => {
     setActiveSession({
       state: 'audit',
       timer: null,
-      captures: [],
+      capture: '',
       usedPrimer: false,
       auditProductive: '',
       auditNotes: '',
@@ -189,7 +192,7 @@ describe('audit and summary', () => {
     setActiveSession({
       state: 'audit',
       timer: null,
-      captures: [],
+      capture: '',
       usedPrimer: false,
       auditProductive: '',
       auditNotes: '',
@@ -202,12 +205,12 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
-  it('rendering the summary screen shows the task list, captures, and audit answers as markdown', () => {
+  it('rendering the summary screen shows the task list, capture text, and audit answers as markdown', () => {
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({
       state: 'summary',
       timer: null,
-      captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:15:00Z' }],
+      capture: 'reply to Mai',
       usedPrimer: false,
       auditProductive: 'focused',
       auditNotes: 'got it done',
@@ -225,7 +228,7 @@ describe('audit and summary', () => {
     setActiveSession({
       state: 'summary',
       timer: null,
-      captures: [{ text: 'reply to Mai', timestamp: '2026-07-13T09:15:00Z' }],
+      capture: 'reply to Mai',
       usedPrimer: false,
       auditProductive: 'focused',
       auditNotes: 'got it done',
