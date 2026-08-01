@@ -73,8 +73,35 @@ function onDownload() {
 <template>
   <div class="session-summary">
     <pre class="session-summary__markdown">{{ markdown }}</pre>
-    <button type="button" @click="onCopy">Copy</button>
-    <button type="button" @click="onDownload">Download</button>
-    <button type="button" @click="emit('start-new-session')">Start new session</button>
+    <div class="session-summary__actions">
+      <button type="button" @click="onCopy">Copy</button>
+      <button type="button" @click="onDownload">Download</button>
+    </div>
+    <button type="button" class="btn-primary" @click="emit('start-new-session')">
+      Start new session
+    </button>
   </div>
 </template>
+
+<style scoped>
+.session-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* The export, shown as the quiet source text it is. */
+.session-summary__markdown {
+  background: var(--surface-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  color: var(--ink-secondary);
+  max-height: 24rem;
+  overflow-y: auto;
+}
+
+.session-summary__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+</style>

@@ -101,6 +101,16 @@ v1 is **countdown only**. No stopwatch/flowtime mode. That is v1.1.
 - One component (`MarkdownChecklist.vue`) serves the single persistent Task List everywhere it's shown (Setup, Active, Audit, Summary). Do not write two.
 - Use Pinia only if cross-component state genuinely needs it. For a single-view app, a couple of composables may be enough — don't add Pinia reflexively.
 
+## Design
+
+Visual references live in `design/`. The look is Apple-HIG-adjacent: monochrome base, one accent, rounded cards on a light-gray canvas, generous whitespace. Take the references' *visual language*, not their layout — they are multi-pane native apps; Paradone is one column with no sidebar.
+
+- `src/styles/tokens.css` is the only place colors, spacing, type sizes, radii, and shadows are defined. Components reference `var(--…)` and never a literal hex or px value.
+- Both light and dark themes are defined there together. A screen is not done until it has been checked in both.
+- `src/styles/base.css` styles bare elements, so most components need no CSS of their own. Reach for a scoped `<style>` block only when an element genuinely needs component-specific treatment.
+- Don't add a CSS framework, an icon package, or an animation library — the no-new-runtime-dependencies rule applies to styling exactly as it applies to logic.
+- **Tests match buttons by their label text and sections by heading id.** Restyle freely, but never change a button's visible string or a heading's `id`. If a label must be visually hidden, keep it in the DOM as an `aria-label`.
+
 ## Planning requirements
 
 - Enter Plan Mode before any task touching more than 2 files. Wait for explicit approval before writing code.

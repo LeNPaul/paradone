@@ -43,10 +43,34 @@ function onBreakChange() {
 
 <template>
   <div class="settings-panel">
-    <label for="work-duration">Work (minutes)</label>
-    <input id="work-duration" v-model.number="workDuration" type="number" min="1" @change="onWorkChange" />
+    <div class="settings-panel__field">
+      <label for="work-duration">Work (minutes)</label>
+      <input id="work-duration" v-model.number="workDuration" type="number" min="1" @change="onWorkChange" />
+    </div>
 
-    <label for="break-duration">Break (minutes, 0 = no breaks)</label>
-    <input id="break-duration" v-model.number="breakDuration" type="number" min="0" @change="onBreakChange" />
+    <div class="settings-panel__field">
+      <label for="break-duration">Break (minutes, 0 = no breaks)</label>
+      <input id="break-duration" v-model.number="breakDuration" type="number" min="0" @change="onBreakChange" />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.settings-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.settings-panel__field {
+  flex: 1 1 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.settings-panel__field label {
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+}
+</style>

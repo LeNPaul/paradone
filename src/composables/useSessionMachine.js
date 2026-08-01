@@ -40,6 +40,9 @@ export function useSessionMachine() {
   const taskListStartText = ref(stored?.taskListStartText ?? null)
 
   const remainingMs = computed(() => (timer.value ? getRemainingMs(timer.value, now.value) : 0))
+  // The ring's denominator. Comes off the timer itself so it's correct for every
+  // variant — work, break, and the fixed 2-minute primer — without reconstruction.
+  const totalMs = computed(() => timer.value?.durationMs ?? 0)
   const isPaused = computed(() => !!timer.value && !timer.value.running)
   const showPrimerChoice = computed(
     () => state.value === 'primer' && (primerSkipped.value || isFinished(timer.value, now.value)),
@@ -231,6 +234,7 @@ export function useSessionMachine() {
   return {
     state,
     remainingMs,
+    totalMs,
     isPaused,
     showPrimerChoice,
     prefs,

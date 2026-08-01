@@ -57,8 +57,8 @@ function onSubmit() {
         placeholder="What needs doing?"
       />
       <div class="task-modal__actions">
-        <button type="button" @click="emit('close')">Cancel</button>
-        <button type="submit" :disabled="draft.trim() === ''">Save</button>
+        <button type="button" class="btn-quiet" @click="emit('close')">Cancel</button>
+        <button type="submit" class="btn-primary" :disabled="draft.trim() === ''">Save</button>
       </div>
     </form>
   </dialog>
@@ -67,19 +67,22 @@ function onSubmit() {
 <style scoped>
 .task-modal {
   border: none;
-  border-radius: 0.5rem;
-  padding: 1rem;
-  min-width: min(20rem, 90vw);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  min-width: min(24rem, 90vw);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-modal);
 }
 
 .task-modal::backdrop {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--scrim);
 }
 
 .task-modal__form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-4);
 }
 
 .task-modal__title {
@@ -87,15 +90,15 @@ function onSubmit() {
 }
 
 .task-modal__input {
-  box-sizing: border-box;
   width: 100%;
-  font: inherit;
-  padding: 0.375rem 0.5rem;
+  padding: var(--space-3);
+  font-size: var(--text-lg);
 }
 
 .task-modal__actions {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
+  align-items: center;
+  gap: var(--space-2);
 }
 </style>

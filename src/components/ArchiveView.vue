@@ -25,11 +25,13 @@ function onDownload() {
 
 <template>
   <div class="archive-view">
-    <button type="button" @click="onDownload">Download archive</button>
-    <button type="button" @click="emit('back')">Back</button>
+    <div class="archive-view__bar">
+      <button type="button" class="btn-quiet" @click="emit('back')">Back</button>
+      <button type="button" @click="onDownload">Download archive</button>
+    </div>
 
-    <p v-if="!sorted.length">No tasks archived yet.</p>
-    <ol v-else class="archive-view__entries">
+    <p v-if="!sorted.length" class="archive-view__empty">No tasks archived yet.</p>
+    <ol v-else class="list-reset archive-view__entries">
       <li v-for="entry in sorted" :key="entry.id" class="archive-view__entry">
         <span>{{ entry.text }}</span>
         <time :datetime="entry.completedAt">{{ formatDateTime(entry.completedAt) }}</time>
@@ -39,18 +41,42 @@ function onDownload() {
 </template>
 
 <style scoped>
-.archive-view__entries {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.archive-view {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: var(--space-4);
+}
+
+.archive-view__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archive-view__empty {
+  color: var(--ink-muted);
+}
+
+.archive-view__entries {
+  display: flex;
+  flex-direction: column;
 }
 
 .archive-view__entry {
   display: flex;
   align-items: baseline;
-  gap: 0.5em;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+}
+
+.archive-view__entry + .archive-view__entry {
+  border-top: 1px solid var(--hairline);
+}
+
+.archive-view__entry time {
+  flex: none;
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
 }
 </style>

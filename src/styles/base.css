@@ -1,0 +1,174 @@
+/* Element defaults. Styling bare tags here means most components need no CSS. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-7);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h2 {
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+h3 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+}
+
+p {
+  margin: 0;
+}
+
+/* Default button is the quiet secondary. Later slices add the primary variant. */
+button {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-full);
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: background var(--duration), opacity var(--duration);
+}
+
+button:hover:not(:disabled) {
+  background: var(--canvas);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+input,
+textarea {
+  font: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+textarea {
+  width: 100%;
+  min-height: 6rem;
+  resize: vertical;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--accent);
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* A card on the canvas. The app's one repeated container. */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Small caps-y section label. Used for every heading that names a region
+   rather than announcing a screen. */
+.eyebrow {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+}
+
+/* The one affirmative action on a screen. Carries visible text, so it uses the
+   darker --accent-strong to clear 4.5:1 against white. */
+.btn-primary {
+  background: var(--accent-strong);
+  color: var(--ink-on-accent);
+  border-color: transparent;
+  font-weight: 600;
+  padding: var(--space-3) var(--space-6);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  opacity: 0.9;
+}
+
+/* Tertiary: reads as a link, not a control. */
+.btn-quiet {
+  background: none;
+  border-color: transparent;
+  color: var(--accent-strong);
+  padding: var(--space-2) var(--space-2);
+}
+
+.btn-quiet:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
+.list-reset {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Readable by screen readers, invisible on screen. Lets an icon-only control
+   keep a real text label instead of leaning on a title attribute. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  margin: 0;
+}

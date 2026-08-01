@@ -2,6 +2,10 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import AuditPrompt from './AuditPrompt.vue'
 
+// Match by label, not position — the buttons get reordered for visual hierarchy.
+const continueButton = (wrapper) =>
+  wrapper.findAll('button').find((b) => b.text() === 'Continue')
+
 describe('AuditPrompt', () => {
   it('shows the current Task List alongside the questions', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '- [x] draft outline' } })
@@ -42,7 +46,7 @@ describe('AuditPrompt', () => {
 
   it('disables Continue until a quick-select option is chosen', async () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
-    const button = wrapper.find('button')
+    const button = continueButton(wrapper)
     expect(button.attributes('disabled')).toBeDefined()
 
     await wrapper.findAll('input[type="radio"]')[1].setValue()
@@ -53,7 +57,7 @@ describe('AuditPrompt', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
     await wrapper.findAll('input[type="radio"]')[1].setValue()
     await wrapper.find('textarea').setValue('  tabbed out twice  ')
-    await wrapper.find('button').trigger('click')
+    await continueButton(wrapper).trigger('click')
 
     expect(wrapper.emitted('submit')).toEqual([
       [{ auditProductive: 'distracted', auditNotes: 'tabbed out twice' }],
@@ -63,7 +67,7 @@ describe('AuditPrompt', () => {
   it('submits with empty notes, since free text is optional', async () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
     await wrapper.findAll('input[type="radio"]')[0].setValue()
-    await wrapper.find('button').trigger('click')
+    await continueButton(wrapper).trigger('click')
 
     expect(wrapper.emitted('submit')).toEqual([[{ auditProductive: 'focused', auditNotes: '' }]])
   })

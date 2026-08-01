@@ -45,13 +45,13 @@ describe('ArchiveView', () => {
 
   it('emits back', async () => {
     const wrapper = mount(ArchiveView, { props: { entries: [entry()] } })
-    await wrapper.findAll('button')[1].trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
     expect(wrapper.emitted('back')).toHaveLength(1)
   })
 
   it('downloads the archive as markdown', async () => {
     const wrapper = mount(ArchiveView, { props: { entries: [entry()] } })
-    await wrapper.findAll('button')[0].trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Download archive').trigger('click')
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
   })
 })

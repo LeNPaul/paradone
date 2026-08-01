@@ -70,17 +70,17 @@ function onModalSubmit(text) {
       </label>
       <span v-else>{{ item.text }}</span>
       <span v-if="editable" class="markdown-checklist__controls">
-        <button type="button" @click="openEdit(item)">Edit</button>
-        <button type="button" aria-label="Delete task" @click="onDelete(item.hash)">✕</button>
+        <button type="button" class="btn-quiet" @click="openEdit(item)">Edit</button>
+        <button type="button" class="btn-quiet" aria-label="Delete task" @click="onDelete(item.hash)">✕</button>
       </span>
     </li>
   </ul>
   <div v-if="editable" class="markdown-checklist__actions">
-    <button type="button" class="markdown-checklist__add" @click="openAdd">+ Add Task</button>
+    <button type="button" class="markdown-checklist__add btn-quiet" @click="openAdd">+ Add Task</button>
     <button
       v-if="checkedCount"
       type="button"
-      class="markdown-checklist__archive"
+      class="markdown-checklist__archive btn-quiet"
       @click="emit('archive')"
     >
       Archive completed ({{ checkedCount }})
@@ -101,35 +101,61 @@ function onModalSubmit(text) {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--markdown-checklist-gap, 0.25rem);
 }
 
 .markdown-checklist__item {
   display: flex;
-  align-items: baseline;
-  gap: 0.5em;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
+}
+
+/* Hairline between rows, not around them — the card already draws the edge. */
+.markdown-checklist__item + .markdown-checklist__item {
+  border-top: 1px solid var(--hairline);
 }
 
 .markdown-checklist__item label {
   display: flex;
-  align-items: baseline;
-  gap: 0.5em;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  cursor: pointer;
+}
+
+.markdown-checklist__item input[type='checkbox'] {
+  flex: none;
 }
 
 .markdown-checklist__controls {
   display: flex;
-  gap: 0.25rem;
+  gap: var(--space-1);
+  margin-left: auto;
+  /* Quiet until wanted, but never hidden from keyboard or touch. */
+  opacity: 0;
+  transition: opacity var(--duration);
 }
 
+.markdown-checklist__item:hover .markdown-checklist__controls,
+.markdown-checklist__controls:focus-within {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .markdown-checklist__controls {
+    opacity: 1;
+  }
+}
+
+/* Wrap the row, not the labels inside each pill. */
 .markdown-checklist__actions {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.markdown-checklist__item input[type='checkbox'] {
-  accent-color: var(--markdown-checklist-accent, currentColor);
+.markdown-checklist__actions button {
+  flex: none;
+  white-space: nowrap;
 }
 </style>
