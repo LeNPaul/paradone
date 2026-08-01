@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import MarkdownChecklist from './components/MarkdownChecklist.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import CaptureBox from './components/CaptureBox.vue'
@@ -8,6 +8,7 @@ import SessionSummary from './components/SessionSummary.vue'
 import SessionLog from './components/SessionLog.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import { getGoalsList, setGoalsList, getSessions } from './lib/storage.js'
+import { completedSince } from './lib/checklist.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
 
@@ -37,6 +38,7 @@ const {
   primerIntent,
   auditProductive,
   auditNotes,
+  taskListStartText,
   updatePrefs,
   startSession,
   openPrimerSetup,
@@ -54,6 +56,14 @@ const {
   skipAudit,
   startNewSession,
 } = useSessionMachine()
+
+// What got ticked off during this block: the list as it stands now, minus what
+// was already checked when the block started.
+const completedTasks = computed(() =>
+  taskListStartText.value === null
+    ? []
+    : completedSince(taskListStartText.value, taskListText.value),
+)
 
 useDocumentTitle(state, remainingMs, isPaused)
 </script>
@@ -136,6 +146,7 @@ useDocumentTitle(state, remainingMs, isPaused)
       <h2 id="audit-heading">Audit</h2>
       <AuditPrompt
         :task-list-text="taskListText"
+        :completed-tasks="completedTasks"
         :capture="capture"
         @submit="submitAudit"
         @skip="skipAudit"
@@ -146,6 +157,7 @@ useDocumentTitle(state, remainingMs, isPaused)
       <h2 id="summary-heading">Summary</h2>
       <SessionSummary
         :task-list-text="taskListText"
+        :completed-tasks="completedTasks"
         :capture="capture"
         :audit-productive="auditProductive"
         :audit-notes="auditNotes"

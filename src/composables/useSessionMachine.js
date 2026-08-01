@@ -13,6 +13,7 @@ import {
   setSessions,
   getGoalsList,
 } from '../lib/storage.js'
+import { completedSince } from '../lib/checklist.js'
 
 const PRIMER_DURATION_MINUTES = 2
 
@@ -32,6 +33,11 @@ export function useSessionMachine() {
   const primerIntent = ref(stored?.primerIntent ?? '')
   const stoppedEarly = ref(stored?.stoppedEarly ?? false)
   const actualDurationMs = ref(stored?.actualDurationMs ?? null)
+  // Task List snapshot taken when the block started, diffed against the list at
+  // audit time to work out what got ticked off during it. null means "no
+  // snapshot" — a session rehydrated from before this existed reports nothing
+  // rather than claiming every already-checked task was done in this block.
+  const taskListStartText = ref(stored?.taskListStartText ?? null)
 
   const remainingMs = computed(() => (timer.value ? getRemainingMs(timer.value, now.value) : 0))
   const isPaused = computed(() => !!timer.value && !timer.value.running)
@@ -57,6 +63,7 @@ export function useSessionMachine() {
   function startSession(at = Date.now()) {
     timer.value = start(createTimer(prefs.workDuration), at)
     sessionStartedAt.value = at
+    taskListStartText.value = getGoalsList().text
     usedPrimer.value = false
     primerIntent.value = ''
     state.value = 'active'
@@ -85,6 +92,7 @@ export function useSessionMachine() {
   function commitFullSession(at = Date.now()) {
     timer.value = start(createTimer(prefs.workDuration), at)
     sessionStartedAt.value = at
+    taskListStartText.value = getGoalsList().text
     usedPrimer.value = true
     state.value = 'active'
   }
@@ -93,6 +101,7 @@ export function useSessionMachine() {
     timer.value = null
     capture.value = ''
     primerIntent.value = ''
+    taskListStartText.value = null
     state.value = 'setup'
   }
 
@@ -127,11 +136,16 @@ export function useSessionMachine() {
   // screen would silently discard the audit.
   function logSession() {
     const sessions = getSessions()
+    const taskListText = getGoalsList().text
     sessions.push({
       id: crypto.randomUUID(),
       date: new Date(sessionStartedAt.value).toISOString(),
       auditedAt: new Date().toISOString(),
-      taskListText: getGoalsList().text,
+      taskListText,
+      completedTasks:
+        taskListStartText.value === null
+          ? []
+          : completedSince(taskListStartText.value, taskListText),
       plannedDuration: prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       capture: capture.value,
@@ -168,6 +182,7 @@ export function useSessionMachine() {
     sessionStartedAt.value = null
     stoppedEarly.value = false
     actualDurationMs.value = null
+    taskListStartText.value = null
   }
 
   watch(
@@ -183,6 +198,7 @@ export function useSessionMachine() {
       primerIntent,
       stoppedEarly,
       actualDurationMs,
+      taskListStartText,
     ],
     () => {
       setActiveSession(
@@ -200,6 +216,7 @@ export function useSessionMachine() {
               primerIntent: primerIntent.value,
               stoppedEarly: stoppedEarly.value,
               actualDurationMs: actualDurationMs.value,
+              taskListStartText: taskListStartText.value,
             },
       )
     },
@@ -222,6 +239,7 @@ export function useSessionMachine() {
     primerIntent,
     auditProductive,
     auditNotes,
+    taskListStartText,
     updatePrefs,
     startSession,
     openPrimerSetup,

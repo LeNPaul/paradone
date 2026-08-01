@@ -24,12 +24,6 @@ const emit = defineEmits(['update:modelValue'])
 // list shows no phantom row (and no stray edit/delete controls) when empty.
 const items = computed(() => (props.modelValue === '' ? [] : parseChecklist(props.modelValue)))
 
-// checklist.js already confirmed the marker is present before item.checkbox
-// is true, so this is a safe strip, not a re-detection of checkbox lines.
-function displayText(item) {
-  return item.checkbox ? item.line.replace(/^- \[[ xX]\] ?/, '') : item.line
-}
-
 function onToggle(hash) {
   emit('update:modelValue', toggleItem(props.modelValue, hash))
 }
@@ -47,7 +41,7 @@ function openAdd() {
 
 function openEdit(item) {
   editingHash.value = item.hash
-  modalDraft.value = displayText(item)
+  modalDraft.value = item.text
   modalOpen.value = true
 }
 
@@ -70,9 +64,9 @@ function onModalSubmit(text) {
     <li v-for="item in items" :key="item.hash" class="markdown-checklist__item">
       <label v-if="item.checkbox">
         <input type="checkbox" :checked="item.checked" @change="onToggle(item.hash)" />
-        <span>{{ displayText(item) }}</span>
+        <span>{{ item.text }}</span>
       </label>
-      <span v-else>{{ displayText(item) }}</span>
+      <span v-else>{{ item.text }}</span>
       <span v-if="editable" class="markdown-checklist__controls">
         <button type="button" @click="openEdit(item)">Edit</button>
         <button type="button" aria-label="Delete task" @click="onDelete(item.hash)">✕</button>

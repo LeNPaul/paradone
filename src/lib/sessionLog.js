@@ -51,6 +51,11 @@ function entryMarkdown(session) {
     `- Duration: ${session.plannedDuration} min planned / ${session.actualDuration} min actual`,
     `- Focus: ${session.auditProductive ? productiveLabel(session.auditProductive) : `_${SKIPPED_LABEL}_`}`,
   ]
+  // Records written before per-session completion tracking have no
+  // completedTasks at all, so guard rather than printing an empty section.
+  if (session.completedTasks?.length) {
+    lines.push(`- Completed: ${session.completedTasks.join(', ')}`)
+  }
   if (session.primerIntent) {
     lines.push(`- Primer: ${session.primerIntent}`)
   }

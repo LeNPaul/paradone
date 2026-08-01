@@ -34,7 +34,8 @@ There is no routing. One page, eight states.
 
 ### Screen behaviours
 
-- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, not a per-session diff.
+- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, plus a derived **completed-this-session** list alongside it.
+- **Completed this session** is derived, not stored per task: the list is snapshotted when the block starts, and a task counts as completed if it is checked at the end and was *not* checked at the start. A task added mid-session and then ticked counts. Unticking a box during the block does not. Shown at Audit, exported in the Summary markdown, and recorded on the session so the audit log can show it.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable — surfaced as a "need help starting?" affordance, never a gate on starting work (plain **Start** never touches it). Choosing it first asks for a breakdown: what can you do in 2 minutes, in a free-text area. That text is required before the countdown starts — an empty primer defeats the point of the step — and it stays visible through the primer and the full focus block, then lands in the session record as `primerIntent`.
 - **Audit log** is a read-only view of every past audit, newest first, reached from a "View log" button at Setup and dismissed with "Back". It is not a machine state — it's a view toggle, so it never lands in `paradone:activeSession`. Each entry shows timestamps, planned/actual duration, focus rating and audit notes; skipped audits are listed and marked as such. One "Download log" button exports the whole log as markdown — there is no per-entry download. The session record is appended when the audit is answered or skipped, *not* when the user starts the next session, so closing the tab at Summary cannot lose an audit. Chronological only — aggregates and trends stay deferred (§6).
@@ -60,6 +61,7 @@ There is no routing. One page, eight states.
   date: "2026-07-13T09:15:00Z",       // session start
   auditedAt: "2026-07-13T09:40:00Z",  // when the audit was answered or skipped — the log's sort key
   taskListText: "- [ ] draft outline\n- [x] send invoice",   // full Task List snapshot at session end
+  completedTasks: ["send invoice"],   // ticked during this block; absent on records written before this existed
   plannedDuration: 25,
   actualDuration: 25,
   capture: "reply to Mai re: weekend\ncheck the deploy logs",   // freeform scratchpad text
@@ -77,6 +79,7 @@ There is no routing. One page, eight states.
 The **source of truth is a raw markdown string**, not a structured array. Parse it into line-items on render so `- [ ]` lines become clickable checkboxes; clicking one rewrites the underlying string and re-saves. The Setup add/edit/delete controls are just string operations too — adding appends a `- [ ]` line, editing rewrites one line's text, deleting drops a line — so the string stays the single source of truth.
 
 - Item identity keys on a **content hash of the line**, not line index — so add/edit/delete (and any reorder) don't attach a checked box to the wrong line.
+- Parsed items carry the marker-stripped task `text`. The completed-this-session diff keys on that **text**, not the hash: the hash covers the whole line including the `- [x] ` marker, so toggling a box changes it. An in-progress session persists its start snapshot to `paradone:activeSession`; when that snapshot is missing (a block started before this existed) the diff reports nothing rather than claiming every checked task.
 - Non-checkbox lines (plain bullets, free text) render as-is and are simply not clickable. New tasks are always added as `- [ ]` checkbox lines; plain lines only arise from pre-existing stored data.
 - This same component is instantiated across every state that shows the Task List (Setup, Active, Audit, Summary), always bound to the one persistent `paradone:goalsList` store — editable (add/edit/delete + toggle) at Setup, toggle-only at Active, read-only at Audit/Summary.
 
@@ -140,11 +143,13 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break or continue
 - [ ] Audit prompt shows the current Task List alongside the questions
-- [ ] Summary exports valid markdown containing the Task List snapshot, capture notes, and audit answers
+- [ ] Audit prompt lists the tasks ticked during the block — not ones already checked before it started — and says so when there were none
+- [ ] Summary exports valid markdown containing the Task List snapshot, the completed-this-session list, capture notes, and audit answers
+- [ ] Audit log entries list the tasks completed in that block, on screen and in the log export
 - [ ] Every audit is appended to `paradone:sessions` the moment it is answered or skipped, and survives closing the tab at Summary
 - [ ] The audit log lists all past audits newest-first with date/time stamps, and downloads in full as one markdown file
 - [ ] App functions with zero network requests after initial page load
-- [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, add/remove/edit-item, hash stability across line reorder
+- [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, add/remove/edit-item, hash stability across line reorder, completed-since diff
 - [ ] `storage.js` has a round-trip test (write → read → deep-equal) for each entity
 - [ ] `vite build` produces a `dist/` that runs correctly when served as static files
 - [ ] CI runs `vitest run` and blocks deploy on failure

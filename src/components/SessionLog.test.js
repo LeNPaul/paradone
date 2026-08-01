@@ -42,6 +42,20 @@ describe('SessionLog', () => {
     expect(wrapper.text()).toContain('Primer: open the doc')
   })
 
+  it('lists the tasks completed during the session', () => {
+    const wrapper = mount(SessionLog, {
+      props: { sessions: [session({ completedTasks: ['draft outline', 'send invoice'] })] },
+    })
+    const items = wrapper.findAll('.session-log__entry li')
+    expect(items.map((li) => li.text())).toEqual(['draft outline', 'send invoice'])
+  })
+
+  it('renders a record written before completed-task tracking existed', () => {
+    const wrapper = mount(SessionLog, { props: { sessions: [session()] } })
+    expect(wrapper.findAll('.session-log__entry li')).toHaveLength(0)
+    expect(wrapper.text()).toContain('got the outline done')
+  })
+
   it('lists entries newest first regardless of stored order', () => {
     const wrapper = mount(SessionLog, {
       props: {

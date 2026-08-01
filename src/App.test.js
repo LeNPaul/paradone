@@ -258,6 +258,29 @@ describe('audit and summary', () => {
     expect(wrapper.text()).toContain('tabbed out to check email')
   })
 
+  it('reports only the tasks ticked during the block, from Start through to the summary export', async () => {
+    setGoalsList({ text: '- [x] send invoice\n- [ ] draft outline', updatedAt: null })
+    const wrapper = mount(App)
+
+    const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
+    await startButton.trigger('click')
+
+    // Tick the second task; the first was already done before the block began.
+    await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
+    const stopButton = wrapper.findAll('button').find((b) => b.text() === 'Stop & log session')
+    await stopButton.trigger('click')
+
+    const completed = wrapper.findAll('#audit-completed-heading ~ ul li').map((li) => li.text())
+    expect(completed).toEqual(['draft outline'])
+
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    const continueButton = wrapper.findAll('button').find((b) => b.text() === 'Continue')
+    await continueButton.trigger('click')
+
+    expect(wrapper.find('#summary-heading').exists()).toBe(true)
+    expect(wrapper.text()).toContain('## Completed this session\n- draft outline')
+  })
+
   it('submitting the audit prompt transitions to the summary screen', async () => {
     setActiveSession({
       state: 'audit',

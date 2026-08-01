@@ -8,6 +8,19 @@ describe('AuditPrompt', () => {
     expect(wrapper.text()).toContain('draft outline')
   })
 
+  it('lists the tasks checked off during the session', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: '', completedTasks: ['draft outline', 'send invoice'] },
+    })
+    const items = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(items.map((li) => li.text())).toEqual(['draft outline', 'send invoice'])
+  })
+
+  it('says so when nothing was checked off during the session', () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '', completedTasks: [] } })
+    expect(wrapper.text()).toContain('No tasks checked off this session.')
+  })
+
   it('shows the captures recorded during the session', () => {
     const wrapper = mount(AuditPrompt, {
       props: { taskListText: '', capture: 'tabbed out to check email' },

@@ -4,6 +4,7 @@ import SessionSummary from './SessionSummary.vue'
 
 const baseProps = {
   taskListText: '- [x] draft outline',
+  completedTasks: ['draft outline'],
   capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
   auditNotes: 'got the outline done',
@@ -33,6 +34,18 @@ describe('SessionSummary', () => {
     const text = wrapper.text()
     expect(text).not.toContain('## Audit')
     expect(text).not.toContain('Focus:')
+  })
+
+  it('lists the tasks completed this session in their own section', () => {
+    const wrapper = mount(SessionSummary, {
+      props: { ...baseProps, completedTasks: ['draft outline', 'send invoice'] },
+    })
+    expect(wrapper.text()).toContain('## Completed this session\n- draft outline\n- send invoice')
+  })
+
+  it('renders a fallback message when nothing was completed this session', () => {
+    const wrapper = mount(SessionSummary, { props: { ...baseProps, completedTasks: [] } })
+    expect(wrapper.text()).toContain('_No tasks checked off this session._')
   })
 
   it('renders a fallback message when the capture is empty', () => {

@@ -326,6 +326,7 @@ describe('audit and summary', () => {
       date: new Date(now).toISOString(),
       auditedAt: expect.any(String),
       taskListText: '- [ ] draft outline',
+      completedTasks: [],
       plannedDuration: 25,
       actualDuration: 25,
       capture: 'reply to Mai',
@@ -387,6 +388,48 @@ describe('audit and summary', () => {
     expect(sessions[0].taskListText).toBe('- [x] draft outline\n- [ ] send invoice')
   })
 
+  it('logs only the tasks checked off during the block, not ones already checked at the start', () => {
+    setGoalsList({ text: '- [x] send invoice\n- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+
+    setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    expect(getSessions()[0].completedTasks).toEqual(['draft outline'])
+  })
+
+  it('counts a task added mid-session and then checked', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+
+    setGoalsList({ text: '- [ ] draft outline\n- [x] reply to Mai', updatedAt: null })
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    expect(getSessions()[0].completedTasks).toEqual(['reply to Mai'])
+  })
+
+  it('records completed tasks on a skipped audit too', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+
+    setGoalsList({ text: '- [x] draft outline', updatedAt: null })
+    machine.skipAudit()
+
+    expect(getSessions()[0].completedTasks).toEqual(['draft outline'])
+  })
+
   it('records the work block\'s own start time and duration, not the break\'s, when a break was taken', () => {
     const machine = useSessionMachine()
     const now = 1000
@@ -420,6 +463,7 @@ describe('activeSession persistence', () => {
       primerIntent: '',
       stoppedEarly: false,
       actualDurationMs: null,
+      taskListStartText: '',
     })
   })
 
@@ -476,6 +520,36 @@ describe('rehydration', () => {
     expect(machine.usedPrimer.value).toBe(true)
     expect(machine.auditProductive.value).toBe('mixed')
     expect(machine.auditNotes.value).toBe('tabbed out twice')
+  })
+
+  it('restores the Task List start snapshot, so a reload mid-session still diffs against the right baseline', () => {
+    const sessionStartedAt = Date.now() - 60 * 1000
+    setActiveSession({
+      state: 'blockEnd',
+      timer: null,
+      sessionStartedAt,
+      taskListStartText: '- [x] send invoice\n- [ ] draft outline',
+    })
+    const machine = useSessionMachine()
+    expect(machine.taskListStartText.value).toBe('- [x] send invoice\n- [ ] draft outline')
+
+    setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
+    machine.keepGoing()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    expect(getSessions()[0].completedTasks).toEqual(['draft outline'])
+  })
+
+  it('reports no completed tasks for a session stored before the snapshot existed, rather than claiming every checked task', () => {
+    const sessionStartedAt = Date.now() - 60 * 1000
+    setActiveSession({ state: 'blockEnd', timer: null, sessionStartedAt })
+    setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
+
+    const machine = useSessionMachine()
+    machine.keepGoing()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    expect(getSessions()[0].completedTasks).toEqual([])
   })
 
   it('restores a skipped primer so the commit/stop choice survives a reload, instead of reverting to waiting out the countdown', () => {

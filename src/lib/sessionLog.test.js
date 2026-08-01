@@ -100,6 +100,17 @@ describe('buildLogMarkdown', () => {
     expect(buildLogMarkdown([session()])).not.toContain('- Primer:')
   })
 
+  it('lists the tasks completed during the session, and omits the line when none were', () => {
+    const md = buildLogMarkdown([session({ completedTasks: ['draft outline', 'send invoice'] })])
+    expect(md).toContain('- Completed: draft outline, send invoice')
+    expect(buildLogMarkdown([session({ completedTasks: [] })])).not.toContain('- Completed:')
+  })
+
+  it('does not throw on a record written before completed-task tracking existed', () => {
+    const md = buildLogMarkdown([session()])
+    expect(md).not.toContain('- Completed:')
+  })
+
   it('notes an answered audit that was left without notes', () => {
     const md = buildLogMarkdown([session({ auditNotes: '' })])
     expect(md).toContain('- What got done: _(none noted)_')

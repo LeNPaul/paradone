@@ -8,6 +8,10 @@ defineProps({
     type: String,
     default: '',
   },
+  completedTasks: {
+    type: Array,
+    default: () => [],
+  },
   capture: {
     type: String,
     default: '',
@@ -26,6 +30,14 @@ function onSubmit() {
 
 <template>
   <div class="audit-prompt">
+    <section aria-labelledby="audit-completed-heading">
+      <h3 id="audit-completed-heading">Completed this session</h3>
+      <ul v-if="completedTasks.length">
+        <li v-for="task in completedTasks" :key="task">{{ task }}</li>
+      </ul>
+      <p v-else>No tasks checked off this session.</p>
+    </section>
+
     <section aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading">Task list</h3>
       <MarkdownChecklist :model-value="taskListText" :editable="false" />

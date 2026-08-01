@@ -9,6 +9,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  completedTasks: {
+    type: Array,
+    default: () => [],
+  },
   capture: {
     type: String,
     default: '',
@@ -28,6 +32,10 @@ const emit = defineEmits(['start-new-session'])
 const markdown = computed(() => {
   const captureText = props.capture.trim() || '_No captures recorded._'
 
+  const completedText = props.completedTasks.length
+    ? props.completedTasks.map((task) => `- ${task}`).join('\n')
+    : '_No tasks checked off this session._'
+
   // A skipped audit leaves auditProductive empty; a submitted one always has a
   // Focus value (the audit prompt requires one), so empty here means skipped —
   // in which case the whole Audit section is omitted.
@@ -44,6 +52,9 @@ const markdown = computed(() => {
 
 ## Tasks
 ${props.taskListText}
+
+## Completed this session
+${completedText}
 
 ## Captures
 ${captureText}${auditSection}

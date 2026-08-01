@@ -19,10 +19,26 @@ export function parseChecklist(text) {
     return {
       hash: hashLine(line),
       line,
+      text: match ? match[2] : line,
       checkbox: match !== null,
       checked: match !== null && match[1].toLowerCase() === 'x',
     }
   })
+}
+
+// A task counts as completed for a block if it's checked at the end and wasn't
+// checked at the start — including tasks added mid-session. Identity is the
+// marker-stripped text, not the hash: hashLine covers the whole line, so a
+// toggle changes an item's hash.
+export function completedSince(startText, endText) {
+  const checkedAtStart = new Set(
+    parseChecklist(startText)
+      .filter((item) => item.checkbox && item.checked)
+      .map((item) => item.text),
+  )
+  return parseChecklist(endText)
+    .filter((item) => item.checkbox && item.checked && !checkedAtStart.has(item.text))
+    .map((item) => item.text)
 }
 
 export function toggleItem(text, hash) {
