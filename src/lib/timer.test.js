@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createTimer, start, pause, resume, reset, getRemainingMs, isFinished } from './timer.js'
+import { createTimer, start, pause, resume, reset, getRemainingMs, isFinished, formatMs } from './timer.js'
 
 describe('createTimer', () => {
   it('converts minutes to milliseconds', () => {
@@ -84,5 +84,24 @@ describe('isFinished', () => {
   it('is true past the duration, not just exactly at it', () => {
     const timer = start(createTimer(25), 0)
     expect(isFinished(timer, 30 * 60 * 1000)).toBe(true)
+  })
+})
+
+describe('formatMs', () => {
+  it('pads minutes and seconds to two digits', () => {
+    expect(formatMs(0)).toBe('00:00')
+    expect(formatMs(61 * 1000)).toBe('01:01')
+  })
+
+  it('floors partial seconds rather than rounding up', () => {
+    expect(formatMs(1999)).toBe('00:01')
+  })
+
+  it('formats a full work duration', () => {
+    expect(formatMs(25 * 60 * 1000)).toBe('25:00')
+  })
+
+  it('lets minutes run past 60 instead of rolling over to hours', () => {
+    expect(formatMs(90 * 60 * 1000)).toBe('90:00')
   })
 })

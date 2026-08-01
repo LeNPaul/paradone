@@ -8,6 +8,7 @@ import SessionSummary from './components/SessionSummary.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import { getGoalsList, setGoalsList } from './lib/storage.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
+import { useDocumentTitle } from './composables/useDocumentTitle.js'
 
 const taskListText = ref(getGoalsList().text)
 function onTaskListUpdate(text) {
@@ -39,6 +40,8 @@ const {
   skipAudit,
   startNewSession,
 } = useSessionMachine()
+
+useDocumentTitle(state, remainingMs, isPaused)
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
 import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
+import { DEFAULT_TITLE } from './lib/title.js'
 
 beforeEach(() => {
   localStorage.clear()
@@ -290,5 +291,37 @@ describe('interval wiring', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('browser tab title', () => {
+  it('is the default title at Setup', () => {
+    mount(App)
+    expect(document.title).toBe(DEFAULT_TITLE)
+  })
+
+  it('counts down in the tab while a session is active', async () => {
+    const wrapper = mount(App)
+    const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
+    await startButton.trigger('click')
+    expect(document.title).toMatch(/^⏱ \d{2}:\d{2} Focus — Paradone$/)
+  })
+
+  it('marks the tab as paused', async () => {
+    const wrapper = mount(App)
+    const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
+    await startButton.trigger('click')
+    const pauseButton = wrapper.findAll('button').find((b) => b.text() === 'Pause')
+    await pauseButton.trigger('click')
+    expect(document.title).toMatch(/^⏸ \d{2}:\d{2} Focus — Paradone$/)
+  })
+
+  it('reverts to the default title once the session stops', async () => {
+    const wrapper = mount(App)
+    const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
+    await startButton.trigger('click')
+    const stopButton = wrapper.findAll('button').find((b) => b.text() === 'Stop & log session')
+    await stopButton.trigger('click')
+    expect(document.title).toBe(DEFAULT_TITLE)
   })
 })
