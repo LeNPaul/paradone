@@ -1,6 +1,8 @@
 <script setup>
 // SessionSummary: assembles markdown (task list, captures, audit), copy + download
 import { computed } from 'vue'
+import { PRODUCTIVE_LABELS } from '../lib/sessionLog.js'
+import { downloadMarkdown } from '../lib/download.js'
 
 const props = defineProps({
   taskListText: {
@@ -22,8 +24,6 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['start-new-session'])
-
-const PRODUCTIVE_LABELS = { focused: 'Focused', distracted: 'Distracted', mixed: 'Mixed' }
 
 const markdown = computed(() => {
   const captureText = props.capture.trim() || '_No captures recorded._'
@@ -55,13 +55,7 @@ async function onCopy() {
 }
 
 function onDownload() {
-  const blob = new Blob([markdown.value], { type: 'text/markdown' })
-  const url = URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = 'paradone-session.md'
-  link.click()
-  URL.revokeObjectURL(url)
+  downloadMarkdown(markdown.value, 'paradone-session.md')
 }
 </script>
 

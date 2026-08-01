@@ -272,6 +272,52 @@ describe('audit and summary', () => {
   })
 })
 
+describe('audit log', () => {
+  it('clicking "View log" replaces Setup with the log screen', async () => {
+    const wrapper = mount(App)
+    const viewLogButton = wrapper.findAll('button').find((b) => b.text() === 'View log')
+    await viewLogButton.trigger('click')
+
+    expect(wrapper.find('#log-heading').exists()).toBe(true)
+    expect(wrapper.find('#task-list-heading').exists()).toBe(false)
+    expect(wrapper.find('#start-heading').exists()).toBe(false)
+  })
+
+  it('clicking Back returns to Setup', async () => {
+    const wrapper = mount(App)
+    await wrapper.findAll('button').find((b) => b.text() === 'View log').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
+
+    expect(wrapper.find('#log-heading').exists()).toBe(false)
+    expect(wrapper.find('#task-list-heading').exists()).toBe(true)
+  })
+
+  it('shows an audit completed in this session, without a reload', async () => {
+    setActiveSession({
+      state: 'audit',
+      timer: null,
+      capture: '',
+      usedPrimer: false,
+      auditProductive: '',
+      auditNotes: '',
+      sessionStartedAt: Date.now(),
+    })
+    const wrapper = mount(App)
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await wrapper.findAll('button').find((b) => b.text() === 'Continue').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Start new session').trigger('click')
+
+    await wrapper.findAll('button').find((b) => b.text() === 'View log').trigger('click')
+    expect(wrapper.findAll('.session-log__entry')).toHaveLength(1)
+  })
+
+  it('reports an empty log when no audits have been recorded', async () => {
+    const wrapper = mount(App)
+    await wrapper.findAll('button').find((b) => b.text() === 'View log').trigger('click')
+    expect(wrapper.text()).toContain('No audits logged yet.')
+  })
+})
+
 describe('interval wiring', () => {
   it('auto-transitions active -> blockEnd as real time passes', async () => {
     vi.useFakeTimers()

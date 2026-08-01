@@ -109,22 +109,15 @@ export function useSessionMachine() {
     state.value = 'audit'
   }
 
-  function submitAudit(answers) {
-    auditProductive.value = answers.auditProductive
-    auditNotes.value = answers.auditNotes ?? ''
-    state.value = 'summary'
-  }
-
-  function skipAudit() {
-    if (state.value !== 'audit') return
-    state.value = 'summary'
-  }
-
-  function startNewSession() {
+  // Appended when the audit is answered or skipped, not when the user later
+  // clicks "Start new session" — otherwise closing the tab at the summary
+  // screen would silently discard the audit.
+  function logSession() {
     const sessions = getSessions()
     sessions.push({
       id: crypto.randomUUID(),
       date: new Date(sessionStartedAt.value).toISOString(),
+      auditedAt: new Date().toISOString(),
       taskListText: getGoalsList().text,
       plannedDuration: prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
@@ -135,7 +128,22 @@ export function useSessionMachine() {
       completed: !stoppedEarly.value,
     })
     setSessions(sessions)
+  }
 
+  function submitAudit(answers) {
+    auditProductive.value = answers.auditProductive
+    auditNotes.value = answers.auditNotes ?? ''
+    logSession()
+    state.value = 'summary'
+  }
+
+  function skipAudit() {
+    if (state.value !== 'audit') return
+    logSession()
+    state.value = 'summary'
+  }
+
+  function startNewSession() {
     state.value = 'setup'
     timer.value = null
     capture.value = ''

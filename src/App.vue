@@ -5,8 +5,9 @@ import TimerDisplay from './components/TimerDisplay.vue'
 import CaptureBox from './components/CaptureBox.vue'
 import AuditPrompt from './components/AuditPrompt.vue'
 import SessionSummary from './components/SessionSummary.vue'
+import SessionLog from './components/SessionLog.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
-import { getGoalsList, setGoalsList } from './lib/storage.js'
+import { getGoalsList, setGoalsList, getSessions } from './lib/storage.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
 
@@ -14,6 +15,16 @@ const taskListText = ref(getGoalsList().text)
 function onTaskListUpdate(text) {
   taskListText.value = text
   setGoalsList({ text, updatedAt: new Date().toISOString() })
+}
+
+// The log is a plain view toggle, not a machine state: useSessionMachine
+// persists every non-setup state to paradone:activeSession, so a 'log' state
+// would rehydrate the user into the log on reload.
+const showLog = ref(false)
+const loggedSessions = ref([])
+function openLog() {
+  loggedSessions.value = getSessions() // re-read on open so it's fresh after an audit
+  showLog.value = true
 }
 
 const {
@@ -46,16 +57,17 @@ useDocumentTitle(state, remainingMs, isPaused)
 
 <template>
   <div class="app">
-    <section v-if="state === 'setup'" aria-labelledby="task-list-heading">
+    <section v-if="state === 'setup' && !showLog" aria-labelledby="task-list-heading">
       <h2 id="task-list-heading">Task List</h2>
       <MarkdownChecklist :model-value="taskListText" @update:model-value="onTaskListUpdate" />
     </section>
 
-    <section v-if="state === 'setup'" aria-labelledby="start-heading">
+    <section v-if="state === 'setup' && !showLog" aria-labelledby="start-heading">
       <h2 id="start-heading">Start</h2>
       <SettingsPanel :prefs="prefs" @update="updatePrefs" />
       <button type="button" @click="startPrimer()">Need help starting? Try a 2-minute primer</button>
       <button type="button" @click="startSession()">Start</button>
+      <button type="button" @click="openLog()">View log</button>
     </section>
 
     <section v-if="state === 'primer'" aria-labelledby="primer-heading">
@@ -122,6 +134,11 @@ useDocumentTitle(state, remainingMs, isPaused)
         :audit-notes="auditNotes"
         @start-new-session="startNewSession"
       />
+    </section>
+
+    <section v-if="showLog" aria-labelledby="log-heading">
+      <h2 id="log-heading">Audit log</h2>
+      <SessionLog :sessions="loggedSessions" @back="showLog = false" />
     </section>
   </div>
 </template>

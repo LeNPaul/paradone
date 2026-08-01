@@ -68,7 +68,6 @@ describe('pausing and stopping an active session', () => {
     machine.startSession(now)
     machine.stopSession(now + 5 * 60 * 1000)
     machine.submitAudit({ auditProductive: 'distracted', auditNotes: '' })
-    machine.startNewSession()
 
     const sessions = getSessions()
     expect(sessions[0].completed).toBe(false)
@@ -223,7 +222,6 @@ describe('audit and summary', () => {
     machine.startSession(now)
     machine.stopSession(now + 5 * 60 * 1000)
     machine.skipAudit()
-    machine.startNewSession()
 
     const sessions = getSessions()
     expect(sessions[0].auditProductive).toBe('')
@@ -231,7 +229,7 @@ describe('audit and summary', () => {
     expect(sessions[0].completed).toBe(false)
   })
 
-  it('startNewSession appends a session matching the data-model shape, then resets to setup', () => {
+  it('submitAudit appends a session matching the data-model shape', () => {
     setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     const machine = useSessionMachine()
     const now = 1000
@@ -241,13 +239,12 @@ describe('audit and summary', () => {
     machine.keepGoing()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
-    machine.startNewSession()
-
     const sessions = getSessions()
     expect(sessions).toHaveLength(1)
     expect(sessions[0]).toEqual({
       id: expect.any(String),
       date: new Date(now).toISOString(),
+      auditedAt: expect.any(String),
       taskListText: '- [ ] draft outline',
       plannedDuration: 25,
       actualDuration: 25,
@@ -258,7 +255,22 @@ describe('audit and summary', () => {
       completed: true,
     })
     expect(sessions[0].actualDuration).toBe(sessions[0].plannedDuration)
+    expect(new Date(sessions[0].auditedAt).toISOString()).toBe(sessions[0].auditedAt)
+  })
 
+  it('startNewSession resets to setup without logging the session a second time', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.capture.value = 'reply to Mai'
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+    expect(getSessions()).toHaveLength(1)
+
+    machine.startNewSession()
+
+    expect(getSessions()).toHaveLength(1)
     expect(machine.state.value).toBe('setup')
     expect(machine.capture.value).toBe('')
     expect(machine.auditProductive.value).toBe('')
@@ -266,8 +278,7 @@ describe('audit and summary', () => {
     expect(getActiveSession()).toBeNull()
   })
 
-  it('startNewSession reads the live Task List at finalization time, not a value cached at session start', () => {
-    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+  it('logs the audit as soon as it is answered, so abandoning the summary screen does not lose it', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
@@ -275,8 +286,21 @@ describe('audit and summary', () => {
     machine.keepGoing()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
+    // No startNewSession() — this is the "closed the tab at the summary" case.
+    expect(getSessions()).toHaveLength(1)
+    expect(getSessions()[0].auditNotes).toBe('done')
+  })
+
+  it('reads the live Task List at audit time, not a value cached at session start', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing()
+
     setGoalsList({ text: '- [x] draft outline\n- [ ] send invoice', updatedAt: null })
-    machine.startNewSession()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
     const sessions = getSessions()
     expect(sessions[0].taskListText).toBe('- [x] draft outline\n- [ ] send invoice')
@@ -290,7 +314,6 @@ describe('audit and summary', () => {
     machine.takeBreak(now + 25 * 60 * 1000)
     machine.tick(now + 25 * 60 * 1000 + 5 * 60 * 1000)
     machine.submitAudit({ auditProductive: 'mixed', auditNotes: '' })
-    machine.startNewSession()
 
     const sessions = getSessions()
     expect(sessions[0].date).toBe(new Date(now).toISOString())
