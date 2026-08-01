@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession } from './lib/storage.js'
+import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { DEFAULT_TITLE } from './lib/title.js'
 
@@ -397,6 +397,106 @@ describe('audit log', () => {
     const wrapper = mount(App)
     await wrapper.findAll('button').find((b) => b.text() === 'View log').trigger('click')
     expect(wrapper.text()).toContain('No audits logged yet.')
+  })
+})
+
+describe('archiving completed tasks', () => {
+  function clickButton(wrapper, label) {
+    return wrapper.findAll('button').find((b) => b.text() === label).trigger('click')
+  }
+
+  function archiveButton(wrapper) {
+    return wrapper.findAll('button').find((b) => b.text().startsWith('Archive completed'))
+  }
+
+  it('sweeps checked tasks off the list, leaving unchecked ones, and persists', async () => {
+    setGoalsList({ text: '- [ ] draft outline\n- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
+
+    await archiveButton(wrapper).trigger('click')
+
+    expect(getGoalsList().text).toBe('- [ ] draft outline')
+    expect(getArchive().archived.map((e) => e.text)).toEqual(['send invoice'])
+    expect(wrapper.get('section[aria-labelledby="task-list-heading"]').text()).not.toContain(
+      'send invoice',
+    )
+  })
+
+  it('offers no archive button when nothing is checked', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const wrapper = mount(App)
+    expect(archiveButton(wrapper)).toBeUndefined()
+  })
+
+  // The whole point of the timestamp: it records the tick, not the sweep.
+  it('records the time a task was ticked, surviving a reload before archiving', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+    const tickedAt = getArchive().completedAt['send invoice']
+    expect(tickedAt).toBeTruthy()
+
+    const reloaded = mount(App)
+    await archiveButton(reloaded).trigger('click')
+
+    const entry = getArchive().archived[0]
+    expect(entry.completedAt).toBe(tickedAt)
+    expect(entry.archivedAt).not.toBe(entry.completedAt)
+  })
+
+  it('forgets the tick time when a task is unticked before archiving', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    // Re-query between toggles: the row's key is a hash of the line, so ticking
+    // it replaces the element and the first handle goes stale.
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+    await wrapper.get('input[type="checkbox"]').setValue(false)
+
+    expect(getGoalsList().text).toBe('- [ ] send invoice')
+    expect(getArchive().completedAt).toEqual({})
+  })
+
+  it('records a tick made during an active session', async () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    setActiveSession({
+      state: 'active',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    const wrapper = mount(App)
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+
+    expect(getArchive().completedAt['draft outline']).toBeTruthy()
+  })
+
+  it('"View archive" replaces Setup and lists archived tasks, Back returns', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+    await archiveButton(wrapper).trigger('click')
+
+    await clickButton(wrapper, 'View archive')
+    expect(wrapper.find('#archive-heading').exists()).toBe(true)
+    expect(wrapper.find('#task-list-heading').exists()).toBe(false)
+    expect(wrapper.text()).toContain('send invoice')
+
+    await clickButton(wrapper, 'Back')
+    expect(wrapper.find('#archive-heading').exists()).toBe(false)
+    expect(wrapper.find('#task-list-heading').exists()).toBe(true)
+  })
+
+  it('reports an empty archive when nothing has been archived', async () => {
+    const wrapper = mount(App)
+    await clickButton(wrapper, 'View archive')
+    expect(wrapper.text()).toContain('No tasks archived yet.')
+  })
+
+  // The archive view is a view toggle, not a machine state — it must never
+  // rehydrate the user into it.
+  it('does not write the archive view into the active session', async () => {
+    const wrapper = mount(App)
+    await clickButton(wrapper, 'View archive')
+    expect(getActiveSession()).toBeNull()
   })
 })
 

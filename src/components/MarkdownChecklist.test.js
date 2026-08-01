@@ -132,4 +132,27 @@ describe('MarkdownChecklist', () => {
     await wrapper.find('input[type="checkbox"]').setValue(true)
     expect(wrapper.emitted('update:modelValue')).toEqual([['- [x] draft outline']])
   })
+
+  it('emits archive when the archive button is clicked, labelled with the checked count', async () => {
+    const wrapper = mountChecklist({
+      modelValue: '- [ ] draft outline\n- [x] send invoice\n- [x] book flights',
+    })
+
+    const button = wrapper.find('.markdown-checklist__archive')
+    expect(button.text()).toBe('Archive completed (2)')
+
+    await button.trigger('click')
+    expect(wrapper.emitted('archive')).toHaveLength(1)
+  })
+
+  it('hides the archive button when nothing is checked', () => {
+    const wrapper = mountChecklist({ modelValue: '- [ ] draft outline\n- ideas for post' })
+    expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
+
+  // Archiving is a Setup-only action; during a session the list is toggle-only.
+  it('hides the archive button when editable is false', () => {
+    const wrapper = mountChecklist({ modelValue: '- [x] send invoice', editable: false })
+    expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
 })

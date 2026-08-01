@@ -69,6 +69,19 @@ export function removeItem(text, hash) {
   return lines.join('\n')
 }
 
+// Drop every checked line, returning the remaining markdown plus the
+// marker-stripped text of what was dropped. Unchecked and plain lines pass
+// through untouched.
+export function removeChecked(text) {
+  const items = text === '' ? [] : parseChecklist(text)
+  const kept = items.filter((item) => !(item.checkbox && item.checked))
+  const removed = items.filter((item) => item.checkbox && item.checked)
+  return {
+    text: kept.map((item) => item.line).join('\n'),
+    removed: removed.map((item) => item.text),
+  }
+}
+
 // Replace a line's text by hash. Checkbox lines keep their marker (and thus
 // their checked state); plain lines are replaced whole. Empty input is a no-op.
 export function editItem(text, hash, newText) {

@@ -4,6 +4,7 @@ import {
   getGoalsList, setGoalsList,
   getSessions, setSessions,
   getActiveSession, setActiveSession,
+  getArchive, setArchive,
 } from './storage.js'
 
 beforeEach(() => {
@@ -79,5 +80,25 @@ describe('activeSession', () => {
     setActiveSession({ startedAt: '2026-07-13T09:15:00Z' })
     setActiveSession(null)
     expect(getActiveSession()).toBeNull()
+  })
+})
+
+describe('archive', () => {
+  it('returns an empty archive when unset', () => {
+    expect(getArchive()).toEqual({ completedAt: {}, archived: [] })
+  })
+
+  it('round-trips a write', () => {
+    const archive = {
+      completedAt: { 'draft outline': '2026-08-01T09:14:00Z' },
+      archived: [{
+        id: 'abc-123',
+        text: 'send invoice',
+        completedAt: '2026-07-30T11:00:00Z',
+        archivedAt: '2026-08-01T09:20:00Z',
+      }],
+    }
+    setArchive(archive)
+    expect(getArchive()).toEqual(archive)
   })
 })

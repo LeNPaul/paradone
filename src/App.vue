@@ -6,16 +6,36 @@ import CaptureBox from './components/CaptureBox.vue'
 import AuditPrompt from './components/AuditPrompt.vue'
 import SessionSummary from './components/SessionSummary.vue'
 import SessionLog from './components/SessionLog.vue'
+import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
-import { getGoalsList, setGoalsList, getSessions } from './lib/storage.js'
+import { getGoalsList, setGoalsList, getSessions, getArchive, setArchive } from './lib/storage.js'
 import { completedSince } from './lib/checklist.js'
+import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
 
 const taskListText = ref(getGoalsList().text)
+const archive = ref(getArchive())
+
+// The single funnel for every Task List write (Setup and Active both route
+// here), so no checkbox tick escapes the completion-time bookkeeping.
 function onTaskListUpdate(text) {
+  const now = new Date().toISOString()
+  archive.value = {
+    ...archive.value,
+    completedAt: syncCompletions(archive.value.completedAt, taskListText.value, text, now),
+  }
+  setArchive(archive.value)
   taskListText.value = text
-  setGoalsList({ text, updatedAt: new Date().toISOString() })
+  setGoalsList({ text, updatedAt: now })
+}
+
+function onArchiveCompleted() {
+  const result = archiveChecked(taskListText.value, archive.value, new Date().toISOString())
+  archive.value = result.archive
+  setArchive(archive.value)
+  taskListText.value = result.taskListText
+  setGoalsList({ text: result.taskListText, updatedAt: new Date().toISOString() })
 }
 
 // The log is a plain view toggle, not a machine state: useSessionMachine
@@ -27,6 +47,8 @@ function openLog() {
   loggedSessions.value = getSessions() // re-read on open so it's fresh after an audit
   showLog.value = true
 }
+
+const showArchive = ref(false)
 
 const {
   state,
@@ -70,12 +92,22 @@ useDocumentTitle(state, remainingMs, isPaused)
 
 <template>
   <div class="app">
-    <section v-if="state === 'setup' && !showLog" aria-labelledby="task-list-heading">
+    <section
+      v-if="state === 'setup' && !showLog && !showArchive"
+      aria-labelledby="task-list-heading"
+    >
       <h2 id="task-list-heading">Task List</h2>
-      <MarkdownChecklist :model-value="taskListText" @update:model-value="onTaskListUpdate" />
+      <MarkdownChecklist
+        :model-value="taskListText"
+        @update:model-value="onTaskListUpdate"
+        @archive="onArchiveCompleted"
+      />
     </section>
 
-    <section v-if="state === 'setup' && !showLog" aria-labelledby="start-heading">
+    <section
+      v-if="state === 'setup' && !showLog && !showArchive"
+      aria-labelledby="start-heading"
+    >
       <h2 id="start-heading">Start</h2>
       <SettingsPanel :prefs="prefs" @update="updatePrefs" />
       <button type="button" @click="openPrimerSetup()">
@@ -83,6 +115,7 @@ useDocumentTitle(state, remainingMs, isPaused)
       </button>
       <button type="button" @click="startSession()">Start</button>
       <button type="button" @click="openLog()">View log</button>
+      <button type="button" @click="showArchive = true">View archive</button>
     </section>
 
     <section v-if="state === 'primerSetup'" aria-labelledby="primer-setup-heading">
@@ -168,6 +201,11 @@ useDocumentTitle(state, remainingMs, isPaused)
     <section v-if="showLog" aria-labelledby="log-heading">
       <h2 id="log-heading">Audit log</h2>
       <SessionLog :sessions="loggedSessions" @back="showLog = false" />
+    </section>
+
+    <section v-if="showArchive" aria-labelledby="archive-heading">
+      <h2 id="archive-heading">Archived tasks</h2>
+      <ArchiveView :entries="archive.archived" @back="showArchive = false" />
     </section>
   </div>
 </template>

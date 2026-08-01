@@ -6,6 +6,7 @@ const KEYS = {
   goalsList: 'paradone:goalsList',
   sessions: 'paradone:sessions',
   activeSession: 'paradone:activeSession',
+  archive: 'paradone:archive',
 }
 
 function readJSON(key, fallback) {
@@ -48,4 +49,11 @@ export function getActiveSession() {
 }
 export function setActiveSession(activeSession) {
   writeJSON(KEYS.activeSession, activeSession)
+}
+
+export function getArchive() {
+  return readJSON(KEYS.archive, { completedAt: {}, archived: [] })
+}
+export function setArchive(archive) {
+  writeJSON(KEYS.archive, archive)
 }

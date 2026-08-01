@@ -18,11 +18,13 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'archive'])
 
 // An empty string parses to a single blank line; render nothing for it so the
 // list shows no phantom row (and no stray edit/delete controls) when empty.
 const items = computed(() => (props.modelValue === '' ? [] : parseChecklist(props.modelValue)))
+
+const checkedCount = computed(() => items.value.filter((item) => item.checked).length)
 
 function onToggle(hash) {
   emit('update:modelValue', toggleItem(props.modelValue, hash))
@@ -73,9 +75,17 @@ function onModalSubmit(text) {
       </span>
     </li>
   </ul>
-  <button v-if="editable" type="button" class="markdown-checklist__add" @click="openAdd">
-    + Add Task
-  </button>
+  <div v-if="editable" class="markdown-checklist__actions">
+    <button type="button" class="markdown-checklist__add" @click="openAdd">+ Add Task</button>
+    <button
+      v-if="checkedCount"
+      type="button"
+      class="markdown-checklist__archive"
+      @click="emit('archive')"
+    >
+      Archive completed ({{ checkedCount }})
+    </button>
+  </div>
   <TaskModal
     v-if="editable"
     :open="modalOpen"
@@ -113,7 +123,9 @@ function onModalSubmit(text) {
   gap: 0.25rem;
 }
 
-.markdown-checklist__add {
+.markdown-checklist__actions {
+  display: flex;
+  gap: 0.5rem;
   margin-top: 0.5rem;
 }
 

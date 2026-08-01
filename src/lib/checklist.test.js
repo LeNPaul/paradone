@@ -4,6 +4,7 @@ import {
   toggleItem,
   addItem,
   removeItem,
+  removeChecked,
   editItem,
   completedSince,
 } from './checklist.js'
@@ -108,6 +109,37 @@ describe('removeItem', () => {
   it('returns the text unchanged when the hash is not found', () => {
     const text = '- [ ] draft outline'
     expect(removeItem(text, 'nonexistent')).toBe(text)
+  })
+})
+
+describe('removeChecked', () => {
+  it('drops checked lines and reports their stripped text', () => {
+    const text = '- [ ] draft outline\n- [x] send invoice\n- [x] book flights'
+    expect(removeChecked(text)).toEqual({
+      text: '- [ ] draft outline',
+      removed: ['send invoice', 'book flights'],
+    })
+  })
+
+  it('leaves plain non-checkbox lines in place', () => {
+    const text = '- [x] send invoice\n- ideas for post'
+    expect(removeChecked(text)).toEqual({ text: '- ideas for post', removed: ['send invoice'] })
+  })
+
+  it('empties the list when everything is checked', () => {
+    expect(removeChecked('- [x] send invoice\n- [x] book flights')).toEqual({
+      text: '',
+      removed: ['send invoice', 'book flights'],
+    })
+  })
+
+  it('is a no-op on a list with nothing checked', () => {
+    const text = '- [ ] draft outline\n- ideas for post'
+    expect(removeChecked(text)).toEqual({ text, removed: [] })
+  })
+
+  it('is a no-op on an empty list', () => {
+    expect(removeChecked('')).toEqual({ text: '', removed: [] })
   })
 })
 
