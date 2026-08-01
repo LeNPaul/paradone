@@ -51,6 +51,9 @@ function entryMarkdown(session) {
     `- Duration: ${session.plannedDuration} min planned / ${session.actualDuration} min actual`,
     `- Focus: ${session.auditProductive ? productiveLabel(session.auditProductive) : `_${SKIPPED_LABEL}_`}`,
   ]
+  if (session.primerIntent) {
+    lines.push(`- Primer: ${session.primerIntent}`)
+  }
   if (session.auditProductive) {
     lines.push(`- What got done: ${session.auditNotes || '_(none noted)_'}`)
   }

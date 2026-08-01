@@ -29,6 +29,65 @@ describe('setup', () => {
   })
 })
 
+describe('primer setup', () => {
+  // Clicking the primer affordance at Setup lands on the breakdown screen.
+  async function openPrimerSetup(wrapper) {
+    const primerButton = wrapper.findAll('button').find((b) => b.text().includes('2-minute primer'))
+    await primerButton.trigger('click')
+  }
+
+  it('clicking the primer button asks for a 2-minute breakdown instead of starting the countdown', async () => {
+    const wrapper = mount(App)
+    await openPrimerSetup(wrapper)
+
+    expect(wrapper.find('#primer-setup-heading').exists()).toBe(true)
+    expect(wrapper.find('#primer-intent').exists()).toBe(true)
+    expect(wrapper.find('#primer-heading').exists()).toBe(false)
+  })
+
+  it('"Start 2 minutes" stays disabled until the breakdown has real text', async () => {
+    const wrapper = mount(App)
+    await openPrimerSetup(wrapper)
+    const startButton = () => wrapper.findAll('button').find((b) => b.text() === 'Start 2 minutes')
+
+    expect(startButton().element.disabled).toBe(true)
+    await wrapper.get('#primer-intent').setValue('   ')
+    expect(startButton().element.disabled).toBe(true)
+    await wrapper.get('#primer-intent').setValue('open the doc')
+    expect(startButton().element.disabled).toBe(false)
+  })
+
+  it('starting the primer shows the countdown with the breakdown alongside it', async () => {
+    const wrapper = mount(App)
+    await openPrimerSetup(wrapper)
+    await wrapper.get('#primer-intent').setValue('open the doc')
+    await wrapper.findAll('button').find((b) => b.text() === 'Start 2 minutes').trigger('click')
+
+    expect(wrapper.find('#primer-heading').exists()).toBe(true)
+    expect(wrapper.get('section[aria-labelledby="primer-heading"]').text()).toContain('open the doc')
+  })
+
+  it('Back returns to Setup and discards the draft', async () => {
+    const wrapper = mount(App)
+    await openPrimerSetup(wrapper)
+    await wrapper.get('#primer-intent').setValue('open the doc')
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
+
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
+    await openPrimerSetup(wrapper)
+    expect(wrapper.get('#primer-intent').element.value).toBe('')
+  })
+
+  it('shows the breakdown during the active block, and nothing when the session skipped the primer', () => {
+    const timer = { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true }
+    setActiveSession({ state: 'active', timer, primerIntent: 'open the doc' })
+    expect(mount(App).get('section[aria-labelledby="active-heading"]').text()).toContain('open the doc')
+
+    setActiveSession({ state: 'active', timer, primerIntent: '' })
+    expect(mount(App).get('section[aria-labelledby="active-heading"]').text()).not.toContain('Primer:')
+  })
+})
+
 // Add a task at Setup through the Add-Task modal.
 async function addTaskViaModal(wrapper, text) {
   const addButton = wrapper.findAll('button').find((b) => b.text().includes('Add Task'))

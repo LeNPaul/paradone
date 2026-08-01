@@ -95,6 +95,11 @@ describe('buildLogMarkdown', () => {
     expect(md).not.toContain('What got done')
   })
 
+  it('includes the 2-minute breakdown when the session used the primer, and omits the line otherwise', () => {
+    expect(buildLogMarkdown([session({ primerIntent: 'open the doc' })])).toContain('- Primer: open the doc')
+    expect(buildLogMarkdown([session()])).not.toContain('- Primer:')
+  })
+
   it('notes an answered audit that was left without notes', () => {
     const md = buildLogMarkdown([session({ auditNotes: '' })])
     expect(md).toContain('- What got done: _(none noted)_')

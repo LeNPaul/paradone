@@ -35,6 +35,13 @@ describe('SessionLog', () => {
     expect(text).toContain('got the outline done')
   })
 
+  it('shows the 2-minute breakdown on entries that used the primer', () => {
+    const wrapper = mount(SessionLog, {
+      props: { sessions: [session({ primerIntent: 'open the doc' })] },
+    })
+    expect(wrapper.text()).toContain('Primer: open the doc')
+  })
+
   it('lists entries newest first regardless of stored order', () => {
     const wrapper = mount(SessionLog, {
       props: {

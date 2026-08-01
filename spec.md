@@ -19,12 +19,13 @@ The user arrives via paradone.com's productivity technique reference content and
 
 ## 3. Key screens (single-page state machine)
 
-There is no routing. One page, seven states.
+There is no routing. One page, eight states.
 
 | State | Purpose |
 |---|---|
 | **Setup** | Task List (persistent, editable, checkbox-aware) — add/edit/delete tasks + duration settings + optional 2-minute primer link + Start |
-| **Primer** *(optional)* | 2-minute timer, then: commit to a full session, or stop here |
+| **Primer setup** *(optional)* | Break the task down into something doable in 2 minutes, typed into a free-text area, then start the countdown |
+| **Primer** *(optional)* | 2-minute timer showing that breakdown, then: commit to a full session, or stop here |
 | **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea), capture scratchpad always available |
 | **Block end** | Bell → "take the break, or keep going?" |
 | **Break** *(skippable)* | Break countdown |
@@ -35,7 +36,7 @@ There is no routing. One page, seven states.
 
 - **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, not a per-session diff.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
-- **2-minute primer** is optional and skippable. Surfaced as a "need help starting?" affordance, never a required gate.
+- **2-minute primer** is optional and skippable — surfaced as a "need help starting?" affordance, never a gate on starting work (plain **Start** never touches it). Choosing it first asks for a breakdown: what can you do in 2 minutes, in a free-text area. That text is required before the countdown starts — an empty primer defeats the point of the step — and it stays visible through the primer and the full focus block, then lands in the session record as `primerIntent`.
 - **Audit log** is a read-only view of every past audit, newest first, reached from a "View log" button at Setup and dismissed with "Back". It is not a machine state — it's a view toggle, so it never lands in `paradone:activeSession`. Each entry shows timestamps, planned/actual duration, focus rating and audit notes; skipped audits are listed and marked as such. One "Download log" button exports the whole log as markdown — there is no per-entry download. The session record is appended when the audit is answered or skipped, *not* when the user starts the next session, so closing the tab at Summary cannot lose an audit. Chronological only — aggregates and trends stay deferred (§6).
 
 ## 4. Data model
@@ -63,6 +64,7 @@ There is no routing. One page, seven states.
   actualDuration: 25,
   capture: "reply to Mai re: weekend\ncheck the deploy logs",   // freeform scratchpad text
   usedPrimer: false,
+  primerIntent: "open the doc and write one sentence",   // the 2-minute breakdown, "" when no primer was used
   auditProductive: "focused" | "distracted" | "mixed",
   auditNotes: "got the outline done, tabbed out twice"
 }]

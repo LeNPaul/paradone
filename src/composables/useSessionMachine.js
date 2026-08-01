@@ -1,7 +1,7 @@
-// useSessionMachine.js — drives the single-page state machine (setup | primer
-// | active | blockEnd | break | audit | summary), ticking timer.js countdowns
-// and persisting the in-progress block to paradone:activeSession so a reload
-// doesn't lose it.
+// useSessionMachine.js — drives the single-page state machine (setup |
+// primerSetup | primer | active | blockEnd | break | audit | summary), ticking
+// timer.js countdowns and persisting the in-progress block to
+// paradone:activeSession so a reload doesn't lose it.
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { createTimer, start, pause, resume, getRemainingMs, isFinished } from '../lib/timer.js'
 import {
@@ -29,6 +29,7 @@ export function useSessionMachine() {
   const sessionStartedAt = ref(stored?.sessionStartedAt ?? null)
   const now = ref(Date.now())
   const primerSkipped = ref(stored?.primerSkipped ?? false)
+  const primerIntent = ref(stored?.primerIntent ?? '')
   const stoppedEarly = ref(stored?.stoppedEarly ?? false)
   const actualDurationMs = ref(stored?.actualDurationMs ?? null)
 
@@ -57,11 +58,22 @@ export function useSessionMachine() {
     timer.value = start(createTimer(prefs.workDuration), at)
     sessionStartedAt.value = at
     usedPrimer.value = false
+    primerIntent.value = ''
     state.value = 'active'
+  }
+
+  function openPrimerSetup() {
+    state.value = 'primerSetup'
+  }
+
+  function cancelPrimerSetup() {
+    primerIntent.value = ''
+    state.value = 'setup'
   }
 
   function startPrimer(at = Date.now()) {
     primerSkipped.value = false
+    primerIntent.value = primerIntent.value.trim()
     timer.value = start(createTimer(PRIMER_DURATION_MINUTES), at)
     state.value = 'primer'
   }
@@ -80,6 +92,7 @@ export function useSessionMachine() {
   function stopPrimer() {
     timer.value = null
     capture.value = ''
+    primerIntent.value = ''
     state.value = 'setup'
   }
 
@@ -123,6 +136,7 @@ export function useSessionMachine() {
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       capture: capture.value,
       usedPrimer: usedPrimer.value,
+      primerIntent: primerIntent.value,
       auditProductive: auditProductive.value,
       auditNotes: auditNotes.value,
       completed: !stoppedEarly.value,
@@ -148,6 +162,7 @@ export function useSessionMachine() {
     timer.value = null
     capture.value = ''
     usedPrimer.value = false
+    primerIntent.value = ''
     auditProductive.value = ''
     auditNotes.value = ''
     sessionStartedAt.value = null
@@ -165,6 +180,7 @@ export function useSessionMachine() {
       auditNotes,
       sessionStartedAt,
       primerSkipped,
+      primerIntent,
       stoppedEarly,
       actualDurationMs,
     ],
@@ -181,6 +197,7 @@ export function useSessionMachine() {
               auditNotes: auditNotes.value,
               sessionStartedAt: sessionStartedAt.value,
               primerSkipped: primerSkipped.value,
+              primerIntent: primerIntent.value,
               stoppedEarly: stoppedEarly.value,
               actualDurationMs: actualDurationMs.value,
             },
@@ -202,10 +219,13 @@ export function useSessionMachine() {
     prefs,
     capture,
     usedPrimer,
+    primerIntent,
     auditProductive,
     auditNotes,
     updatePrefs,
     startSession,
+    openPrimerSetup,
+    cancelPrimerSetup,
     startPrimer,
     skipPrimerCountdown,
     commitFullSession,

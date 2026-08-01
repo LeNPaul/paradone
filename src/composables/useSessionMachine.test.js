@@ -99,6 +99,86 @@ describe('block end', () => {
 })
 
 describe('primer', () => {
+  it('openPrimerSetup moves setup -> primerSetup without starting a countdown', () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    expect(machine.state.value).toBe('primerSetup')
+    expect(machine.remainingMs.value).toBe(0)
+  })
+
+  it('cancelPrimerSetup returns to setup and discards the drafted breakdown', () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    machine.primerIntent.value = 'open the doc'
+    machine.cancelPrimerSetup()
+    expect(machine.state.value).toBe('setup')
+    expect(machine.primerIntent.value).toBe('')
+  })
+
+  it('startPrimer trims the breakdown text', () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    machine.primerIntent.value = '  open the doc\n'
+    machine.startPrimer(1000)
+    expect(machine.primerIntent.value).toBe('open the doc')
+  })
+
+  it('the breakdown survives commitFullSession into the active block', () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    machine.primerIntent.value = 'open the doc'
+    machine.startPrimer(1000)
+    machine.commitFullSession(1000 + 2 * 60 * 1000)
+    expect(machine.state.value).toBe('active')
+    expect(machine.primerIntent.value).toBe('open the doc')
+  })
+
+  it('stopPrimer and startNewSession each clear the breakdown', () => {
+    const stopped = useSessionMachine()
+    stopped.primerIntent.value = 'open the doc'
+    stopped.startPrimer(1000)
+    stopped.stopPrimer()
+    expect(stopped.primerIntent.value).toBe('')
+
+    const restarted = useSessionMachine()
+    restarted.primerIntent.value = 'open the doc'
+    restarted.startPrimer(1000)
+    restarted.commitFullSession(1000)
+    restarted.startNewSession()
+    expect(restarted.primerIntent.value).toBe('')
+  })
+
+  it('a session started directly carries no breakdown', () => {
+    const machine = useSessionMachine()
+    machine.primerIntent.value = 'open the doc'
+    machine.startSession(1000)
+    expect(machine.primerIntent.value).toBe('')
+  })
+
+  it('logs the breakdown with the audited session', () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    machine.primerIntent.value = 'open the doc'
+    machine.startPrimer(1000)
+    machine.commitFullSession(1000 + 2 * 60 * 1000)
+    machine.stopSession(1000 + 7 * 60 * 1000)
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: '' })
+
+    expect(getSessions()[0].primerIntent).toBe('open the doc')
+  })
+
+  it('persists the breakdown so a reload during primerSetup keeps the draft', async () => {
+    const machine = useSessionMachine()
+    machine.openPrimerSetup()
+    machine.primerIntent.value = 'open the doc'
+    await nextTick()
+    expect(getActiveSession().primerIntent).toBe('open the doc')
+
+    const reloaded = useSessionMachine()
+    expect(reloaded.state.value).toBe('primerSetup')
+    expect(reloaded.primerIntent.value).toBe('open the doc')
+  })
+
   it('startPrimer moves setup -> primer, and showPrimerChoice is false until the countdown ends', () => {
     const machine = useSessionMachine()
     const now = 1000
@@ -250,6 +330,7 @@ describe('audit and summary', () => {
       actualDuration: 25,
       capture: 'reply to Mai',
       usedPrimer: false,
+      primerIntent: '',
       auditProductive: 'focused',
       auditNotes: 'done',
       completed: true,
@@ -336,6 +417,7 @@ describe('activeSession persistence', () => {
       auditNotes: '',
       sessionStartedAt: 1000,
       primerSkipped: false,
+      primerIntent: '',
       stoppedEarly: false,
       actualDurationMs: null,
     })

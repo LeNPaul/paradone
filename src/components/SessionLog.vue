@@ -32,6 +32,7 @@ function onDownload() {
         <h3>{{ formatDateTime(entry.auditedAt ?? entry.date) }}</h3>
         <p>Started: {{ formatTime(entry.date) }} · Audited: {{ formatTime(entry.auditedAt ?? entry.date) }}</p>
         <p>{{ entry.plannedDuration }} min planned / {{ entry.actualDuration }} min actual</p>
+        <p v-if="entry.primerIntent">Primer: {{ entry.primerIntent }}</p>
         <p>{{ productiveLabel(entry.auditProductive) }}</p>
         <p v-if="entry.auditProductive && entry.auditNotes">{{ entry.auditNotes }}</p>
       </li>

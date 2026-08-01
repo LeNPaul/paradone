@@ -34,10 +34,13 @@ const {
   showPrimerChoice,
   prefs,
   capture,
+  primerIntent,
   auditProductive,
   auditNotes,
   updatePrefs,
   startSession,
+  openPrimerSetup,
+  cancelPrimerSetup,
   startPrimer,
   skipPrimerCountdown,
   commitFullSession,
@@ -65,13 +68,26 @@ useDocumentTitle(state, remainingMs, isPaused)
     <section v-if="state === 'setup' && !showLog" aria-labelledby="start-heading">
       <h2 id="start-heading">Start</h2>
       <SettingsPanel :prefs="prefs" @update="updatePrefs" />
-      <button type="button" @click="startPrimer()">Need help starting? Try a 2-minute primer</button>
+      <button type="button" @click="openPrimerSetup()">
+        Need help starting? Try a 2-minute primer
+      </button>
       <button type="button" @click="startSession()">Start</button>
       <button type="button" @click="openLog()">View log</button>
     </section>
 
+    <section v-if="state === 'primerSetup'" aria-labelledby="primer-setup-heading">
+      <h2 id="primer-setup-heading">Primer</h2>
+      <label for="primer-intent">What can you do in 2 minutes?</label>
+      <textarea id="primer-intent" v-model="primerIntent" />
+      <button type="button" :disabled="!primerIntent.trim()" @click="startPrimer()">
+        Start 2 minutes
+      </button>
+      <button type="button" @click="cancelPrimerSetup()">Back</button>
+    </section>
+
     <section v-if="state === 'primer'" aria-labelledby="primer-heading">
       <h2 id="primer-heading">Primer</h2>
+      <p>{{ primerIntent }}</p>
       <TimerDisplay :remaining-ms="remainingMs" variant="primer" />
       <button v-if="!showPrimerChoice" type="button" @click="skipPrimerCountdown()">Skip ahead</button>
       <div v-else>
@@ -83,6 +99,7 @@ useDocumentTitle(state, remainingMs, isPaused)
 
     <section v-if="state === 'active'" aria-labelledby="active-heading">
       <h2 id="active-heading">Focus block</h2>
+      <p v-if="primerIntent">Primer: {{ primerIntent }}</p>
       <TimerDisplay :remaining-ms="remainingMs" variant="session" />
       <button v-if="!isPaused" type="button" @click="pauseSession()">Pause</button>
       <button v-else type="button" @click="resumeSession()">Resume</button>
