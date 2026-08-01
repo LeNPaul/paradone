@@ -8,6 +8,18 @@ describe('AuditPrompt', () => {
     expect(wrapper.text()).toContain('draft outline')
   })
 
+  it('shows the captures recorded during the session', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: '', capture: 'tabbed out to check email' },
+    })
+    expect(wrapper.text()).toContain('tabbed out to check email')
+  })
+
+  it('shows a fallback when no captures were recorded', () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '', capture: '   ' } })
+    expect(wrapper.text()).toContain('No captures recorded.')
+  })
+
   it('renders exactly three quick-select options', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
     const radios = wrapper.findAll('input[type="radio"]')

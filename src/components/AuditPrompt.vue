@@ -8,6 +8,10 @@ defineProps({
     type: String,
     default: '',
   },
+  capture: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['submit', 'skip'])
@@ -25,6 +29,11 @@ function onSubmit() {
     <section aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading">Task list</h3>
       <MarkdownChecklist :model-value="taskListText" :editable="false" />
+    </section>
+
+    <section aria-labelledby="audit-capture-heading">
+      <h3 id="audit-capture-heading">Captures</h3>
+      <pre>{{ capture.trim() || 'No captures recorded.' }}</pre>
     </section>
 
     <div>

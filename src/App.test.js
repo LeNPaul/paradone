@@ -181,12 +181,12 @@ describe('capture box', () => {
 })
 
 describe('audit and summary', () => {
-  it('shows the audit prompt with the current Task List when state is audit', () => {
+  it('shows the audit prompt with the current Task List and session captures when state is audit', () => {
     setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     setActiveSession({
       state: 'audit',
       timer: null,
-      capture: '',
+      capture: 'tabbed out to check email',
       usedPrimer: false,
       auditProductive: '',
       auditNotes: '',
@@ -195,6 +195,7 @@ describe('audit and summary', () => {
     const wrapper = mount(App)
     expect(wrapper.find('#audit-heading').exists()).toBe(true)
     expect(wrapper.text()).toContain('draft outline')
+    expect(wrapper.text()).toContain('tabbed out to check email')
   })
 
   it('submitting the audit prompt transitions to the summary screen', async () => {
