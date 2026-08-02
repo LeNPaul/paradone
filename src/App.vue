@@ -397,17 +397,19 @@ useTheme(prefs, updatePrefs)
   fill: var(--ink-secondary);
 }
 
-/* Icon-only, so this can use --accent rather than the darker --accent-strong:
-   the visible content is a 2rem glyph (needs 3:1, has 4.0:1), not label text. */
+/* The solid ink circle from the monochrome reference — the app's one heaviest
+   element, carrying a 2rem glyph rather than label text. */
 .transport__button--primary {
   width: 4.5rem;
   height: 4.5rem;
   background: var(--accent);
 }
 
+/* Dims rather than darkens: --accent and --accent-strong are the same ink under
+   monochrome, so a background swap would be a no-op. */
 .transport__button--primary:hover:not(:disabled) {
-  background: var(--accent-strong);
-  opacity: 1;
+  background: var(--accent);
+  opacity: 0.85;
 }
 
 .transport__button--primary svg {

@@ -9,9 +9,9 @@ function offsetOf(wrapper) {
 }
 
 describe('TimerDisplay ring', () => {
-  it('draws a full arc when nothing has elapsed', () => {
+  it('draws no arc when nothing has elapsed', () => {
     const wrapper = mount(TimerDisplay, { props: { remainingMs: 60000, totalMs: 60000 } })
-    expect(offsetOf(wrapper)).toBeCloseTo(0, 5)
+    expect(offsetOf(wrapper)).toBeCloseTo(CIRCUMFERENCE, 5)
   })
 
   it('draws half an arc at the halfway point', () => {
@@ -19,24 +19,24 @@ describe('TimerDisplay ring', () => {
     expect(offsetOf(wrapper)).toBeCloseTo(CIRCUMFERENCE / 2, 5)
   })
 
-  it('draws no arc when fully elapsed', () => {
+  it('draws a full arc when fully elapsed', () => {
     const wrapper = mount(TimerDisplay, { props: { remainingMs: 0, totalMs: 60000 } })
-    expect(offsetOf(wrapper)).toBeCloseTo(CIRCUMFERENCE, 5)
+    expect(offsetOf(wrapper)).toBeCloseTo(0, 5)
   })
 
-  // A zero total would divide by zero; the ring should read full, not blank.
+  // A zero total would divide by zero; the ring should read blank, not full.
   it('treats a zero total as not started', () => {
     const wrapper = mount(TimerDisplay, { props: { remainingMs: 0, totalMs: 0 } })
-    expect(offsetOf(wrapper)).toBe(0)
+    expect(offsetOf(wrapper)).toBe(CIRCUMFERENCE)
   })
 
   // remainingMs can briefly exceed totalMs on resume, or go negative on overrun.
   it('clamps out-of-range remaining values', () => {
     const over = mount(TimerDisplay, { props: { remainingMs: 90000, totalMs: 60000 } })
-    expect(offsetOf(over)).toBeCloseTo(0, 5)
+    expect(offsetOf(over)).toBeCloseTo(CIRCUMFERENCE, 5)
 
     const under = mount(TimerDisplay, { props: { remainingMs: -5000, totalMs: 60000 } })
-    expect(offsetOf(under)).toBeCloseTo(CIRCUMFERENCE, 5)
+    expect(offsetOf(under)).toBeCloseTo(0, 5)
   })
 
   it('still renders the formatted time and an optional label', () => {

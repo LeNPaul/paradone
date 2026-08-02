@@ -32,15 +32,17 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 const formatted = computed(() => formatMs(props.remainingMs))
 
 // 0 = nothing elapsed, 1 = fully elapsed. A zero total would divide by zero;
-// treat it as "not started" so the ring reads full rather than blank.
+// treat it as "not started", which reads as a blank ring.
 const elapsedFraction = computed(() => {
   if (props.totalMs <= 0) return 0
   const remaining = Math.min(Math.max(props.remainingMs, 0), props.totalMs)
   return 1 - remaining / props.totalMs
 })
 
-// The arc shrinks as time is spent, so the ring drains clockwise.
-const dashOffset = computed(() => CIRCUMFERENCE * elapsedFraction.value)
+// The arc covers the elapsed share of the circle and grows clockwise from twelve
+// o'clock, so a complete ring means the block is done. An offset of the full
+// circumference hides it; zero draws it whole.
+const dashOffset = computed(() => CIRCUMFERENCE * (1 - elapsedFraction.value))
 </script>
 
 <template>
@@ -94,6 +96,10 @@ const dashOffset = computed(() => CIRCUMFERENCE * elapsedFraction.value)
 
 .timer-display__progress {
   stroke: var(--accent);
+  /* Unconditional. A round cap can't paint an arc shorter than the stroke, so
+     the ring begins as a dot at twelve o'clock and the arc grows out of it.
+     That starting dot is intended — squaring it off to hide it introduces a
+     visible jump later, when the arc outgrows the cap. */
   stroke-linecap: round;
   transition: stroke-dashoffset var(--duration) linear;
 }

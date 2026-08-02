@@ -139,11 +139,16 @@ input[type='radio'] {
   border-color: transparent;
   color: var(--accent-strong);
   padding: var(--space-2) var(--space-2);
+  /* Blue used to be what marked these as clickable. Monochrome has no hue to
+     spend, so the underline carries the affordance — and unlike a hover state
+     it still works on touch. */
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 
 .btn-quiet:hover:not(:disabled) {
   background: none;
-  text-decoration: underline;
+  opacity: 0.7;
 }
 
 .list-reset {

@@ -25,16 +25,19 @@
   --ink: light-dark(#000000, #ffffff);
   --ink-secondary: light-dark(#48484a, #aeaeb2);
   --ink-muted: light-dark(#8a8a8e, #8e8e93);
-  --ink-on-accent: #ffffff;
+  /* Flips with the theme: the primary action is black in light and white in
+     dark, so its label has to invert too. */
+  --ink-on-accent: light-dark(#ffffff, #000000);
 
-  /* Accent — the only color in the app. Ring, checked boxes, primary action.
-     Two values because one blue can't do both jobs accessibly: --accent is a
-     UI-component color (needs 3:1, has 4.0:1 on white), --accent-strong backs
-     white label text (needs 4.5:1, has 5.7:1). The brighter dark-mode blue is
-     4.7:1 against --surface, so it can do both jobs alone. */
-  --accent: light-dark(#007aff, #0a84ff);
-  --accent-strong: light-dark(#0063cc, #0a84ff);
-  --accent-track: light-dark(rgba(0, 122, 255, 0.18), rgba(10, 132, 255, 0.25));
+  /* Accent — not a color. Ring, checked boxes, primary action. Two tokens are
+     kept because they still mean different things (--accent is a UI-component
+     color, --accent-strong backs label text), but pure ink clears both the 3:1
+     and 4.5:1 bars, so under monochrome they coincide.
+     --accent-track is the remaining portion of the timer ring: it is the whole
+     ring at the start of a block and is covered as the arc fills. */
+  --accent: light-dark(#000000, #ffffff);
+  --accent-strong: light-dark(#000000, #ffffff);
+  --accent-track: light-dark(#e5e5ea, #2c2c2e);
 
   /* Type */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
