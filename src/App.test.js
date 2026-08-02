@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, getSessions, setSessions } from './lib/storage.js'
+import { setActiveSession, setPrefs, getPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, getSessions, setSessions } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { DEFAULT_TITLE } from './lib/title.js'
 
@@ -12,12 +12,17 @@ beforeEach(() => {
 })
 
 describe('setup', () => {
-  it('shows the Setup screen with duration inputs, primer button, and Start button', () => {
+  it('shows the Setup screen with the primer button and Start button', () => {
     const wrapper = mount(App)
-    expect(wrapper.get('#work-duration').element.value).toBe('25')
-    expect(wrapper.get('#break-duration').element.value).toBe('5')
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
     expect(wrapper.text()).toContain('2-minute primer')
     expect(wrapper.get('button[type="button"]').exists()).toBe(true)
+  })
+
+  it('keeps the duration inputs out of Setup — they live behind the gear', () => {
+    const wrapper = mount(App)
+    expect(wrapper.find('#work-duration').exists()).toBe(false)
+    expect(wrapper.find('#break-duration').exists()).toBe(false)
   })
 
   it('clicking Start renders the Active section with a TimerDisplay', async () => {
@@ -26,6 +31,100 @@ describe('setup', () => {
     await startButton.trigger('click')
     expect(wrapper.find('#active-heading').exists()).toBe(true)
     expect(wrapper.findComponent(TimerDisplay).exists()).toBe(true)
+  })
+})
+
+describe('settings view', () => {
+  function openSettings(wrapper) {
+    return wrapper.findAll('button').find((b) => b.text() === 'Settings').trigger('click')
+  }
+
+  function activeSession() {
+    setActiveSession({
+      state: 'active',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+  }
+
+  it('the gear opens the settings view over Setup, and Back returns', async () => {
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    expect(wrapper.find('#settings-heading').exists()).toBe(true)
+    expect(wrapper.get('#work-duration').element.value).toBe('25')
+    expect(wrapper.get('#break-duration').element.value).toBe('5')
+    expect(wrapper.find('#start-heading').exists()).toBe(false)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
+    expect(wrapper.find('#settings-heading').exists()).toBe(false)
+  })
+
+  it('editing a duration persists it to prefs', async () => {
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    const work = wrapper.get('#work-duration')
+    await work.setValue(50)
+    await work.trigger('change')
+
+    expect(getPrefs().workDuration).toBe(50)
+    expect(getPrefs().breakDuration).toBe(5)
+  })
+
+  it('the new duration drives the next session', async () => {
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+    const work = wrapper.get('#work-duration')
+    await work.setValue(50)
+    await work.trigger('change')
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Start').trigger('click')
+    expect(wrapper.findComponent(TimerDisplay).props('totalMs')).toBe(50 * 60 * 1000)
+  })
+
+  it('is reachable mid-session, replacing the timer until Back', async () => {
+    activeSession()
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    expect(wrapper.find('#settings-heading').exists()).toBe(true)
+    expect(wrapper.find('#active-heading').exists()).toBe(false)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Back').trigger('click')
+    expect(wrapper.find('#active-heading').exists()).toBe(true)
+  })
+
+  it('holds the theme toggle, which is not on any other screen', async () => {
+    const wrapper = mount(App)
+    expect(wrapper.findAll('button').map((b) => b.text())).not.toContain('Dark')
+
+    await openSettings(wrapper)
+    const dark = wrapper.findAll('button').find((b) => b.text() === 'Dark')
+    expect(wrapper.findAll('button').map((b) => b.text())).toContain('Light')
+    await dark.trigger('click')
+
+    expect(document.documentElement.dataset.theme).toBe('dark')
+    expect(getPrefs().theme).toBe('dark')
+  })
+
+  it('closes itself when the block ends, so the prompt is not swallowed', async () => {
+    vi.useFakeTimers()
+    try {
+      activeSession()
+      const wrapper = mount(App)
+      await openSettings(wrapper)
+      expect(wrapper.find('#settings-heading').exists()).toBe(true)
+
+      await vi.advanceTimersByTimeAsync(25 * 60 * 1000 + 500)
+      await flushPromises()
+
+      expect(wrapper.find('#settings-heading').exists()).toBe(false)
+      expect(wrapper.find('#block-end-heading').exists()).toBe(true)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
 

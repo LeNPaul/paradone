@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import MarkdownChecklist from './components/MarkdownChecklist.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import CaptureBox from './components/CaptureBox.vue'
@@ -63,6 +63,11 @@ function onClearLog() {
 
 const showArchive = ref(false)
 
+// Settings is a view toggle for the same reason the log and archive are: a
+// machine state would be persisted to paradone:activeSession and rehydrate the
+// user into settings on reload.
+const showSettings = ref(false)
+
 const {
   state,
   remainingMs,
@@ -102,6 +107,12 @@ const completedTasks = computed(() =>
     : completedSince(taskListStartText.value, taskListText.value),
 )
 
+// Settings can be open over a running block, so get out of the way when the
+// machine advances — otherwise it would swallow the block-end prompt.
+watch(state, () => {
+  showSettings.value = false
+})
+
 useDocumentTitle(state, remainingMs, isPaused)
 useTheme(prefs, updatePrefs)
 </script>
@@ -109,205 +120,237 @@ useTheme(prefs, updatePrefs)
 <template>
   <div class="app">
     <!-- The one element outside the state machine: every state renders below it,
-         so the theme stays switchable mid-session. -->
+         so settings (and the theme inside them) stay reachable mid-session. -->
     <header class="app__header">
       <span class="app__wordmark">Paradone</span>
-      <ThemeToggle :theme="prefs.theme" @update="(theme) => updatePrefs({ theme })" />
+      <button type="button" class="app__settings" @click="showSettings = !showSettings">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.25" />
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+          />
+        </svg>
+        <span class="sr-only">Settings</span>
+      </button>
     </header>
 
-    <section
-      v-if="state === 'setup' && !showLog && !showArchive"
-      class="card"
-      aria-labelledby="start-heading"
-    >
-      <h2 id="start-heading" class="eyebrow">Start</h2>
+    <section v-if="showSettings" class="card" aria-labelledby="settings-heading">
+      <h2 id="settings-heading" class="eyebrow">Settings</h2>
+      <button type="button" class="btn-quiet settings__back" @click="showSettings = false">
+        Back
+      </button>
       <SettingsPanel :prefs="prefs" @update="updatePrefs" />
-      <button type="button" class="btn-primary setup__start" @click="startSession()">Start</button>
-      <button type="button" class="btn-quiet" @click="openPrimerSetup()">
-        Need help starting? Try a 2-minute primer
-      </button>
-      <div class="setup__links">
-        <button type="button" class="btn-quiet" @click="openLog()">View log</button>
-        <button type="button" class="btn-quiet" @click="showArchive = true">View archive</button>
+      <div class="settings__appearance">
+        <span class="settings__label">Appearance</span>
+        <ThemeToggle :theme="prefs.theme" @update="(theme) => updatePrefs({ theme })" />
       </div>
     </section>
 
-    <section
-      v-if="state === 'setup' && !showLog && !showArchive"
-      class="card"
-      aria-labelledby="task-list-heading"
-    >
-      <h2 id="task-list-heading" class="eyebrow">Task List</h2>
-      <MarkdownChecklist
-        :model-value="taskListText"
-        @update:model-value="onTaskListUpdate"
-        @archive="onArchiveCompleted"
-      />
-    </section>
-
-    <section v-if="state === 'primerSetup'" class="card" aria-labelledby="primer-setup-heading">
-      <h2 id="primer-setup-heading" class="eyebrow">Primer</h2>
-      <label for="primer-intent" class="stage__question">What can you do in 2 minutes?</label>
-      <textarea id="primer-intent" v-model="primerIntent" />
-      <div class="actions">
-        <button type="button" class="btn-quiet" @click="cancelPrimerSetup()">Back</button>
-        <button
-          type="button"
-          class="btn-primary"
-          :disabled="!primerIntent.trim()"
-          @click="startPrimer()"
-        >
-          Start 2 minutes
+    <template v-else>
+      <section
+        v-if="state === 'setup' && !showLog && !showArchive"
+        class="card"
+        aria-labelledby="start-heading"
+      >
+        <h2 id="start-heading" class="eyebrow">Start</h2>
+        <button type="button" class="btn-primary setup__start" @click="startSession()">Start</button>
+        <button type="button" class="btn-quiet" @click="openPrimerSetup()">
+          Need help starting? Try a 2-minute primer
         </button>
-      </div>
-    </section>
+        <div class="setup__links">
+          <button type="button" class="btn-quiet" @click="openLog()">View log</button>
+          <button type="button" class="btn-quiet" @click="showArchive = true">View archive</button>
+        </div>
+      </section>
 
-    <section v-if="state === 'primer'" class="card stage" aria-labelledby="primer-heading">
-      <h2 id="primer-heading" class="eyebrow stage__heading">Primer</h2>
-      <p class="stage__note">{{ primerIntent }}</p>
-      <TimerDisplay
-        :remaining-ms="remainingMs"
-        :total-ms="totalMs"
-        variant="primer"
-        label="Primer"
-      />
-      <button v-if="!showPrimerChoice" type="button" class="btn-quiet" @click="skipPrimerCountdown()">
-        Skip ahead
-      </button>
-      <template v-else>
-        <p class="stage__question">Ready for a full session, or stop here?</p>
-        <div class="actions actions--centred">
-          <button type="button" class="btn-quiet" @click="stopPrimer()">Stop here</button>
-          <button type="button" class="btn-primary" @click="commitFullSession()">
-            Start full session
+      <section
+        v-if="state === 'setup' && !showLog && !showArchive"
+        class="card"
+        aria-labelledby="task-list-heading"
+      >
+        <h2 id="task-list-heading" class="eyebrow">Task List</h2>
+        <MarkdownChecklist
+          :model-value="taskListText"
+          @update:model-value="onTaskListUpdate"
+          @archive="onArchiveCompleted"
+        />
+      </section>
+
+      <section v-if="state === 'primerSetup'" class="card" aria-labelledby="primer-setup-heading">
+        <h2 id="primer-setup-heading" class="eyebrow">Primer</h2>
+        <label for="primer-intent" class="stage__question">What can you do in 2 minutes?</label>
+        <textarea id="primer-intent" v-model="primerIntent" />
+        <div class="actions">
+          <button type="button" class="btn-quiet" @click="cancelPrimerSetup()">Back</button>
+          <button
+            type="button"
+            class="btn-primary"
+            :disabled="!primerIntent.trim()"
+            @click="startPrimer()"
+          >
+            Start 2 minutes
           </button>
         </div>
-      </template>
-    </section>
+      </section>
 
-    <section v-if="state === 'active'" class="card stage" aria-labelledby="active-heading">
-      <h2 id="active-heading" class="eyebrow stage__heading">Focus block</h2>
-      <p v-if="primerIntent" class="stage__note">Primer: {{ primerIntent }}</p>
-      <TimerDisplay
-        :remaining-ms="remainingMs"
-        :total-ms="totalMs"
-        variant="session"
-        :label="isPaused ? 'Paused' : 'Focus'"
-      />
-      <div class="transport">
+      <section v-if="state === 'primer'" class="card stage" aria-labelledby="primer-heading">
+        <h2 id="primer-heading" class="eyebrow stage__heading">Primer</h2>
+        <p class="stage__note">{{ primerIntent }}</p>
+        <TimerDisplay
+          :remaining-ms="remainingMs"
+          :total-ms="totalMs"
+          variant="primer"
+          label="Primer"
+        />
         <button
-          v-if="!isPaused"
+          v-if="!showPrimerChoice"
           type="button"
-          class="transport__button transport__button--primary"
-          @click="pauseSession()"
+          class="btn-quiet"
+          @click="skipPrimerCountdown()"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="7" y="5" width="3.5" height="14" rx="1.2" />
-            <rect x="13.5" y="5" width="3.5" height="14" rx="1.2" />
-          </svg>
-          <span class="sr-only">Pause</span>
+          Skip ahead
         </button>
-        <button
-          v-else
-          type="button"
-          class="transport__button transport__button--primary"
-          @click="resumeSession()"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 5.5v13a1 1 0 0 0 1.54.84l10-6.5a1 1 0 0 0 0-1.68l-10-6.5A1 1 0 0 0 8 5.5Z" />
-          </svg>
-          <span class="sr-only">Resume</span>
-        </button>
-        <button type="button" class="transport__button" @click="stopSession()">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="6" y="6" width="12" height="12" rx="2" />
-          </svg>
-          <span class="sr-only">Stop &amp; log session</span>
-        </button>
-      </div>
-      <h3 id="active-task-list-heading" class="eyebrow">Task List</h3>
-      <MarkdownChecklist
-        :model-value="taskListText"
-        :editable="false"
-        @update:model-value="onTaskListUpdate"
-      />
-    </section>
+        <template v-else>
+          <p class="stage__question">Ready for a full session, or stop here?</p>
+          <div class="actions actions--centred">
+            <button type="button" class="btn-quiet" @click="stopPrimer()">Stop here</button>
+            <button type="button" class="btn-primary" @click="commitFullSession()">
+              Start full session
+            </button>
+          </div>
+        </template>
+      </section>
 
-    <section v-if="state === 'blockEnd'" class="card stage" aria-labelledby="block-end-heading">
-      <h2 id="block-end-heading" class="eyebrow stage__heading">Block complete</h2>
-      <p class="stage__question">Take the break, or keep going?</p>
-      <div class="actions actions--centred">
-        <button
-          v-if="prefs.breakDuration > 0"
-          type="button"
-          class="btn-choice"
-          @click="takeBreak()"
-        >
-          Take a break
-        </button>
-        <button type="button" class="btn-choice" @click="keepGoing()">Keep going</button>
-      </div>
-    </section>
+      <section v-if="state === 'active'" class="card stage" aria-labelledby="active-heading">
+        <h2 id="active-heading" class="eyebrow stage__heading">Focus block</h2>
+        <p v-if="primerIntent" class="stage__note">Primer: {{ primerIntent }}</p>
+        <TimerDisplay
+          :remaining-ms="remainingMs"
+          :total-ms="totalMs"
+          variant="session"
+          :label="isPaused ? 'Paused' : 'Focus'"
+        />
+        <div class="transport">
+          <button
+            v-if="!isPaused"
+            type="button"
+            class="transport__button transport__button--primary"
+            @click="pauseSession()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="7" y="5" width="3.5" height="14" rx="1.2" />
+              <rect x="13.5" y="5" width="3.5" height="14" rx="1.2" />
+            </svg>
+            <span class="sr-only">Pause</span>
+          </button>
+          <button
+            v-else
+            type="button"
+            class="transport__button transport__button--primary"
+            @click="resumeSession()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M8 5.5v13a1 1 0 0 0 1.54.84l10-6.5a1 1 0 0 0 0-1.68l-10-6.5A1 1 0 0 0 8 5.5Z"
+              />
+            </svg>
+            <span class="sr-only">Resume</span>
+          </button>
+          <button type="button" class="transport__button" @click="stopSession()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="6" y="6" width="12" height="12" rx="2" />
+            </svg>
+            <span class="sr-only">Stop &amp; log session</span>
+          </button>
+        </div>
+        <h3 id="active-task-list-heading" class="eyebrow">Task List</h3>
+        <MarkdownChecklist
+          :model-value="taskListText"
+          :editable="false"
+          @update:model-value="onTaskListUpdate"
+        />
+      </section>
 
-    <section v-if="state === 'break'" class="card stage" aria-labelledby="break-heading">
-      <h2 id="break-heading" class="eyebrow stage__heading">Break</h2>
-      <TimerDisplay
-        :remaining-ms="remainingMs"
-        :total-ms="totalMs"
-        variant="session"
-        label="Break"
-      />
-      <div class="transport">
-        <button type="button" class="transport__button" @click="endBreak()">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <rect x="6" y="6" width="12" height="12" rx="2" />
-          </svg>
-          <span class="sr-only">End break</span>
-        </button>
-      </div>
-    </section>
+      <section v-if="state === 'blockEnd'" class="card stage" aria-labelledby="block-end-heading">
+        <h2 id="block-end-heading" class="eyebrow stage__heading">Block complete</h2>
+        <p class="stage__question">Take the break, or keep going?</p>
+        <div class="actions actions--centred">
+          <button
+            v-if="prefs.breakDuration > 0"
+            type="button"
+            class="btn-choice"
+            @click="takeBreak()"
+          >
+            Take a break
+          </button>
+          <button type="button" class="btn-choice" @click="keepGoing()">Keep going</button>
+        </div>
+      </section>
 
-    <section
-      v-if="state === 'primer' || state === 'active' || state === 'break'"
-      class="card"
-      aria-labelledby="capture-heading"
-    >
-      <h2 id="capture-heading" class="eyebrow">Capture</h2>
-      <CaptureBox v-model="capture" />
-    </section>
+      <section v-if="state === 'break'" class="card stage" aria-labelledby="break-heading">
+        <h2 id="break-heading" class="eyebrow stage__heading">Break</h2>
+        <TimerDisplay
+          :remaining-ms="remainingMs"
+          :total-ms="totalMs"
+          variant="session"
+          label="Break"
+        />
+        <div class="transport">
+          <button type="button" class="transport__button" @click="endBreak()">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="6" y="6" width="12" height="12" rx="2" />
+            </svg>
+            <span class="sr-only">End break</span>
+          </button>
+        </div>
+      </section>
 
-    <section v-if="state === 'audit'" class="card" aria-labelledby="audit-heading">
-      <h2 id="audit-heading" class="eyebrow">Audit</h2>
-      <AuditPrompt
-        :task-list-text="taskListText"
-        :completed-tasks="completedTasks"
-        :capture="capture"
-        @submit="submitAudit"
-        @skip="skipAudit"
-      />
-    </section>
+      <section
+        v-if="state === 'primer' || state === 'active' || state === 'break'"
+        class="card"
+        aria-labelledby="capture-heading"
+      >
+        <h2 id="capture-heading" class="eyebrow">Capture</h2>
+        <CaptureBox v-model="capture" />
+      </section>
 
-    <section v-if="state === 'summary'" class="card" aria-labelledby="summary-heading">
-      <h2 id="summary-heading" class="eyebrow">Summary</h2>
-      <SessionSummary
-        :task-list-text="taskListText"
-        :completed-tasks="completedTasks"
-        :capture="capture"
-        :audit-productive="auditProductive"
-        :audit-notes="auditNotes"
-        @start-new-session="startNewSession"
-      />
-    </section>
+      <section v-if="state === 'audit'" class="card" aria-labelledby="audit-heading">
+        <h2 id="audit-heading" class="eyebrow">Audit</h2>
+        <AuditPrompt
+          :task-list-text="taskListText"
+          :completed-tasks="completedTasks"
+          :capture="capture"
+          @submit="submitAudit"
+          @skip="skipAudit"
+        />
+      </section>
 
-    <section v-if="showLog" class="card" aria-labelledby="log-heading">
-      <h2 id="log-heading" class="eyebrow">Audit log</h2>
-      <SessionLog :sessions="loggedSessions" @back="showLog = false" @clear="onClearLog" />
-    </section>
+      <section v-if="state === 'summary'" class="card" aria-labelledby="summary-heading">
+        <h2 id="summary-heading" class="eyebrow">Summary</h2>
+        <SessionSummary
+          :task-list-text="taskListText"
+          :completed-tasks="completedTasks"
+          :capture="capture"
+          :audit-productive="auditProductive"
+          :audit-notes="auditNotes"
+          @start-new-session="startNewSession"
+        />
+      </section>
 
-    <section v-if="showArchive" class="card" aria-labelledby="archive-heading">
-      <h2 id="archive-heading" class="eyebrow">Archived tasks</h2>
-      <ArchiveView :entries="archive.archived" @back="showArchive = false" @clear="onClearArchive" />
-    </section>
+      <section v-if="showLog" class="card" aria-labelledby="log-heading">
+        <h2 id="log-heading" class="eyebrow">Audit log</h2>
+        <SessionLog :sessions="loggedSessions" @back="showLog = false" @clear="onClearLog" />
+      </section>
+
+      <section v-if="showArchive" class="card" aria-labelledby="archive-heading">
+        <h2 id="archive-heading" class="eyebrow">Archived tasks</h2>
+        <ArchiveView
+          :entries="archive.archived"
+          @back="showArchive = false"
+          @clear="onClearArchive"
+        />
+      </section>
+    </template>
   </div>
 </template>
 
@@ -321,6 +364,49 @@ useTheme(prefs, updatePrefs)
 .app__wordmark {
   font-weight: 600;
   letter-spacing: -0.01em;
+  color: var(--ink-secondary);
+}
+
+.app__settings {
+  display: grid;
+  place-items: center;
+  padding: var(--space-2);
+  background: var(--control);
+  border-color: transparent;
+  border-radius: var(--radius-full);
+  color: var(--ink-secondary);
+}
+
+.app__settings:hover:not(:disabled) {
+  background: var(--control);
+  color: var(--ink);
+}
+
+.app__settings svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Back sits above the fields, so it reads as leaving rather than confirming. */
+.settings__back {
+  align-self: flex-start;
+}
+
+/* Matches a SettingsPanel field so the theme control reads as a third setting. */
+.settings__appearance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.settings__label {
+  font-size: var(--text-sm);
   color: var(--ink-secondary);
 }
 
