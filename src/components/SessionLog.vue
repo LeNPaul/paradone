@@ -1,7 +1,8 @@
 <script setup>
 // SessionLog: read-only list of every logged post-session audit, newest first,
 // with a markdown export of the whole log.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 import { buildLogMarkdown, formatDateTime, formatTime, productiveLabel, sortNewestFirst } from '../lib/sessionLog.js'
 import { downloadMarkdown } from '../lib/download.js'
 
@@ -12,12 +13,24 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['back'])
+const emit = defineEmits(['back', 'clear'])
 
 const entries = computed(() => sortNewestFirst(props.sessions))
 
+const confirming = ref(false)
+
+const confirmMessage = computed(() => {
+  const count = entries.value.length
+  return `This permanently deletes ${count} logged audit${count === 1 ? '' : 's'}. It cannot be undone.`
+})
+
 function onDownload() {
   downloadMarkdown(buildLogMarkdown(props.sessions), 'paradone-audit-log.md')
+}
+
+function onConfirmClear() {
+  confirming.value = false
+  emit('clear')
 }
 </script>
 
@@ -25,8 +38,21 @@ function onDownload() {
   <div class="session-log">
     <div class="session-log__bar">
       <button type="button" class="btn-quiet" @click="emit('back')">Back</button>
-      <button type="button" @click="onDownload">Download log</button>
+      <div class="session-log__actions">
+        <button v-if="entries.length" type="button" class="btn-quiet" @click="confirming = true">
+          Clear log
+        </button>
+        <button type="button" @click="onDownload">Download log</button>
+      </div>
     </div>
+
+    <ConfirmDialog
+      :open="confirming"
+      title="Clear log?"
+      :message="confirmMessage"
+      @confirm="onConfirmClear"
+      @close="confirming = false"
+    />
 
     <p v-if="!entries.length" class="session-log__empty">No audits logged yet.</p>
     <ol v-else class="list-reset session-log__entries">
@@ -56,6 +82,12 @@ function onDownload() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.session-log__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .session-log__empty {

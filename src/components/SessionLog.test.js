@@ -99,4 +99,40 @@ describe('SessionLog', () => {
     await backButton.trigger('click')
     expect(wrapper.emitted('back')).toEqual([[]])
   })
+
+  it('does not offer a clear button when the log is empty', () => {
+    const wrapper = mount(SessionLog, { props: { sessions: [] } })
+    expect(wrapper.findAll('button').find((b) => b.text() === 'Clear log')).toBeUndefined()
+  })
+
+  it('asks for confirmation before clearing instead of emitting straight away', async () => {
+    const wrapper = mount(SessionLog, { props: { sessions: [session()] } })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear log').trigger('click')
+
+    expect(wrapper.emitted('clear')).toBeUndefined()
+    expect(wrapper.text()).toContain('Clear log?')
+    expect(wrapper.text()).toContain('This permanently deletes 1 logged audit.')
+  })
+
+  it('emits clear once the dialog is confirmed', async () => {
+    const wrapper = mount(SessionLog, {
+      props: { sessions: [session(), session({ id: 'b' })] },
+    })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear log').trigger('click')
+    expect(wrapper.text()).toContain('This permanently deletes 2 logged audits.')
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear').trigger('click')
+
+    expect(wrapper.emitted('clear')).toEqual([[]])
+  })
+
+  it('does not emit clear when the dialog is cancelled', async () => {
+    const wrapper = mount(SessionLog, { props: { sessions: [session()] } })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear log').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Cancel').trigger('click')
+
+    expect(wrapper.emitted('clear')).toBeUndefined()
+  })
 })

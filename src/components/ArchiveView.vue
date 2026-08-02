@@ -2,7 +2,8 @@
 // ArchiveView: read-only list of tasks swept off the Task List, newest first,
 // each showing when it was ticked off, with a markdown export of the whole
 // archive.
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 import { buildArchiveMarkdown, sortNewestFirst } from '../lib/archive.js'
 import { formatDateTime } from '../lib/sessionLog.js'
 import { downloadMarkdown } from '../lib/download.js'
@@ -14,12 +15,24 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['back'])
+const emit = defineEmits(['back', 'clear'])
 
 const sorted = computed(() => sortNewestFirst(props.entries))
 
+const confirming = ref(false)
+
+const confirmMessage = computed(() => {
+  const count = sorted.value.length
+  return `This permanently deletes ${count} archived task${count === 1 ? '' : 's'}. It cannot be undone.`
+})
+
 function onDownload() {
   downloadMarkdown(buildArchiveMarkdown(props.entries), 'paradone-archived-tasks.md')
+}
+
+function onConfirmClear() {
+  confirming.value = false
+  emit('clear')
 }
 </script>
 
@@ -27,8 +40,21 @@ function onDownload() {
   <div class="archive-view">
     <div class="archive-view__bar">
       <button type="button" class="btn-quiet" @click="emit('back')">Back</button>
-      <button type="button" @click="onDownload">Download archive</button>
+      <div class="archive-view__actions">
+        <button v-if="sorted.length" type="button" class="btn-quiet" @click="confirming = true">
+          Clear archive
+        </button>
+        <button type="button" @click="onDownload">Download archive</button>
+      </div>
     </div>
+
+    <ConfirmDialog
+      :open="confirming"
+      title="Clear archive?"
+      :message="confirmMessage"
+      @confirm="onConfirmClear"
+      @close="confirming = false"
+    />
 
     <p v-if="!sorted.length" class="archive-view__empty">No tasks archived yet.</p>
     <ol v-else class="list-reset archive-view__entries">
@@ -51,6 +77,12 @@ function onDownload() {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.archive-view__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .archive-view__empty {

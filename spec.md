@@ -38,8 +38,8 @@ There is no routing. One page, eight states.
 - **Completed this session** is derived, not stored per task: the list is snapshotted when the block starts, and a task counts as completed if it is checked at the end and was *not* checked at the start. A task added mid-session and then ticked counts. Unticking a box during the block does not. Shown at Audit, exported in the Summary markdown, and recorded on the session so the audit log can show it.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable — surfaced as a "need help starting?" affordance, never a gate on starting work (plain **Start** never touches it). Choosing it first asks for a breakdown: what can you do in 2 minutes, in a free-text area. That text is required before the countdown starts — an empty primer defeats the point of the step — and it stays visible through the primer and the full focus block, then lands in the session record as `primerIntent`.
-- **Archive** keeps the Task List from growing unbounded. At Setup, one "Archive completed" button sweeps every checked task off the list into `paradone:archive`; it is not offered during a session, where the list stays toggle-only. Each archived task carries the time its box was *ticked*, not the time it was swept — so the tick time is recorded when the checkbox changes and held until the sweep. That map keys on the marker-stripped task text (the identity `completedSince` already uses) and is rebuilt on every Task List write, so unticking, deleting, or renaming a task drops its entry. Tasks checked before this existed have no recorded tick time and fall back to the archive time. Like the audit log, the archive is a **view toggle**, not a machine state, reached from "View archive" at Setup and dismissed with "Back", with one "Download archive" button for the whole list.
-- **Audit log** is a read-only view of every past audit, newest first, reached from a "View log" button at Setup and dismissed with "Back". It is not a machine state — it's a view toggle, so it never lands in `paradone:activeSession`. Each entry shows timestamps, planned/actual duration, focus rating and audit notes; skipped audits are listed and marked as such. One "Download log" button exports the whole log as markdown — there is no per-entry download. The session record is appended when the audit is answered or skipped, *not* when the user starts the next session, so closing the tab at Summary cannot lose an audit. Chronological only — aggregates and trends stay deferred (§6).
+- **Archive** keeps the Task List from growing unbounded. At Setup, one "Archive completed" button sweeps every checked task off the list into `paradone:archive`; it is not offered during a session, where the list stays toggle-only. Each archived task carries the time its box was *ticked*, not the time it was swept — so the tick time is recorded when the checkbox changes and held until the sweep. That map keys on the marker-stripped task text (the identity `completedSince` already uses) and is rebuilt on every Task List write, so unticking, deleting, or renaming a task drops its entry. Tasks checked before this existed have no recorded tick time and fall back to the archive time. Like the audit log, the archive is a **view toggle**, not a machine state, reached from "View archive" at Setup and dismissed with "Back", with one "Download archive" button for the whole list. A "Clear archive" button — offered only when there is something to clear, and confirmed in a dialog — empties the swept-task list. It drops *only* the swept tasks: the tick-time map is left alone, because it belongs to tasks still on the live Task List.
+- **Audit log** is a read-only view of every past audit, newest first, reached from a "View log" button at Setup and dismissed with "Back". It is not a machine state — it's a view toggle, so it never lands in `paradone:activeSession`. Each entry shows timestamps, planned/actual duration, focus rating and audit notes; skipped audits are listed and marked as such. One "Download log" button exports the whole log as markdown — there is no per-entry download. A "Clear log" button — offered only when there is something to clear, and confirmed in a dialog — empties `paradone:sessions`; there is no per-entry delete. The session record is appended when the audit is answered or skipped, *not* when the user starts the next session, so closing the tab at Summary cannot lose an audit. Chronological only — aggregates and trends stay deferred (§6).
 
 ## 4. Data model
 
@@ -129,8 +129,9 @@ The **source of truth is a raw markdown string**, not a structured array. Parse 
 | `CaptureBox.vue` | Freeform scratchpad textarea |
 | `AuditPrompt.vue` | Two questions: what got done, focused/distracted/mixed. Quick-select + optional free text |
 | `SessionSummary.vue` | Assembles markdown, copy + download |
-| `SessionLog.vue` | Read-only list of past audits, newest first, + download-whole-log |
-| `ArchiveView.vue` | Read-only list of archived tasks with completion times, newest first, + download-archive |
+| `SessionLog.vue` | Read-only list of past audits, newest first, + download-whole-log, + clear-log |
+| `ArchiveView.vue` | Read-only list of archived tasks with completion times, newest first, + download-archive, + clear-archive |
+| `ConfirmDialog.vue` | Native `<dialog>` confirmation gating a destructive action |
 | `SettingsPanel.vue` | Work/break durations; stored separately from session data |
 
 **Logic modules (plain `.js`, unit-tested, no component mounting):**
@@ -157,6 +158,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] "Archive completed" at Setup removes every checked task from the Task List and persists them to `paradone:archive`, leaving unchecked and plain lines in place
 - [ ] An archived task records the time its checkbox was ticked — surviving a reload between the tick and the sweep — not the time it was archived
 - [ ] The archive view lists archived tasks newest-first with their completion times, and downloads in full as one markdown file
+- [ ] "Clear archive" empties `paradone:archive.archived` after a confirmation dialog, leaves the tick-time map and the Task List untouched, and survives a reload
 - [ ] Capture box is reachable in every active state without leaving the timer
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break or continue
@@ -166,6 +168,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Audit log entries list the tasks completed in that block, on screen and in the log export
 - [ ] Every audit is appended to `paradone:sessions` the moment it is answered or skipped, and survives closing the tab at Summary
 - [ ] The audit log lists all past audits newest-first with date/time stamps, and downloads in full as one markdown file
+- [ ] "Clear log" empties `paradone:sessions` after a confirmation dialog and survives a reload
 - [ ] App functions with zero network requests after initial page load
 - [ ] `checklist.js` has unit tests: checkbox parse, plain-line passthrough, toggle-rewrite, add/remove/edit-item, hash stability across line reorder, completed-since diff
 - [ ] `storage.js` has a round-trip test (write → read → deep-equal) for each entity

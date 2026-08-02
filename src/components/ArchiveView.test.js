@@ -54,4 +54,38 @@ describe('ArchiveView', () => {
     await wrapper.findAll('button').find((b) => b.text() === 'Download archive').trigger('click')
     expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
   })
+
+  it('does not offer a clear button when the archive is empty', () => {
+    const wrapper = mount(ArchiveView, { props: { entries: [] } })
+    expect(wrapper.findAll('button').find((b) => b.text() === 'Clear archive')).toBeUndefined()
+  })
+
+  it('asks for confirmation before clearing instead of emitting straight away', async () => {
+    const wrapper = mount(ArchiveView, { props: { entries: [entry()] } })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear archive').trigger('click')
+
+    expect(wrapper.emitted('clear')).toBeUndefined()
+    expect(wrapper.text()).toContain('Clear archive?')
+    expect(wrapper.text()).toContain('This permanently deletes 1 archived task.')
+  })
+
+  it('emits clear once the dialog is confirmed', async () => {
+    const wrapper = mount(ArchiveView, { props: { entries: [entry(), entry({ id: 'b' })] } })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear archive').trigger('click')
+    expect(wrapper.text()).toContain('This permanently deletes 2 archived tasks.')
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear').trigger('click')
+
+    expect(wrapper.emitted('clear')).toHaveLength(1)
+  })
+
+  it('does not emit clear when the dialog is cancelled', async () => {
+    const wrapper = mount(ArchiveView, { props: { entries: [entry()] } })
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Clear archive').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Cancel').trigger('click')
+
+    expect(wrapper.emitted('clear')).toBeUndefined()
+  })
 })

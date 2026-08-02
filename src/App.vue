@@ -9,7 +9,7 @@ import SessionLog from './components/SessionLog.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
-import { getGoalsList, setGoalsList, getSessions, getArchive, setArchive } from './lib/storage.js'
+import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive } from './lib/storage.js'
 import { completedSince } from './lib/checklist.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
@@ -40,6 +40,13 @@ function onArchiveCompleted() {
   setGoalsList({ text: result.taskListText, updatedAt: new Date().toISOString() })
 }
 
+// Only the swept tasks go: completedAt holds tick times for tasks still on the
+// live list, so clearing it would lose when they were checked.
+function onClearArchive() {
+  archive.value = { ...archive.value, archived: [] }
+  setArchive(archive.value)
+}
+
 // The log is a plain view toggle, not a machine state: useSessionMachine
 // persists every non-setup state to paradone:activeSession, so a 'log' state
 // would rehydrate the user into the log on reload.
@@ -48,6 +55,10 @@ const loggedSessions = ref([])
 function openLog() {
   loggedSessions.value = getSessions() // re-read on open so it's fresh after an audit
   showLog.value = true
+}
+function onClearLog() {
+  setSessions([])
+  loggedSessions.value = []
 }
 
 const showArchive = ref(false)
@@ -281,12 +292,12 @@ useTheme(prefs, updatePrefs)
 
     <section v-if="showLog" class="card" aria-labelledby="log-heading">
       <h2 id="log-heading" class="eyebrow">Audit log</h2>
-      <SessionLog :sessions="loggedSessions" @back="showLog = false" />
+      <SessionLog :sessions="loggedSessions" @back="showLog = false" @clear="onClearLog" />
     </section>
 
     <section v-if="showArchive" class="card" aria-labelledby="archive-heading">
       <h2 id="archive-heading" class="eyebrow">Archived tasks</h2>
-      <ArchiveView :entries="archive.archived" @back="showArchive = false" />
+      <ArchiveView :entries="archive.archived" @back="showArchive = false" @clear="onClearArchive" />
     </section>
   </div>
 </template>

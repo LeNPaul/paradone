@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive } from './lib/storage.js'
+import { setActiveSession, setPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, getSessions, setSessions } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 import { DEFAULT_TITLE } from './lib/title.js'
 
@@ -398,6 +398,37 @@ describe('audit log', () => {
     await wrapper.findAll('button').find((b) => b.text() === 'View log').trigger('click')
     expect(wrapper.text()).toContain('No audits logged yet.')
   })
+
+  it('"Clear log" empties the log once confirmed, and it stays empty on reload', async () => {
+    setSessions([
+      {
+        id: 'a',
+        date: '2026-08-01T13:50:00.000Z',
+        auditedAt: '2026-08-01T14:15:00.000Z',
+        plannedDuration: 25,
+        actualDuration: 25,
+        auditProductive: 'focused',
+        auditNotes: '',
+      },
+    ])
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const wrapper = mount(App)
+    const click = (label) =>
+      wrapper.findAll('button').find((b) => b.text() === label).trigger('click')
+
+    await click('View log')
+    await click('Clear log')
+    expect(getSessions()).toHaveLength(1) // not until it's confirmed
+    await click('Clear')
+
+    expect(getSessions()).toEqual([])
+    expect(wrapper.text()).toContain('No audits logged yet.')
+    expect(getGoalsList().text).toBe('- [ ] draft outline')
+
+    const reloaded = mount(App)
+    await reloaded.findAll('button').find((b) => b.text() === 'View log').trigger('click')
+    expect(reloaded.text()).toContain('No audits logged yet.')
+  })
 })
 
 describe('archiving completed tasks', () => {
@@ -489,6 +520,44 @@ describe('archiving completed tasks', () => {
     const wrapper = mount(App)
     await clickButton(wrapper, 'View archive')
     expect(wrapper.text()).toContain('No tasks archived yet.')
+  })
+
+  it('"Clear archive" drops swept tasks once confirmed, keeping tick times for live ones', async () => {
+    setGoalsList({ text: '- [ ] draft outline\n- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
+    await archiveButton(wrapper).trigger('click')
+    // A task ticked but not yet swept: its tick time must survive the clear.
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+    const tickedAt = getArchive().completedAt['draft outline']
+
+    await clickButton(wrapper, 'View archive')
+    await clickButton(wrapper, 'Clear archive')
+    expect(getArchive().archived).toHaveLength(1) // not until it's confirmed
+    await clickButton(wrapper, 'Clear')
+
+    expect(getArchive().archived).toEqual([])
+    expect(getArchive().completedAt['draft outline']).toBe(tickedAt)
+    expect(getGoalsList().text).toBe('- [x] draft outline')
+    expect(wrapper.text()).toContain('No tasks archived yet.')
+
+    const reloaded = mount(App)
+    await clickButton(reloaded, 'View archive')
+    expect(reloaded.text()).toContain('No tasks archived yet.')
+  })
+
+  it('leaves the archive alone when the clear dialog is cancelled', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+    await wrapper.get('input[type="checkbox"]').setValue(true)
+    await archiveButton(wrapper).trigger('click')
+
+    await clickButton(wrapper, 'View archive')
+    await clickButton(wrapper, 'Clear archive')
+    await clickButton(wrapper, 'Cancel')
+
+    expect(getArchive().archived).toHaveLength(1)
+    expect(wrapper.text()).toContain('send invoice')
   })
 
   // The archive view is a view toggle, not a machine state — it must never
