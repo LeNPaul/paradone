@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import SessionSummary from './SessionSummary.vue'
+import { buildSummaryMarkdown } from '../lib/summary.js'
 
 const baseProps = {
   taskListText: '- [x] draft outline',
@@ -18,7 +19,7 @@ beforeEach(() => {
 })
 
 describe('SessionSummary', () => {
-  it('renders markdown containing the task list, the capture text, and the audit answers', () => {
+  it('renders the task list, the capture text, and the audit answers', () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
     const text = wrapper.text()
     expect(text).toContain('draft outline')
@@ -31,21 +32,23 @@ describe('SessionSummary', () => {
     const wrapper = mount(SessionSummary, {
       props: { ...baseProps, auditProductive: '', auditNotes: '' },
     })
-    const text = wrapper.text()
-    expect(text).not.toContain('## Audit')
-    expect(text).not.toContain('Focus:')
+    expect(wrapper.find('#summary-audit-heading').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Focus:')
   })
 
   it('lists the tasks completed this session in their own section', () => {
     const wrapper = mount(SessionSummary, {
       props: { ...baseProps, completedTasks: ['draft outline', 'send invoice'] },
     })
-    expect(wrapper.text()).toContain('## Completed this session\n- draft outline\n- send invoice')
+    const completed = wrapper
+      .findAll('#summary-completed-heading ~ ul li')
+      .map((li) => li.text())
+    expect(completed).toEqual(['draft outline', 'send invoice'])
   })
 
   it('renders a fallback message when nothing was completed this session', () => {
     const wrapper = mount(SessionSummary, { props: { ...baseProps, completedTasks: [] } })
-    expect(wrapper.text()).toContain('_No tasks checked off this session._')
+    expect(wrapper.text()).toContain('No tasks checked off this session.')
   })
 
   it('renders a fallback message when the capture is empty', () => {
@@ -53,11 +56,12 @@ describe('SessionSummary', () => {
     expect(wrapper.text()).toContain('No captures recorded.')
   })
 
-  it('copies the exact markdown shown on screen to the clipboard', async () => {
+  // The screen renders structured markup; the export stays markdown, built from
+  // the same props by the one module that owns the wire format.
+  it('copies the markdown export of the rendered session to the clipboard', async () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
-    const rendered = wrapper.find('pre').element.textContent
     await wrapper.find('button').trigger('click')
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(rendered)
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(buildSummaryMarkdown(baseProps))
   })
 
   it('creates a blob URL and triggers a download on Download', async () => {

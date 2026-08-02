@@ -303,7 +303,8 @@ describe('audit and summary', () => {
     await continueButton.trigger('click')
 
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
-    expect(wrapper.text()).toContain('## Completed this session\n- draft outline')
+    const summarised = wrapper.findAll('#summary-completed-heading ~ ul li').map((li) => li.text())
+    expect(summarised).toEqual(['draft outline'])
   })
 
   it('submitting the audit prompt transitions to the summary screen', async () => {
@@ -339,7 +340,7 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
-  it('rendering the summary screen shows the task list, capture text, and audit answers as markdown', () => {
+  it('rendering the summary screen shows the task list, capture text, and audit answers', () => {
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({
       state: 'summary',

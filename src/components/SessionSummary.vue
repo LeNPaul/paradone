@@ -1,7 +1,9 @@
 <script setup>
-// SessionSummary: assembles markdown (task list, captures, audit), copy + download
+// SessionSummary: renders the end-of-session record, copy + download as markdown
 import { computed } from 'vue'
+import MarkdownChecklist from './MarkdownChecklist.vue'
 import { PRODUCTIVE_LABELS } from '../lib/sessionLog.js'
+import { buildSummaryMarkdown } from '../lib/summary.js'
 import { downloadMarkdown } from '../lib/download.js'
 
 const props = defineProps({
@@ -29,37 +31,11 @@ const props = defineProps({
 
 const emit = defineEmits(['start-new-session'])
 
-const markdown = computed(() => {
-  const captureText = props.capture.trim() || '_No captures recorded._'
+const markdown = computed(() => buildSummaryMarkdown(props))
 
-  const completedText = props.completedTasks.length
-    ? props.completedTasks.map((task) => `- ${task}`).join('\n')
-    : '_No tasks checked off this session._'
-
-  // A skipped audit leaves auditProductive empty; a submitted one always has a
-  // Focus value (the audit prompt requires one), so empty here means skipped —
-  // in which case the whole Audit section is omitted.
-  const productiveLabel = PRODUCTIVE_LABELS[props.auditProductive] ?? props.auditProductive
-  const auditSection = props.auditProductive
-    ? `
-
-## Audit
-- **Focus:** ${productiveLabel}
-- **What actually got done:** ${props.auditNotes || '_(none noted)_'}`
-    : ''
-
-  return `# Session Summary
-
-## Tasks
-${props.taskListText}
-
-## Completed this session
-${completedText}
-
-## Captures
-${captureText}${auditSection}
-`
-})
+const productiveLabel = computed(
+  () => PRODUCTIVE_LABELS[props.auditProductive] ?? props.auditProductive,
+)
 
 async function onCopy() {
   await navigator.clipboard.writeText(markdown.value)
@@ -72,7 +48,38 @@ function onDownload() {
 
 <template>
   <div class="session-summary">
-    <pre class="session-summary__markdown">{{ markdown }}</pre>
+    <section class="session-summary__block" aria-labelledby="summary-tasks-heading">
+      <h3 id="summary-tasks-heading" class="eyebrow">Tasks</h3>
+      <MarkdownChecklist :model-value="taskListText" :editable="false" />
+    </section>
+
+    <section class="session-summary__block" aria-labelledby="summary-completed-heading">
+      <h3 id="summary-completed-heading" class="eyebrow">Completed this session</h3>
+      <ul v-if="completedTasks.length" class="list-reset session-summary__completed">
+        <li v-for="task in completedTasks" :key="task">{{ task }}</li>
+      </ul>
+      <p v-else class="session-summary__empty">No tasks checked off this session.</p>
+    </section>
+
+    <section class="session-summary__block" aria-labelledby="summary-captures-heading">
+      <h3 id="summary-captures-heading" class="eyebrow">Captures</h3>
+      <pre class="session-summary__capture">{{ capture.trim() || 'No captures recorded.' }}</pre>
+    </section>
+
+    <section
+      v-if="auditProductive"
+      class="session-summary__block"
+      aria-labelledby="summary-audit-heading"
+    >
+      <h3 id="summary-audit-heading" class="eyebrow">Audit</h3>
+      <p><strong>Focus:</strong> {{ productiveLabel }}</p>
+      <p v-if="auditNotes"><strong>What actually got done:</strong> {{ auditNotes }}</p>
+      <p v-else>
+        <strong>What actually got done:</strong>
+        <span class="session-summary__empty">(none noted)</span>
+      </p>
+    </section>
+
     <div class="session-summary__actions">
       <button type="button" @click="onCopy">Copy</button>
       <button type="button" @click="onDownload">Download</button>
@@ -87,17 +94,36 @@ function onDownload() {
 .session-summary {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
-/* The export, shown as the quiet source text it is. */
-.session-summary__markdown {
+.session-summary__block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.session-summary__completed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.session-summary__completed li::before {
+  content: '✓';
+  color: var(--accent);
+  margin-right: var(--space-2);
+}
+
+.session-summary__empty {
+  color: var(--ink-muted);
+}
+
+.session-summary__capture {
   background: var(--surface-sunken);
   border-radius: var(--radius-md);
-  padding: var(--space-4);
+  padding: var(--space-3);
   color: var(--ink-secondary);
-  max-height: 24rem;
-  overflow-y: auto;
 }
 
 .session-summary__actions {
