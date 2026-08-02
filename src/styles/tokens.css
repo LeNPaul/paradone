@@ -1,34 +1,40 @@
 /* The only place raw values live. Components reference var(--…), never literals. */
 
 :root {
+  /* Both palettes live in the light-dark() pairs below. Declaring the pair here
+     means the OS preference applies with no JS; useTheme.js then stamps
+     [data-theme] on <html> to override it with the user's stored choice. */
+  color-scheme: light dark;
+
   /* Surfaces — monochrome. Canvas is the page, surface is a card on top of it. */
-  --canvas: #f2f2f7;
-  --surface: #ffffff;
+  --canvas: light-dark(#f2f2f7, #000000);
+  --surface: light-dark(#ffffff, #1c1c1e);
   /* Filled controls that sit on a surface — secondary buttons, segmented tracks.
      Distinct from --canvas so it still reads as raised in dark mode. */
-  --control: #e8e8ed;
+  --control: light-dark(#e8e8ed, #2c2c2e);
   /* A recessed panel inside a card — log entries, code blocks. Steps *away*
      from --surface in both themes, which --canvas cannot do (it's pure black
      in dark mode, so a nested block reads as a hole rather than a well). */
-  --surface-sunken: #f2f2f7;
+  --surface-sunken: light-dark(#f2f2f7, #2c2c2e);
   /* The selected thumb in a segmented control — must read as raised above
      --control, which means lighter in dark mode, not darker. */
-  --control-raised: #ffffff;
-  --hairline: rgba(60, 60, 67, 0.18);
+  --control-raised: light-dark(#ffffff, #48484a);
+  --hairline: light-dark(rgba(60, 60, 67, 0.18), rgba(84, 84, 88, 0.65));
 
   /* Ink */
-  --ink: #000000;
-  --ink-secondary: #48484a;
-  --ink-muted: #8a8a8e;
+  --ink: light-dark(#000000, #ffffff);
+  --ink-secondary: light-dark(#48484a, #aeaeb2);
+  --ink-muted: light-dark(#8a8a8e, #8e8e93);
   --ink-on-accent: #ffffff;
 
   /* Accent — the only color in the app. Ring, checked boxes, primary action.
      Two values because one blue can't do both jobs accessibly: --accent is a
      UI-component color (needs 3:1, has 4.0:1 on white), --accent-strong backs
-     white label text (needs 4.5:1, has 5.7:1). */
-  --accent: #007aff;
-  --accent-strong: #0063cc;
-  --accent-track: rgba(0, 122, 255, 0.18);
+     white label text (needs 4.5:1, has 5.7:1). The brighter dark-mode blue is
+     4.7:1 against --surface, so it can do both jobs alone. */
+  --accent: light-dark(#007aff, #0a84ff);
+  --accent-strong: light-dark(#0063cc, #0a84ff);
+  --accent-track: light-dark(rgba(0, 122, 255, 0.18), rgba(10, 132, 255, 0.25));
 
   /* Type */
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -55,34 +61,22 @@
   --radius-lg: 18px;
   --radius-full: 999px;
 
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.25);
-  --scrim: rgba(0, 0, 0, 0.4);
+  /* light-dark() only takes colors, so the geometry sits outside it. Cards drop
+     their shadow in dark mode via a transparent color rather than `none`. */
+  --shadow-card: 0 1px 2px light-dark(rgba(0, 0, 0, 0.05), transparent);
+  --shadow-modal: 0 20px 60px light-dark(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.6));
+  --scrim: light-dark(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6));
 
   --duration: 150ms;
   --content-width: 40rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --canvas: #000000;
-    --surface: #1c1c1e;
-    --control: #2c2c2e;
-    --surface-sunken: #2c2c2e;
-    --control-raised: #48484a;
-    --hairline: rgba(84, 84, 88, 0.65);
+/* The user's stored choice, stamped on <html>. Switching color-scheme resolves
+   every light-dark() above — and native controls and scrollbars with them. */
+:root[data-theme='light'] {
+  color-scheme: light;
+}
 
-    --ink: #ffffff;
-    --ink-secondary: #aeaeb2;
-    --ink-muted: #8e8e93;
-
-    /* The brighter dark-mode blue: 4.7:1 against --surface. */
-    --accent: #0a84ff;
-    --accent-strong: #0a84ff;
-    --accent-track: rgba(10, 132, 255, 0.25);
-
-    --shadow-card: none;
-    --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.6);
-    --scrim: rgba(0, 0, 0, 0.6);
-  }
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }

@@ -8,11 +8,13 @@ import SessionSummary from './components/SessionSummary.vue'
 import SessionLog from './components/SessionLog.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
 import { getGoalsList, setGoalsList, getSessions, getArchive, setArchive } from './lib/storage.js'
 import { completedSince } from './lib/checklist.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
+import { useTheme } from './composables/useTheme.js'
 
 const taskListText = ref(getGoalsList().text)
 const archive = ref(getArchive())
@@ -89,10 +91,18 @@ const completedTasks = computed(() =>
 )
 
 useDocumentTitle(state, remainingMs, isPaused)
+useTheme(prefs, updatePrefs)
 </script>
 
 <template>
   <div class="app">
+    <!-- The one element outside the state machine: every state renders below it,
+         so the theme stays switchable mid-session. -->
+    <header class="app__header">
+      <span class="app__wordmark">Paradone</span>
+      <ThemeToggle :theme="prefs.theme" @update="(theme) => updatePrefs({ theme })" />
+    </header>
+
     <section
       v-if="state === 'setup' && !showLog && !showArchive"
       class="card"
@@ -282,6 +292,18 @@ useDocumentTitle(state, remainingMs, isPaused)
 </template>
 
 <style scoped>
+.app__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app__wordmark {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink-secondary);
+}
+
 /* A timer screen: everything centred under the ring. */
 .stage {
   align-items: center;

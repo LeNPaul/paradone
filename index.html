@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Paradone — Focus Timer</title>
+    <script>
+      // Inline so the stored theme lands before first paint — otherwise a user
+      // whose choice differs from their OS sees the wrong palette flash on every
+      // load. The one place outside src/lib/storage.js that reads a paradone:* key.
+      try {
+        var t = JSON.parse(localStorage.getItem('paradone:prefs') || '{}').theme
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="app"></div>

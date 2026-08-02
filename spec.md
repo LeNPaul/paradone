@@ -48,6 +48,7 @@ There is no routing. One page, eight states.
 {
   workDuration: 25,      // minutes, user-editable
   breakDuration: 5,      // minutes, user-editable; 0 = no breaks
+  theme: "light",        // "light" | "dark"; seeded once from the OS, then fixed
 }
 
 // paradone:goalsList  — the single persistent Task List, cross-session
@@ -148,6 +149,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 ## 8. Acceptance criteria
 
 - [ ] Timer defaults to 25/5; both durations editable and persisted
+- [ ] Light/dark toggle is reachable in every state, applies immediately, and persists to `paradone:prefs`; on first load it takes the OS preference, and after that the stored choice wins with no flash of the wrong palette on reload
 - [ ] Break duration of 0 skips the break state entirely
 - [ ] Task List persists across page reloads and across sessions
 - [ ] At Setup, tasks can be added via the Add-Task modal, edited, and deleted, and each change persists to `paradone:goalsList`
