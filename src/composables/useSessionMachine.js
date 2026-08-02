@@ -130,6 +130,11 @@ export function useSessionMachine() {
     state.value = 'break'
   }
 
+  function endBreak() {
+    if (state.value !== 'break') return
+    state.value = 'audit'
+  }
+
   function keepGoing() {
     state.value = 'audit'
   }
@@ -256,6 +261,7 @@ export function useSessionMachine() {
     resumeSession,
     stopSession,
     takeBreak,
+    endBreak,
     keepGoing,
     submitAudit,
     skipAudit,

@@ -87,6 +87,7 @@ const {
   resumeSession,
   stopSession,
   takeBreak,
+  endBreak,
   keepGoing,
   submitAudit,
   skipAudit,
@@ -256,6 +257,14 @@ useTheme(prefs, updatePrefs)
         variant="session"
         label="Break"
       />
+      <div class="transport">
+        <button type="button" class="transport__button" @click="endBreak()">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="2" />
+          </svg>
+          <span class="sr-only">End break</span>
+        </button>
+      </div>
     </section>
 
     <section

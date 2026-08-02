@@ -200,6 +200,31 @@ describe('block end', () => {
   })
 })
 
+describe('break', () => {
+  function mountBreak() {
+    setActiveSession({
+      state: 'break',
+      timer: { durationMs: 5 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    return mount(App)
+  }
+
+  it('renders an End break button', () => {
+    const wrapper = mountBreak()
+    expect(wrapper.findAll('button').map((b) => b.text())).toContain('End break')
+  })
+
+  it('clicking End break transitions to the Audit screen', async () => {
+    const wrapper = mountBreak()
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'End break')
+      .trigger('click')
+    expect(wrapper.find('#break-heading').exists()).toBe(false)
+    expect(wrapper.find('#audit-heading').exists()).toBe(true)
+  })
+})
+
 describe('capture box', () => {
   it.each(['primer', 'active', 'break'])('is shown while state is %s', (state) => {
     setActiveSession({

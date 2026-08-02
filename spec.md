@@ -162,6 +162,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Capture box is reachable in every active state without leaving the timer
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break or continue
+- [ ] An in-progress break can be ended early, going straight to the audit
 - [ ] Audit prompt shows the current Task List alongside the questions
 - [ ] Audit prompt lists the tasks ticked during the block — not ones already checked before it started — and says so when there were none
 - [ ] Summary exports valid markdown containing the Task List snapshot, the completed-this-session list, capture notes, and audit answers

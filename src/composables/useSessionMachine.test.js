@@ -88,6 +88,24 @@ describe('block end', () => {
     expect(machine.state.value).toBe('audit')
   })
 
+  it('endBreak ends an in-progress break early, moving break -> audit', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+    expect(machine.state.value).toBe('break')
+    machine.endBreak()
+    expect(machine.state.value).toBe('audit')
+  })
+
+  it('endBreak does nothing outside the break state', () => {
+    const machine = useSessionMachine()
+    machine.startSession(1000)
+    machine.endBreak()
+    expect(machine.state.value).toBe('active')
+  })
+
   it('keepGoing moves blockEnd -> audit directly, without creating a break timer', () => {
     const machine = useSessionMachine()
     const now = 1000
@@ -443,6 +461,22 @@ describe('audit and summary', () => {
     expect(sessions[0].date).toBe(new Date(now).toISOString())
     expect(sessions[0].plannedDuration).toBe(25)
     expect(sessions[0].actualDuration).toBe(25)
+  })
+
+  it('records the full work block when the break was ended early', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+    machine.tick(now + 25 * 60 * 1000 + 60 * 1000)
+    machine.endBreak()
+    machine.skipAudit()
+
+    const sessions = getSessions()
+    expect(sessions[0].date).toBe(new Date(now).toISOString())
+    expect(sessions[0].actualDuration).toBe(25)
+    expect(sessions[0].completed).toBe(true)
   })
 })
 
