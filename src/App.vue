@@ -106,19 +106,6 @@ useTheme(prefs, updatePrefs)
     <section
       v-if="state === 'setup' && !showLog && !showArchive"
       class="card"
-      aria-labelledby="task-list-heading"
-    >
-      <h2 id="task-list-heading" class="eyebrow">Task List</h2>
-      <MarkdownChecklist
-        :model-value="taskListText"
-        @update:model-value="onTaskListUpdate"
-        @archive="onArchiveCompleted"
-      />
-    </section>
-
-    <section
-      v-if="state === 'setup' && !showLog && !showArchive"
-      class="card"
       aria-labelledby="start-heading"
     >
       <h2 id="start-heading" class="eyebrow">Start</h2>
@@ -131,6 +118,19 @@ useTheme(prefs, updatePrefs)
         <button type="button" class="btn-quiet" @click="openLog()">View log</button>
         <button type="button" class="btn-quiet" @click="showArchive = true">View archive</button>
       </div>
+    </section>
+
+    <section
+      v-if="state === 'setup' && !showLog && !showArchive"
+      class="card"
+      aria-labelledby="task-list-heading"
+    >
+      <h2 id="task-list-heading" class="eyebrow">Task List</h2>
+      <MarkdownChecklist
+        :model-value="taskListText"
+        @update:model-value="onTaskListUpdate"
+        @archive="onArchiveCompleted"
+      />
     </section>
 
     <section v-if="state === 'primerSetup'" class="card" aria-labelledby="primer-setup-heading">
