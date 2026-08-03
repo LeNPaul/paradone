@@ -11,6 +11,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive } from './lib/storage.js'
 import { completedSince } from './lib/checklist.js'
+import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
@@ -107,6 +108,10 @@ const completedTasks = computed(() =>
     : completedSince(taskListStartText.value, taskListText.value),
 )
 
+// The setup ring previews the configured block, so it uses the same
+// minutes → ms conversion a real session's timer does.
+const idleTotalMs = computed(() => createTimer(prefs.workDuration).durationMs)
+
 // Settings can be open over a running block, so get out of the way when the
 // machine advances — otherwise it would swallow the block-end prompt.
 watch(state, () => {
@@ -149,11 +154,30 @@ useTheme(prefs, updatePrefs)
     <template v-else>
       <section
         v-if="state === 'setup' && !showLog && !showArchive"
-        class="card"
+        class="card stage"
         aria-labelledby="start-heading"
       >
-        <h2 id="start-heading" class="eyebrow">Start</h2>
-        <button type="button" class="btn-primary setup__start" @click="startSession()">Start</button>
+        <h2 id="start-heading" class="eyebrow stage__heading">Start</h2>
+        <TimerDisplay
+          :remaining-ms="idleTotalMs"
+          :total-ms="idleTotalMs"
+          variant="session"
+          label="Ready"
+        />
+        <div class="transport">
+          <button
+            type="button"
+            class="transport__button transport__button--primary"
+            @click="startSession()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M8 5.5v13a1 1 0 0 0 1.54.84l10-6.5a1 1 0 0 0 0-1.68l-10-6.5A1 1 0 0 0 8 5.5Z"
+              />
+            </svg>
+            <span class="sr-only">Start</span>
+          </button>
+        </div>
         <button type="button" class="btn-quiet" @click="openPrimerSetup()">
           Need help starting? Try a 2-minute primer
         </button>
@@ -453,11 +477,6 @@ useTheme(prefs, updatePrefs)
 .stage :deep(.markdown-checklist) {
   align-self: stretch;
   text-align: left;
-}
-
-.setup__start {
-  font-size: var(--text-lg);
-  align-self: stretch;
 }
 
 .setup__links {

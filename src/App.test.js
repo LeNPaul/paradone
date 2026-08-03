@@ -25,6 +25,22 @@ describe('setup', () => {
     expect(wrapper.find('#break-duration').exists()).toBe(false)
   })
 
+  it('previews the configured block length in an unstarted ring', () => {
+    const wrapper = mount(App)
+    expect(wrapper.get('.timer-display__time').text()).toBe('25:00')
+    expect(wrapper.get('.timer-display__label').text()).toBe('Ready')
+    const circumference = 2 * Math.PI * 45
+    expect(
+      Number(wrapper.get('.timer-display__progress').attributes('stroke-dashoffset')),
+    ).toBeCloseTo(circumference, 5)
+  })
+
+  it('follows the configured work duration', () => {
+    setPrefs({ workDuration: 50, breakDuration: 5 })
+    const wrapper = mount(App)
+    expect(wrapper.get('.timer-display__time').text()).toBe('50:00')
+  })
+
   it('clicking Start renders the Active section with a TimerDisplay', async () => {
     const wrapper = mount(App)
     const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
