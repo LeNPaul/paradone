@@ -34,7 +34,7 @@ There is no routing. One page, eight states.
 
 ### Screen behaviours
 
-- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary, and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, plus a derived **completed-this-session** list alongside it.
+- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary — at Audit only the unchecked remainder, so completed work appears once and only under **completed-this-session** — and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, plus a derived **completed-this-session** list alongside it.
 - **Completed this session** is derived, not stored per task: the list is snapshotted when the block starts, and a task counts as completed if it is checked at the end and was *not* checked at the start. A task added mid-session and then ticked counts. Unticking a box during the block does not. Shown at Audit, exported in the Summary markdown, and recorded on the session so the audit log can show it.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable — surfaced as a "need help starting?" affordance, never a gate on starting work (plain **Start** never touches it). Choosing it first asks for a breakdown: what can you do in 2 minutes, in a free-text area. That text is required before the countdown starts — an empty primer defeats the point of the step — and it stays visible through the primer and the full focus block, then lands in the session record as `primerIntent`.
@@ -166,7 +166,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] At block end, user can choose break, continue, or end the session
 - [ ] "Keep going" starts another work block immediately, in the same session — planned and actual duration accumulate across chained blocks into one log record
 - [ ] An in-progress break can be ended early, going straight to the audit
-- [ ] Audit prompt shows the current Task List alongside the questions
+- [ ] Audit prompt shows the unchecked remainder of the Task List alongside the questions; checked tasks appear only under Completed this session
 - [ ] Audit prompt lists the tasks ticked during the block — not ones already checked before it started — and says so when there were none
 - [ ] Summary exports valid markdown containing the Task List snapshot, the completed-this-session list, capture notes, and audit answers
 - [ ] Audit log entries list the tasks completed in that block, on screen and in the log export

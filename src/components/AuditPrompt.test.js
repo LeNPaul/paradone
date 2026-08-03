@@ -8,8 +8,30 @@ const continueButton = (wrapper) =>
 
 describe('AuditPrompt', () => {
   it('shows the current Task List alongside the questions', () => {
-    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [x] draft outline' } })
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
     expect(wrapper.text()).toContain('draft outline')
+  })
+
+  it('leaves completed tasks out of the Task List, showing them only as completed', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: {
+        taskListText: '- [x] send invoice\n- [ ] email Mai',
+        completedTasks: ['send invoice'],
+      },
+    })
+    const taskList = wrapper.find('[aria-labelledby="audit-goal-heading"]')
+    expect(taskList.text()).toContain('email Mai')
+    expect(taskList.text()).not.toContain('send invoice')
+
+    const completed = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(completed.map((li) => li.text())).toEqual(['send invoice'])
+  })
+
+  it('says so when every task on the list is checked off', () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [x] send invoice' } })
+    expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).toContain(
+      'Nothing left on the list.',
+    )
   })
 
   it('lists the tasks checked off during the session', () => {

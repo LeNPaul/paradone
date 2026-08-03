@@ -1,9 +1,10 @@
 <script setup>
 // AuditPrompt: what got done, focused/distracted/mixed. Quick-select + optional free text.
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
+import { removeChecked } from '../lib/checklist.js'
 
-defineProps({
+const props = defineProps({
   taskListText: {
     type: String,
     default: '',
@@ -19,6 +20,10 @@ defineProps({
 })
 
 const emit = defineEmits(['submit', 'skip'])
+
+// The Audit screen is a before/after read: completed work belongs under
+// "Completed this session", so the list below it shows only what's left.
+const remainingText = computed(() => removeChecked(props.taskListText).text)
 
 const auditProductive = ref('')
 const auditNotes = ref('')
@@ -40,7 +45,8 @@ function onSubmit() {
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading" class="eyebrow">Task list</h3>
-      <MarkdownChecklist :model-value="taskListText" :editable="false" />
+      <MarkdownChecklist v-if="remainingText" :model-value="remainingText" :editable="false" />
+      <p v-else class="audit-prompt__empty">Nothing left on the list.</p>
     </section>
 
     <section class="audit-prompt__block" aria-labelledby="audit-capture-heading">
