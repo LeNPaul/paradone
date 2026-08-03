@@ -292,26 +292,52 @@ describe('pausing and stopping an active session', () => {
 })
 
 describe('block end', () => {
-  it('hides "Take a break" when breakDuration is 0', () => {
-    setPrefs({ workDuration: 25, breakDuration: 0 })
+  function mountBlockEnd() {
     setActiveSession({
       state: 'blockEnd',
       timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 25 * 60 * 1000, running: false },
     })
-    const wrapper = mount(App)
-    const buttons = wrapper.findAll('button').map((b) => b.text())
+    return mount(App)
+  }
+
+  it('hides "Take a break" when breakDuration is 0, keeping the other two choices', () => {
+    setPrefs({ workDuration: 25, breakDuration: 0 })
+    const buttons = mountBlockEnd()
+      .findAll('button')
+      .map((b) => b.text())
     expect(buttons).not.toContain('Take a break')
     expect(buttons).toContain('Keep going')
+    expect(buttons).toContain('End session')
   })
 
-  it('shows "Take a break" when breakDuration is greater than 0', () => {
-    setActiveSession({
-      state: 'blockEnd',
-      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 25 * 60 * 1000, running: false },
-    })
-    const wrapper = mount(App)
-    const buttons = wrapper.findAll('button').map((b) => b.text())
+  it('offers break, keep going, and end session when breakDuration is greater than 0', () => {
+    const buttons = mountBlockEnd()
+      .findAll('button')
+      .map((b) => b.text())
     expect(buttons).toContain('Take a break')
+    expect(buttons).toContain('Keep going')
+    expect(buttons).toContain('End session')
+  })
+
+  it('clicking Keep going starts another block, returning to the Active screen', async () => {
+    const wrapper = mountBlockEnd()
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Keep going')
+      .trigger('click')
+    expect(wrapper.find('#block-end-heading').exists()).toBe(false)
+    expect(wrapper.find('#active-task-list-heading').exists()).toBe(true)
+    expect(wrapper.text()).toContain('25:00')
+  })
+
+  it('clicking End session transitions to the Audit screen', async () => {
+    const wrapper = mountBlockEnd()
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'End session')
+      .trigger('click')
+    expect(wrapper.find('#block-end-heading').exists()).toBe(false)
+    expect(wrapper.find('#audit-heading').exists()).toBe(true)
   })
 })
 

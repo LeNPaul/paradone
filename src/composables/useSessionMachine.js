@@ -33,6 +33,10 @@ export function useSessionMachine() {
   const primerIntent = ref(stored?.primerIntent ?? '')
   const stoppedEarly = ref(stored?.stoppedEarly ?? false)
   const actualDurationMs = ref(stored?.actualDurationMs ?? null)
+  // Planned minutes across every block chained into this session. null means "no
+  // record" — a session rehydrated from before this existed falls back to the
+  // current work duration rather than logging 0.
+  const plannedDurationMin = ref(stored?.plannedDurationMin ?? null)
   // Task List snapshot taken when the block started, diffed against the list at
   // audit time to work out what got ticked off during it. null means "no
   // snapshot" — a session rehydrated from before this existed reports nothing
@@ -52,7 +56,8 @@ export function useSessionMachine() {
     now.value = at
     if (!timer.value) return
     if (state.value === 'active' && isFinished(timer.value, at)) {
-      actualDurationMs.value = timer.value.durationMs - getRemainingMs(timer.value, at)
+      actualDurationMs.value =
+        (actualDurationMs.value ?? 0) + (timer.value.durationMs - getRemainingMs(timer.value, at))
       state.value = 'blockEnd'
     } else if (state.value === 'break' && isFinished(timer.value, at)) state.value = 'audit'
   }
@@ -67,6 +72,7 @@ export function useSessionMachine() {
     timer.value = start(createTimer(prefs.workDuration), at)
     sessionStartedAt.value = at
     taskListStartText.value = getGoalsList().text
+    plannedDurationMin.value = prefs.workDuration
     usedPrimer.value = false
     primerIntent.value = ''
     state.value = 'active'
@@ -96,6 +102,7 @@ export function useSessionMachine() {
     timer.value = start(createTimer(prefs.workDuration), at)
     sessionStartedAt.value = at
     taskListStartText.value = getGoalsList().text
+    plannedDurationMin.value = prefs.workDuration
     usedPrimer.value = true
     state.value = 'active'
   }
@@ -120,7 +127,8 @@ export function useSessionMachine() {
 
   function stopSession(at = Date.now()) {
     if (state.value !== 'active') return
-    actualDurationMs.value = timer.value.durationMs - getRemainingMs(timer.value, at)
+    actualDurationMs.value =
+      (actualDurationMs.value ?? 0) + (timer.value.durationMs - getRemainingMs(timer.value, at))
     stoppedEarly.value = true
     state.value = 'audit'
   }
@@ -135,7 +143,17 @@ export function useSessionMachine() {
     state.value = 'audit'
   }
 
-  function keepGoing() {
+  // Chains another block onto the same session: sessionStartedAt, the Task List
+  // snapshot and the capture box all carry over, so one audit covers every block.
+  function keepGoing(at = Date.now()) {
+    if (state.value !== 'blockEnd') return
+    timer.value = start(createTimer(prefs.workDuration), at)
+    plannedDurationMin.value = (plannedDurationMin.value ?? 0) + prefs.workDuration
+    state.value = 'active'
+  }
+
+  function endSession() {
+    if (state.value !== 'blockEnd') return
     state.value = 'audit'
   }
 
@@ -154,7 +172,7 @@ export function useSessionMachine() {
         taskListStartText.value === null
           ? []
           : completedSince(taskListStartText.value, taskListText),
-      plannedDuration: prefs.workDuration,
+      plannedDuration: plannedDurationMin.value ?? prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       capture: capture.value,
       usedPrimer: usedPrimer.value,
@@ -190,6 +208,7 @@ export function useSessionMachine() {
     sessionStartedAt.value = null
     stoppedEarly.value = false
     actualDurationMs.value = null
+    plannedDurationMin.value = null
     taskListStartText.value = null
   }
 
@@ -206,6 +225,7 @@ export function useSessionMachine() {
       primerIntent,
       stoppedEarly,
       actualDurationMs,
+      plannedDurationMin,
       taskListStartText,
     ],
     () => {
@@ -224,6 +244,7 @@ export function useSessionMachine() {
               primerIntent: primerIntent.value,
               stoppedEarly: stoppedEarly.value,
               actualDurationMs: actualDurationMs.value,
+              plannedDurationMin: plannedDurationMin.value,
               taskListStartText: taskListStartText.value,
             },
       )
@@ -263,6 +284,7 @@ export function useSessionMachine() {
     takeBreak,
     endBreak,
     keepGoing,
+    endSession,
     submitAudit,
     skipAudit,
     startNewSession,

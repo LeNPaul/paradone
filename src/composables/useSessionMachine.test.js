@@ -106,13 +106,38 @@ describe('block end', () => {
     expect(machine.state.value).toBe('active')
   })
 
-  it('keepGoing moves blockEnd -> audit directly, without creating a break timer', () => {
+  it('keepGoing moves blockEnd -> active with a fresh work-duration timer', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.keepGoing(now + 25 * 60 * 1000)
+    expect(machine.state.value).toBe('active')
+    expect(machine.totalMs.value).toBe(25 * 60 * 1000)
+    expect(machine.remainingMs.value).toBe(25 * 60 * 1000)
+  })
+
+  it('keepGoing does nothing outside the block-end state', () => {
+    const machine = useSessionMachine()
+    machine.startSession(1000)
+    machine.keepGoing(2000)
+    expect(machine.state.value).toBe('active')
+  })
+
+  it('endSession moves blockEnd -> audit directly, without creating a break timer', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.endSession()
     expect(machine.state.value).toBe('audit')
+  })
+
+  it('endSession does nothing outside the block-end state', () => {
+    const machine = useSessionMachine()
+    machine.startSession(1000)
+    machine.endSession()
+    expect(machine.state.value).toBe('active')
   })
 })
 
@@ -295,7 +320,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'got the outline done' })
     expect(machine.state.value).toBe('summary')
     expect(machine.auditProductive.value).toBe('focused')
@@ -334,7 +359,7 @@ describe('audit and summary', () => {
     machine.startSession(now)
     machine.capture.value = 'reply to Mai'
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
     const sessions = getSessions()
@@ -364,7 +389,7 @@ describe('audit and summary', () => {
     machine.startSession(now)
     machine.capture.value = 'reply to Mai'
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
     expect(getSessions()).toHaveLength(1)
 
@@ -383,7 +408,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
     // No startNewSession() — this is the "closed the tab at the summary" case.
@@ -397,7 +422,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
 
     setGoalsList({ text: '- [x] draft outline\n- [ ] send invoice', updatedAt: null })
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
@@ -412,7 +437,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
 
     setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
@@ -426,7 +451,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
 
     setGoalsList({ text: '- [ ] draft outline\n- [x] reply to Mai', updatedAt: null })
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
@@ -440,7 +465,7 @@ describe('audit and summary', () => {
     const now = 1000
     machine.startSession(now)
     machine.tick(now + 25 * 60 * 1000)
-    machine.keepGoing()
+    machine.endSession()
 
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     machine.skipAudit()
@@ -478,6 +503,44 @@ describe('audit and summary', () => {
     expect(sessions[0].actualDuration).toBe(25)
     expect(sessions[0].completed).toBe(true)
   })
+
+  it('logs blocks chained with keepGoing as one session with accumulated durations', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing(now + 25 * 60 * 1000)
+    machine.tick(now + 50 * 60 * 1000)
+    machine.endSession()
+
+    setGoalsList({ text: '- [x] draft outline', updatedAt: null })
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'two blocks' })
+
+    const sessions = getSessions()
+    expect(sessions).toHaveLength(1)
+    expect(sessions[0].date).toBe(new Date(now).toISOString())
+    expect(sessions[0].plannedDuration).toBe(50)
+    expect(sessions[0].actualDuration).toBe(50)
+    expect(sessions[0].completed).toBe(true)
+    // The snapshot is the first block's, so the tick still counts.
+    expect(sessions[0].completedTasks).toEqual(['draft outline'])
+  })
+
+  it('counts the part-finished block when a chained session is stopped early', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing(now + 25 * 60 * 1000)
+    machine.stopSession(now + 30 * 60 * 1000)
+    machine.skipAudit()
+
+    const sessions = getSessions()
+    expect(sessions[0].plannedDuration).toBe(50)
+    expect(sessions[0].actualDuration).toBe(30)
+    expect(sessions[0].completed).toBe(false)
+  })
 })
 
 describe('activeSession persistence', () => {
@@ -497,8 +560,20 @@ describe('activeSession persistence', () => {
       primerIntent: '',
       stoppedEarly: false,
       actualDurationMs: null,
+      plannedDurationMin: 25,
       taskListStartText: '',
     })
+  })
+
+  it('persists the accumulated planned duration after keepGoing chains a block', async () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing(now + 25 * 60 * 1000)
+    await nextTick()
+    expect(getActiveSession().plannedDurationMin).toBe(50)
+    expect(getActiveSession().actualDurationMs).toBe(25 * 60 * 1000)
   })
 
   it('clears activeSession when returning to setup', async () => {
@@ -568,7 +643,7 @@ describe('rehydration', () => {
     expect(machine.taskListStartText.value).toBe('- [x] send invoice\n- [ ] draft outline')
 
     setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
     expect(getSessions()[0].completedTasks).toEqual(['draft outline'])
@@ -580,10 +655,39 @@ describe('rehydration', () => {
     setGoalsList({ text: '- [x] send invoice\n- [x] draft outline', updatedAt: null })
 
     const machine = useSessionMachine()
-    machine.keepGoing()
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
 
     expect(getSessions()[0].completedTasks).toEqual([])
+  })
+
+  it('restores the accumulated durations of a chained session, so a reload mid-chain still logs every block', () => {
+    const sessionStartedAt = Date.now() - 50 * 60 * 1000
+    setActiveSession({
+      state: 'blockEnd',
+      timer: null,
+      sessionStartedAt,
+      actualDurationMs: 50 * 60 * 1000,
+      plannedDurationMin: 50,
+    })
+    const machine = useSessionMachine()
+    machine.endSession()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    const sessions = getSessions()
+    expect(sessions[0].plannedDuration).toBe(50)
+    expect(sessions[0].actualDuration).toBe(50)
+  })
+
+  it('falls back to the current work duration for a session stored before chained durations existed', () => {
+    const sessionStartedAt = Date.now() - 25 * 60 * 1000
+    setActiveSession({ state: 'blockEnd', timer: null, sessionStartedAt })
+
+    const machine = useSessionMachine()
+    machine.endSession()
+    machine.skipAudit()
+
+    expect(getSessions()[0].plannedDuration).toBe(25)
   })
 
   it('restores a skipped primer so the commit/stop choice survives a reload, instead of reverting to waiting out the countdown', () => {

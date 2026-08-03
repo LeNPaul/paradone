@@ -95,6 +95,7 @@ const {
   takeBreak,
   endBreak,
   keepGoing,
+  endSession,
   submitAudit,
   skipAudit,
   startNewSession,
@@ -297,7 +298,7 @@ useTheme(prefs, updatePrefs)
 
       <section v-if="state === 'blockEnd'" class="card stage" aria-labelledby="block-end-heading">
         <h2 id="block-end-heading" class="eyebrow stage__heading">Block complete</h2>
-        <p class="stage__question">Take the break, or keep going?</p>
+        <p class="stage__question">Take the break, keep going, or wrap up?</p>
         <div class="actions actions--centred">
           <button
             v-if="prefs.breakDuration > 0"
@@ -308,6 +309,7 @@ useTheme(prefs, updatePrefs)
             Take a break
           </button>
           <button type="button" class="btn-choice" @click="keepGoing()">Keep going</button>
+          <button type="button" class="btn-choice" @click="endSession()">End session</button>
         </div>
       </section>
 
@@ -459,6 +461,7 @@ useTheme(prefs, updatePrefs)
 
 .actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
   gap: var(--space-3);
