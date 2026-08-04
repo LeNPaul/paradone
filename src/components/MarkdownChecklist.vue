@@ -16,13 +16,23 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Hashes to leave out of the render. Display-only: modelValue stays the full
+  // list, so a toggle still writes back every line, hidden ones included.
+  hiddenHashes: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const emit = defineEmits(['update:modelValue', 'archive'])
 
 // An empty string parses to a single blank line; render nothing for it so the
 // list shows no phantom row (and no stray edit/delete controls) when empty.
-const items = computed(() => (props.modelValue === '' ? [] : parseChecklist(props.modelValue)))
+const items = computed(() =>
+  props.modelValue === ''
+    ? []
+    : parseChecklist(props.modelValue).filter((item) => !props.hiddenHashes.includes(item.hash)),
+)
 
 const checkedCount = computed(() => items.value.filter((item) => item.checked).length)
 

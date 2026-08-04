@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { buildSummaryMarkdown } from './summary.js'
 
 const baseInput = {
-  taskListText: '- [x] draft outline\n- [ ] send invoice',
   completedTasks: ['draft outline'],
   capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
@@ -12,10 +11,6 @@ const baseInput = {
 describe('buildSummaryMarkdown', () => {
   it('builds the whole document for an answered audit', () => {
     expect(buildSummaryMarkdown(baseInput)).toBe(`# Session Summary
-
-## Tasks
-- [x] draft outline
-- [ ] send invoice
 
 ## Completed this session
 - draft outline

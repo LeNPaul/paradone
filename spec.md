@@ -26,15 +26,15 @@ There is no routing. One page, eight states.
 | **Setup** | Task List (persistent, editable, checkbox-aware) — add/edit/delete tasks + optional 2-minute primer link + Start |
 | **Primer setup** *(optional)* | Break the task down into something doable in 2 minutes, typed into a free-text area, then start the countdown |
 | **Primer** *(optional)* | 2-minute timer showing that breakdown, then: commit to a full session, or stop here |
-| **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea), capture scratchpad always available |
+| **Active** | Countdown, task list rendered with live checkboxes (toggle-only, no textarea) minus anything already checked when the session started, capture scratchpad always available |
 | **Block end** | Bell → "take the break, keep going, or wrap up?" — keeping going chains another block onto the same session |
 | **Break** *(skippable)* | Break countdown |
 | **Audit** | What actually got done? Focused or distracted? Shown alongside the current task list |
-| **Summary** | Compiled markdown (task list, capture notes, audit), copy or download, start new session |
+| **Summary** | Compiled markdown (completed-this-session list, capture notes, audit), copy or download, start new session |
 
 ### Screen behaviours
 
-- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only. The same list is shown read-only at Audit and Summary — at Audit only the unchecked remainder, so completed work appears once and only under **completed-this-session** — and whatever the list contains at the moment a session ends *is* the export content — a full snapshot, plus a derived **completed-this-session** list alongside it.
+- **Task List** is a single persistent checklist, cross-session, stored as a markdown string. At Setup you build it through structured controls — an **Add Task** button opens a modal to enter a task, and each existing task has edit and delete controls (no raw-markdown textarea). During Active it's checkbox-toggle-only, and tasks already checked when the session started are hidden — they are finished work, and the block is about what's left. Ones ticked *during* the block stay on screen, ticked, so in-block progress is visible and a mis-click can be undone. The list is also shown read-only at Audit, there too as only the unchecked remainder, so completed work appears once and only under **completed-this-session**. The Summary does not show the list at all: it recaps the block that just happened, so the **completed-this-session** list is the export content, alongside capture notes and the audit answers.
 - **Completed this session** is derived, not stored per task: the list is snapshotted when the block starts, and a task counts as completed if it is checked at the end and was *not* checked at the start. A task added mid-session and then ticked counts. Unticking a box during the block does not. Shown at Audit, exported in the Summary markdown, and recorded on the session so the audit log can show it.
 - **Capture box** is a freeform scratchpad textarea, pinned and available in every active state. You write into it continuously as things come up — not discrete, timestamped entries. Whatever it contains at session end is exported verbatim at summary — never triaged mid-block.
 - **2-minute primer** is optional and skippable — surfaced as a "need help starting?" affordance, never a gate on starting work (plain **Start** never touches it). Choosing it first asks for a breakdown: what can you do in 2 minutes, in a free-text area. That text is required before the countdown starts — an empty primer defeats the point of the step — and it stays visible through the primer and the full focus block, then lands in the session record as `primerIntent`.
@@ -95,7 +95,7 @@ The **source of truth is a raw markdown string**, not a structured array. Parse 
 - Item identity keys on a **content hash of the line**, not line index — so add/edit/delete (and any reorder) don't attach a checked box to the wrong line.
 - Parsed items carry the marker-stripped task `text`. The completed-this-session diff keys on that **text**, not the hash: the hash covers the whole line including the `- [x] ` marker, so toggling a box changes it. An in-progress session persists its start snapshot to `paradone:activeSession`; when that snapshot is missing (a block started before this existed) the diff reports nothing rather than claiming every checked task.
 - Non-checkbox lines (plain bullets, free text) render as-is and are simply not clickable. New tasks are always added as `- [ ]` checkbox lines; plain lines only arise from pre-existing stored data.
-- This same component is instantiated across every state that shows the Task List (Setup, Active, Audit, Summary), always bound to the one persistent `paradone:goalsList` store — editable (add/edit/delete + toggle) at Setup, toggle-only at Active, read-only at Audit/Summary.
+- This same component is instantiated across every state that shows the Task List (Setup, Active, Audit), always bound to the one persistent `paradone:goalsList` store — editable (add/edit/delete + toggle) at Setup, toggle-only at Active, read-only at Audit. Active hides the pre-checked tasks through a display-only `hiddenHashes` prop, not by passing a filtered string: the bound value stays the whole list, so a toggle writes back every line rather than deleting the hidden ones.
 
 ## 5. Constraints
 
@@ -157,6 +157,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Task List persists across page reloads and across sessions
 - [ ] At Setup, tasks can be added via the Add-Task modal, edited, and deleted, and each change persists to `paradone:goalsList`
 - [ ] Checkboxes in the Task List are clickable and persist their state, both at Setup and during an active session
+- [ ] An active session hides the tasks already checked when it started, keeps ones ticked during the block on screen, and still persists the hidden tasks when a visible one is toggled
 - [ ] "Archive completed" at Setup removes every checked task from the Task List and persists them to `paradone:archive`, leaving unchecked and plain lines in place
 - [ ] An archived task records the time its checkbox was ticked — surviving a reload between the tick and the sweep — not the time it was archived
 - [ ] The archive view lists archived tasks newest-first with their completion times, and downloads in full as one markdown file
@@ -168,7 +169,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] An in-progress break can be ended early, going straight to the audit
 - [ ] Audit prompt shows the unchecked remainder of the Task List alongside the questions; checked tasks appear only under Completed this session
 - [ ] Audit prompt lists the tasks ticked during the block — not ones already checked before it started — and says so when there were none
-- [ ] Summary exports valid markdown containing the Task List snapshot, the completed-this-session list, capture notes, and audit answers
+- [ ] Summary shows no Task List, and exports valid markdown containing the completed-this-session list, capture notes, and audit answers
 - [ ] Audit log entries list the tasks completed in that block, on screen and in the log export
 - [ ] Every audit is appended to `paradone:sessions` the moment it is answered or skipped, and survives closing the tab at Summary
 - [ ] The audit log lists all past audits newest-first with date/time stamps, and downloads in full as one markdown file

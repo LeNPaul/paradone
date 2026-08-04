@@ -258,6 +258,66 @@ describe('adding to the Task List', () => {
   })
 })
 
+describe('hiding already-completed tasks during a session', () => {
+  function startSession(text) {
+    setGoalsList({ text, updatedAt: null })
+    const wrapper = mount(App)
+    return wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Start')
+      .trigger('click')
+      .then(() => wrapper)
+  }
+
+  it('leaves tasks checked before Start out of the active list', async () => {
+    const wrapper = await startSession('- [x] send invoice\n- [ ] draft outline')
+
+    const activeSection = wrapper.get('[aria-labelledby="active-heading"]')
+    expect(activeSection.text()).not.toContain('send invoice')
+    expect(activeSection.text()).toContain('draft outline')
+    expect(activeSection.findAll('input[type="checkbox"]')).toHaveLength(1)
+  })
+
+  it('keeps a task ticked during the block on screen, checked', async () => {
+    const wrapper = await startSession('- [x] send invoice\n- [ ] draft outline')
+    await wrapper.get('[aria-labelledby="active-heading"] input[type="checkbox"]').setValue(true)
+
+    const checkboxes = wrapper
+      .get('[aria-labelledby="active-heading"]')
+      .findAll('input[type="checkbox"]')
+    expect(checkboxes).toHaveLength(1)
+    expect(checkboxes[0].element.checked).toBe(true)
+  })
+
+  // The hidden lines are filtered at render only, so a toggle must not drop them.
+  it('keeps the hidden tasks in storage when a visible one is toggled', async () => {
+    const wrapper = await startSession('- [x] send invoice\n- [ ] draft outline')
+    await wrapper.get('[aria-labelledby="active-heading"] input[type="checkbox"]').setValue(true)
+
+    expect(getGoalsList().text).toBe('- [x] send invoice\n- [x] draft outline')
+  })
+
+  it('shows the full list again back at Setup', async () => {
+    const wrapper = await startSession('- [x] send invoice\n- [ ] draft outline')
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Stop & log session')
+      .trigger('click')
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Skip')
+      .trigger('click')
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Start new session')
+      .trigger('click')
+
+    const taskListSection = wrapper.get('section[aria-labelledby="task-list-heading"]')
+    expect(taskListSection.text()).toContain('send invoice')
+    expect(taskListSection.text()).toContain('draft outline')
+  })
+})
+
 describe('pausing and stopping an active session', () => {
   function mountActive() {
     setActiveSession({
@@ -431,8 +491,9 @@ describe('audit and summary', () => {
     const startButton = wrapper.findAll('button').find((b) => b.text() === 'Start')
     await startButton.trigger('click')
 
-    // Tick the second task; the first was already done before the block began.
-    await wrapper.findAll('input[type="checkbox"]')[1].setValue(true)
+    // The first task was already done before the block began, so it is hidden
+    // from the active list — the only checkbox on screen is "draft outline".
+    await wrapper.findAll('input[type="checkbox"]')[0].setValue(true)
     const stopButton = wrapper.findAll('button').find((b) => b.text() === 'Stop & log session')
     await stopButton.trigger('click')
 
@@ -481,7 +542,7 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
-  it('rendering the summary screen shows the task list, capture text, and audit answers', () => {
+  it('rendering the summary screen shows the capture text and audit answers, but not the Task List', () => {
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({
       state: 'summary',
@@ -494,9 +555,11 @@ describe('audit and summary', () => {
     })
     const wrapper = mount(App)
     const text = wrapper.text()
-    expect(text).toContain('draft outline')
     expect(text).toContain('reply to Mai')
     expect(text).toContain('got it done')
+    // The summary recaps the block, not the standing list.
+    expect(wrapper.find('#summary-tasks-heading').exists()).toBe(false)
+    expect(text).not.toContain('draft outline')
   })
 
   it('clicking "Start new session" returns to Setup with the Task List preserved (not reset)', async () => {

@@ -1,16 +1,11 @@
 <script setup>
 // SessionSummary: renders the end-of-session record, copy + download as markdown
 import { computed } from 'vue'
-import MarkdownChecklist from './MarkdownChecklist.vue'
 import { PRODUCTIVE_LABELS } from '../lib/sessionLog.js'
 import { buildSummaryMarkdown } from '../lib/summary.js'
 import { downloadMarkdown } from '../lib/download.js'
 
 const props = defineProps({
-  taskListText: {
-    type: String,
-    default: '',
-  },
   completedTasks: {
     type: Array,
     default: () => [],
@@ -48,11 +43,6 @@ function onDownload() {
 
 <template>
   <div class="session-summary">
-    <section class="session-summary__block" aria-labelledby="summary-tasks-heading">
-      <h3 id="summary-tasks-heading" class="eyebrow">Tasks</h3>
-      <MarkdownChecklist :model-value="taskListText" :editable="false" />
-    </section>
-
     <section class="session-summary__block" aria-labelledby="summary-completed-heading">
       <h3 id="summary-completed-heading" class="eyebrow">Completed this session</h3>
       <ul v-if="completedTasks.length" class="list-reset session-summary__completed">

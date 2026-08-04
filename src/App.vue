@@ -10,7 +10,7 @@ import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive } from './lib/storage.js'
-import { completedSince } from './lib/checklist.js'
+import { completedSince, parseChecklist } from './lib/checklist.js'
 import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
@@ -107,6 +107,17 @@ const completedTasks = computed(() =>
   taskListStartText.value === null
     ? []
     : completedSince(taskListStartText.value, taskListText.value),
+)
+
+// Tasks already ticked before this block began are finished work — hide them
+// from the running list. Ones ticked during the block stay, so in-block
+// progress is visible and a mis-click can be undone.
+const hiddenTaskHashes = computed(() =>
+  taskListStartText.value === null
+    ? []
+    : parseChecklist(taskListStartText.value)
+        .filter((item) => item.checked)
+        .map((item) => item.hash),
 )
 
 // The setup ring previews the configured block, so it uses the same
@@ -292,6 +303,7 @@ useTheme(prefs, updatePrefs)
         <MarkdownChecklist
           :model-value="taskListText"
           :editable="false"
+          :hidden-hashes="hiddenTaskHashes"
           @update:model-value="onTaskListUpdate"
         />
       </section>
@@ -354,7 +366,6 @@ useTheme(prefs, updatePrefs)
       <section v-if="state === 'summary'" class="card" aria-labelledby="summary-heading">
         <h2 id="summary-heading" class="eyebrow">Summary</h2>
         <SessionSummary
-          :task-list-text="taskListText"
           :completed-tasks="completedTasks"
           :capture="capture"
           :audit-productive="auditProductive"

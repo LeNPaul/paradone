@@ -5,7 +5,6 @@
 import { PRODUCTIVE_LABELS } from './sessionLog.js'
 
 export function buildSummaryMarkdown({
-  taskListText = '',
   completedTasks = [],
   capture = '',
   auditProductive = '',
@@ -30,9 +29,6 @@ export function buildSummaryMarkdown({
     : ''
 
   return `# Session Summary
-
-## Tasks
-${taskListText}
 
 ## Completed this session
 ${completedText}

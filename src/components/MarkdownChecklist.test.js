@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import TaskModal from './TaskModal.vue'
+import { parseChecklist } from '../lib/checklist.js'
 
 // TaskModal wraps a native <dialog>, whose showModal()/close() jsdom does not
 // implement. Stub it so we can drive the add/edit flow through its props/emits.
@@ -154,5 +155,30 @@ describe('MarkdownChecklist', () => {
   it('hides the archive button when editable is false', () => {
     const wrapper = mountChecklist({ modelValue: '- [x] send invoice', editable: false })
     expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
+
+  describe('hiddenHashes', () => {
+    const text = '- [x] send invoice\n- [ ] draft outline'
+    const hiddenHashes = [parseChecklist(text)[0].hash]
+
+    it('leaves the named lines out of the render', () => {
+      const wrapper = mountChecklist({ modelValue: text, hiddenHashes })
+
+      const items = wrapper.findAll('li')
+      expect(items).toHaveLength(1)
+      expect(items[0].find('label span').text()).toBe('draft outline')
+    })
+
+    // The filter is display-only: modelValue stays the whole list, so a toggle
+    // must write back the hidden lines too rather than dropping them.
+    it('still emits the full list, hidden lines included, on toggle', async () => {
+      const wrapper = mountChecklist({ modelValue: text, hiddenHashes, editable: false })
+
+      await wrapper.find('input[type="checkbox"]').setValue(true)
+
+      expect(wrapper.emitted('update:modelValue')).toEqual([
+        ['- [x] send invoice\n- [x] draft outline'],
+      ])
+    })
   })
 })

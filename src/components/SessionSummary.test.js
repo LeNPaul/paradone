@@ -4,7 +4,6 @@ import SessionSummary from './SessionSummary.vue'
 import { buildSummaryMarkdown } from '../lib/summary.js'
 
 const baseProps = {
-  taskListText: '- [x] draft outline',
   completedTasks: ['draft outline'],
   capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
@@ -19,13 +18,20 @@ beforeEach(() => {
 })
 
 describe('SessionSummary', () => {
-  it('renders the task list, the capture text, and the audit answers', () => {
+  it('renders the capture text and the audit answers', () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
     const text = wrapper.text()
-    expect(text).toContain('draft outline')
     expect(text).toContain('reply to Mai re: weekend')
     expect(text).toContain('Focused')
     expect(text).toContain('got the outline done')
+  })
+
+  // The summary is about the block that just happened, so the standing Task
+  // List is out: completed work appears once, under Completed this session.
+  it('does not render the Task List', () => {
+    const wrapper = mount(SessionSummary, { props: baseProps })
+    expect(wrapper.find('#summary-tasks-heading').exists()).toBe(false)
+    expect(wrapper.find('.markdown-checklist').exists()).toBe(false)
   })
 
   it('omits the entire Audit section when the audit was skipped', () => {
