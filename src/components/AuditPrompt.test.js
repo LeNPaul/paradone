@@ -6,6 +6,9 @@ import AuditPrompt from './AuditPrompt.vue'
 const continueButton = (wrapper) =>
   wrapper.findAll('button').find((b) => b.text() === 'Continue')
 
+const discardButton = (wrapper) =>
+  wrapper.findAll('button').find((b) => b.text() === 'Discard session')
+
 describe('AuditPrompt', () => {
   it('shows the current Task List alongside the questions', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
@@ -102,5 +105,33 @@ describe('AuditPrompt', () => {
 
     await skip.trigger('click')
     expect(wrapper.emitted('skip')).toHaveLength(1)
+  })
+
+  it('asks for confirmation before discarding instead of emitting straight away', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
+
+    await discardButton(wrapper).trigger('click')
+
+    expect(wrapper.emitted('discard')).toBeUndefined()
+    expect(wrapper.text()).toContain('Discard session?')
+    expect(wrapper.text()).toContain("This block won't be added to your audit log.")
+  })
+
+  it('emits discard once the dialog is confirmed', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
+
+    await discardButton(wrapper).trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard').trigger('click')
+
+    expect(wrapper.emitted('discard')).toHaveLength(1)
+  })
+
+  it('does not emit discard when the dialog is cancelled', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
+
+    await discardButton(wrapper).trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Cancel').trigger('click')
+
+    expect(wrapper.emitted('discard')).toBeUndefined()
   })
 })

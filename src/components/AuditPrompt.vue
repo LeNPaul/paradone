@@ -2,6 +2,7 @@
 // AuditPrompt: what got done, focused/distracted/mixed. Quick-select + optional free text.
 import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 import { removeChecked } from '../lib/checklist.js'
 
 const props = defineProps({
@@ -19,7 +20,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['submit', 'skip'])
+const emit = defineEmits(['submit', 'skip', 'discard'])
 
 // The Audit screen is a before/after read: completed work belongs under
 // "Completed this session", so the list below it shows only what's left.
@@ -28,8 +29,15 @@ const remainingText = computed(() => removeChecked(props.taskListText).text)
 const auditProductive = ref('')
 const auditNotes = ref('')
 
+const confirmingDiscard = ref(false)
+
 function onSubmit() {
   emit('submit', { auditProductive: auditProductive.value, auditNotes: auditNotes.value.trim() })
+}
+
+function onConfirmDiscard() {
+  confirmingDiscard.value = false
+  emit('discard')
 }
 </script>
 
@@ -78,11 +86,23 @@ function onSubmit() {
     </fieldset>
 
     <div class="audit-prompt__actions">
+      <button type="button" class="btn-quiet audit-prompt__discard" @click="confirmingDiscard = true">
+        Discard session
+      </button>
       <button type="button" class="btn-quiet" @click="emit('skip')">Skip</button>
       <button type="button" class="btn-primary" :disabled="!auditProductive" @click="onSubmit">
         Continue
       </button>
     </div>
+
+    <ConfirmDialog
+      :open="confirmingDiscard"
+      title="Discard session?"
+      message="This block won't be added to your audit log. Tasks you ticked off stay ticked. This cannot be undone."
+      confirm-label="Discard"
+      @confirm="onConfirmDiscard"
+      @close="confirmingDiscard = false"
+    />
   </div>
 </template>
 
@@ -178,5 +198,11 @@ function onSubmit() {
   justify-content: flex-end;
   align-items: center;
   gap: var(--space-3);
+}
+
+/* Pushed to the far edge: throwing the block away isn't a third way of
+   answering the audit, so it shouldn't sit beside Skip and Continue. */
+.audit-prompt__discard {
+  margin-right: auto;
 }
 </style>

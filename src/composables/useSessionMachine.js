@@ -197,6 +197,14 @@ export function useSessionMachine() {
     state.value = 'summary'
   }
 
+  // The escape hatch for a block that wasn't real: no record is written, so the
+  // audit log stays something the user can trust. Ticked tasks stay ticked —
+  // the Task List is persistent and outlives any one session.
+  function discardSession() {
+    if (state.value !== 'audit') return
+    startNewSession()
+  }
+
   function startNewSession() {
     state.value = 'setup'
     timer.value = null
@@ -287,6 +295,7 @@ export function useSessionMachine() {
     endSession,
     submitAudit,
     skipAudit,
+    discardSession,
     startNewSession,
     tick,
   }

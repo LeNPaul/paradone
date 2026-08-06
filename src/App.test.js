@@ -543,6 +543,27 @@ describe('audit and summary', () => {
     expect(wrapper.find('#summary-heading').exists()).toBe(true)
   })
 
+  it('discarding the session returns to Setup with nothing logged and the Task List untouched', async () => {
+    setGoalsList({ text: '- [x] send invoice\n- [ ] draft outline', updatedAt: null })
+    setActiveSession({
+      state: 'audit',
+      timer: null,
+      capture: 'tabbed out to check email',
+      usedPrimer: false,
+      auditProductive: '',
+      auditNotes: '',
+      sessionStartedAt: Date.now(),
+    })
+    const wrapper = mount(App)
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard session').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard').trigger('click')
+
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
+    expect(getSessions()).toEqual([])
+    expect(getActiveSession()).toBeNull()
+    expect(getGoalsList().text).toBe('- [x] send invoice\n- [ ] draft outline')
+  })
+
   it('rendering the summary screen shows the capture text and audit answers, but not the Task List', () => {
     setGoalsList({ text: '- [x] draft outline', updatedAt: null })
     setActiveSession({

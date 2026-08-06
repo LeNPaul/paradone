@@ -121,6 +121,7 @@ const {
   endSession,
   submitAudit,
   skipAudit,
+  discardSession,
   startNewSession,
 } = useSessionMachine()
 
@@ -387,6 +388,7 @@ useTheme(prefs, updatePrefs)
           :capture="capture"
           @submit="submitAudit"
           @skip="skipAudit"
+          @discard="discardSession"
         />
       </section>
 

@@ -339,6 +339,27 @@ describe('audit and summary', () => {
     expect(machine.auditNotes.value).toBe('')
   })
 
+  it('discardSession returns to setup without logging anything', async () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.stopSession(now + 5 * 60 * 1000)
+    machine.discardSession()
+
+    expect(machine.state.value).toBe('setup')
+    expect(getSessions()).toEqual([])
+    await nextTick()
+    expect(getActiveSession()).toBeNull()
+  })
+
+  it('discardSession does nothing outside the audit state', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.discardSession()
+    expect(machine.state.value).toBe('active')
+  })
+
   it('a skipped audit is logged with empty audit fields', () => {
     const machine = useSessionMachine()
     const now = 1000
