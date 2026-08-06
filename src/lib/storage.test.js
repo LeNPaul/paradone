@@ -5,6 +5,7 @@ import {
   getSessions, setSessions,
   getActiveSession, setActiveSession,
   getArchive, setArchive,
+  clearAll,
 } from './storage.js'
 
 beforeEach(() => {
@@ -100,5 +101,36 @@ describe('archive', () => {
     }
     setArchive(archive)
     expect(getArchive()).toEqual(archive)
+  })
+})
+
+describe('clearAll', () => {
+  function seed() {
+    setPrefs({ workDuration: 50, breakDuration: 10, theme: 'dark' })
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: '2026-08-05T09:00:00Z' })
+    setSessions([{ id: 'abc-123', auditProductive: 'focused' }])
+    setActiveSession({ startedAt: '2026-08-05T09:15:00Z' })
+    setArchive({ completedAt: { 'send invoice': '2026-08-01T09:14:00Z' }, archived: [{ id: 'def' }] })
+  }
+
+  it('puts every entity back to its default', () => {
+    seed()
+
+    clearAll()
+
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5 })
+    expect(getGoalsList()).toEqual({ text: '', updatedAt: null })
+    expect(getSessions()).toEqual([])
+    expect(getActiveSession()).toBeNull()
+    expect(getArchive()).toEqual({ completedAt: {}, archived: [] })
+  })
+
+  it('leaves keys belonging to anything else on the origin alone', () => {
+    seed()
+    localStorage.setItem('other:thing', 'x')
+
+    clearAll()
+
+    expect(localStorage.getItem('other:thing')).toBe('x')
   })
 })

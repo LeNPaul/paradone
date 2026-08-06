@@ -1,16 +1,18 @@
 <script setup>
-// DataPanel: export everything to a JSON file, or restore one over the top.
-// Parses and validates the picked file, then hands the parent a clean payload —
-// storage writes stay in App.vue, same as the log and archive views.
+// DataPanel: export everything to a JSON file, restore one over the top, or
+// delete the lot. Parses and validates the picked file, then hands the parent a
+// clean payload — storage writes stay in App.vue, same as the log and archive
+// views.
 import { ref } from 'vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import { parseBackup } from '../lib/backup.js'
 
-const emit = defineEmits(['export', 'restore'])
+const emit = defineEmits(['export', 'restore', 'clear'])
 
 const fileInput = ref(null)
 const error = ref('')
 const pending = ref(null)
+const confirmingClear = ref(false)
 
 async function onFileChange(event) {
   const input = event.target
@@ -33,6 +35,11 @@ function onConfirmRestore() {
   pending.value = null
   emit('restore', data)
 }
+
+function onConfirmClear() {
+  confirmingClear.value = false
+  emit('clear')
+}
 </script>
 
 <template>
@@ -43,6 +50,7 @@ function onConfirmRestore() {
     <div class="data-panel__actions">
       <button type="button" @click="emit('export')">Export data</button>
       <button type="button" @click="fileInput.click()">Import data</button>
+      <button type="button" @click="confirmingClear = true">Clear all data</button>
     </div>
     <!-- The button is the accessible control; hidden keeps an unlabelled file
          input out of the tab order and off screen readers. -->
@@ -62,6 +70,14 @@ function onConfirmRestore() {
       confirm-label="Replace"
       @confirm="onConfirmRestore"
       @close="pending = null"
+    />
+
+    <ConfirmDialog
+      :open="confirmingClear"
+      title="Clear all data?"
+      message="This permanently deletes your Task List, audit log, archive and settings, and ends any session in progress. It cannot be undone."
+      @confirm="onConfirmClear"
+      @close="confirmingClear = false"
     />
   </div>
 </template>

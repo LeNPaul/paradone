@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
-import { setActiveSession, setPrefs, getPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, getSessions, setSessions } from './lib/storage.js'
+import { setActiveSession, setPrefs, getPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, setArchive, getSessions, setSessions } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
 import DataPanel from './components/DataPanel.vue'
 import { DEFAULT_TITLE } from './lib/title.js'
@@ -881,6 +881,7 @@ describe('data export and restore', () => {
     const labels = wrapper.findAll('button').map((b) => b.text())
     expect(labels).toContain('Export data')
     expect(labels).toContain('Import data')
+    expect(labels).toContain('Clear all data')
   })
 
   it('exports every entity as a dated JSON file', async () => {
@@ -940,5 +941,32 @@ describe('data export and restore', () => {
     await nextTick()
 
     expect(getActiveSession()).toBeNull()
+  })
+
+  it('clearing wipes every entity and reloads to a factory-fresh app', async () => {
+    const reload = vi.fn()
+    vi.spyOn(window, 'location', 'get').mockReturnValue({ reload })
+
+    setPrefs({ workDuration: 50, breakDuration: 10, theme: 'dark' })
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: '2026-08-05T09:00:00.000Z' })
+    setSessions([{ id: 'abc-123', auditProductive: 'focused' }])
+    setActiveSession({
+      state: 'active',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    setArchive({ completedAt: {}, archived: [{ id: 'def', text: 'book flights' }] })
+
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    wrapper.findComponent(DataPanel).vm.$emit('clear')
+    await nextTick()
+
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5 })
+    expect(getGoalsList()).toEqual({ text: '', updatedAt: null })
+    expect(getSessions()).toEqual([])
+    expect(getActiveSession()).toBeNull()
+    expect(getArchive()).toEqual({ completedAt: {}, archived: [] })
+    expect(reload).toHaveBeenCalled()
   })
 })

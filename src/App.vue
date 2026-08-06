@@ -10,7 +10,7 @@ import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import DataPanel from './components/DataPanel.vue'
-import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive } from './lib/storage.js'
+import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive, clearAll } from './lib/storage.js'
 import { completedSince, parseChecklist } from './lib/checklist.js'
 import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
@@ -82,6 +82,13 @@ function onExportData() {
 // re-hydration.
 function onRestoreData(data) {
   restoreBackup(data)
+  window.location.reload()
+}
+
+// Reloads for the same reason a restore does — a stale ref would otherwise be
+// written straight back over the wipe.
+function onClearData() {
+  clearAll()
   window.location.reload()
 }
 
@@ -179,7 +186,7 @@ useTheme(prefs, updatePrefs)
       </div>
       <section class="settings__data" aria-labelledby="data-heading">
         <h3 id="data-heading" class="eyebrow">Data</h3>
-        <DataPanel @export="onExportData" @restore="onRestoreData" />
+        <DataPanel @export="onExportData" @restore="onRestoreData" @clear="onClearData" />
       </section>
     </section>
 

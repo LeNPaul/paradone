@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import DataPanel from './DataPanel.vue'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 const BACKUP = {
   format: 'paradone-backup',
@@ -90,5 +91,39 @@ describe('DataPanel', () => {
     await pickFile(wrapper, JSON.stringify(BACKUP))
 
     expect(wrapper.text()).not.toContain("That file isn't valid JSON.")
+  })
+
+  describe('clear all data', () => {
+    // Both dialogs are always mounted and both render a "Cancel", so scope the
+    // lookup to the clear one rather than trusting template order.
+    const clearDialog = (wrapper) => wrapper.findAllComponents(ConfirmDialog)[1]
+
+    it('asks for confirmation instead of clearing straight away', async () => {
+      const wrapper = mount(DataPanel)
+
+      await click(wrapper, 'Clear all data')
+
+      expect(wrapper.emitted('clear')).toBeUndefined()
+      expect(wrapper.text()).toContain('Clear all data?')
+      expect(wrapper.text()).toContain('It cannot be undone.')
+    })
+
+    it('emits clear once the dialog is confirmed', async () => {
+      const wrapper = mount(DataPanel)
+
+      await click(wrapper, 'Clear all data')
+      await click(clearDialog(wrapper), 'Clear')
+
+      expect(wrapper.emitted('clear')).toHaveLength(1)
+    })
+
+    it('does not emit clear when the dialog is cancelled', async () => {
+      const wrapper = mount(DataPanel)
+
+      await click(wrapper, 'Clear all data')
+      await click(clearDialog(wrapper), 'Cancel')
+
+      expect(wrapper.emitted('clear')).toBeUndefined()
+    })
   })
 })

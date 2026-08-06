@@ -1,5 +1,6 @@
 // storage.js — all localStorage read/write for paradone:prefs, paradone:goalsList,
-// paradone:sessions, paradone:activeSession. Nothing else touches storage directly.
+// paradone:sessions, paradone:activeSession, paradone:archive. Nothing else
+// touches storage directly.
 
 const KEYS = {
   prefs: 'paradone:prefs',
@@ -56,4 +57,12 @@ export function getArchive() {
 }
 export function setArchive(archive) {
   writeJSON(KEYS.archive, archive)
+}
+
+// Targeted removes, not localStorage.clear(): the app may not be the only thing
+// on this origin.
+export function clearAll() {
+  for (const key of Object.values(KEYS)) {
+    localStorage.removeItem(key)
+  }
 }
