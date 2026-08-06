@@ -1,9 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount, flushPromises } from '@vue/test-utils'
 import App from './App.vue'
 import { setActiveSession, setPrefs, getPrefs, setGoalsList, getGoalsList, getActiveSession, getArchive, getSessions, setSessions } from './lib/storage.js'
 import TimerDisplay from './components/TimerDisplay.vue'
+import DataPanel from './components/DataPanel.vue'
 import { DEFAULT_TITLE } from './lib/title.js'
 
 beforeEach(() => {
@@ -850,5 +851,94 @@ describe('browser tab title', () => {
     const stopButton = wrapper.findAll('button').find((b) => b.text() === 'Stop & log session')
     await stopButton.trigger('click')
     expect(document.title).toBe(DEFAULT_TITLE)
+  })
+})
+
+describe('data export and restore', () => {
+  function openSettings(wrapper) {
+    return wrapper.findAll('button').find((b) => b.text() === 'Settings').trigger('click')
+  }
+
+  beforeEach(() => {
+    global.URL.createObjectURL = vi.fn(() => 'blob:mock')
+    global.URL.revokeObjectURL = vi.fn()
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {})
+  })
+
+  // The reload tests stub window.location — put it back so nothing downstream
+  // inherits a fake one.
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('puts the Data block in settings and nowhere else', async () => {
+    const wrapper = mount(App)
+    expect(wrapper.find('#data-heading').exists()).toBe(false)
+
+    await openSettings(wrapper)
+
+    expect(wrapper.find('#data-heading').exists()).toBe(true)
+    const labels = wrapper.findAll('button').map((b) => b.text())
+    expect(labels).toContain('Export data')
+    expect(labels).toContain('Import data')
+  })
+
+  it('exports every entity as a dated JSON file', async () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: '2026-08-05T09:00:00.000Z' })
+    const created = vi.spyOn(document, 'createElement')
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Export data').trigger('click')
+
+    const blob = URL.createObjectURL.mock.calls[0][0]
+    expect(blob.type).toBe('application/json')
+    const link = created.mock.results.find((r) => r.value instanceof HTMLAnchorElement).value
+    expect(link.download).toMatch(/^paradone-backup-\d{4}-\d{2}-\d{2}\.json$/)
+  })
+
+  it('restoring writes every entity and reloads to re-hydrate', async () => {
+    const reload = vi.fn()
+    vi.spyOn(window, 'location', 'get').mockReturnValue({ reload })
+
+    setGoalsList({ text: 'old list', updatedAt: null })
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    wrapper.findComponent(DataPanel).vm.$emit('restore', {
+      prefs: { workDuration: 50, breakDuration: 10, theme: 'dark' },
+      goalsList: { text: '- [ ] restored task', updatedAt: '2026-08-05T09:00:00.000Z' },
+      sessions: [{ id: 'abc-123', auditProductive: 'focused' }],
+      archive: { completedAt: {}, archived: [{ id: 'def', text: 'book flights' }] },
+    })
+    await nextTick()
+
+    expect(getGoalsList().text).toBe('- [ ] restored task')
+    expect(getPrefs().workDuration).toBe(50)
+    expect(getSessions()).toHaveLength(1)
+    expect(getArchive().archived).toHaveLength(1)
+    expect(reload).toHaveBeenCalled()
+  })
+
+  it('restoring drops any session in progress', async () => {
+    const reload = vi.fn()
+    vi.spyOn(window, 'location', 'get').mockReturnValue({ reload })
+
+    setActiveSession({
+      state: 'active',
+      timer: { durationMs: 25 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+    })
+    const wrapper = mount(App)
+    await openSettings(wrapper)
+
+    wrapper.findComponent(DataPanel).vm.$emit('restore', {
+      prefs: { workDuration: 25, breakDuration: 5 },
+      goalsList: { text: '', updatedAt: null },
+      sessions: [],
+      archive: { completedAt: {}, archived: [] },
+    })
+    await nextTick()
+
+    expect(getActiveSession()).toBeNull()
   })
 })

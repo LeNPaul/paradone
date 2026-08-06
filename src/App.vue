@@ -9,10 +9,13 @@ import SessionLog from './components/SessionLog.vue'
 import ArchiveView from './components/ArchiveView.vue'
 import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
+import DataPanel from './components/DataPanel.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive } from './lib/storage.js'
 import { completedSince, parseChecklist } from './lib/checklist.js'
 import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
+import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
+import { downloadJSON } from './lib/download.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
 import { useTheme } from './composables/useTheme.js'
@@ -68,6 +71,19 @@ const showArchive = ref(false)
 // machine state would be persisted to paradone:activeSession and rehydrate the
 // user into settings on reload.
 const showSettings = ref(false)
+
+function onExportData() {
+  const now = new Date().toISOString()
+  downloadJSON(JSON.stringify(buildBackup(now), null, 2), backupFilename(now))
+}
+
+// Every ref here was hydrated from storage once at setup, and its watcher would
+// write the stale value straight back over the import — so a reload is the
+// re-hydration.
+function onRestoreData(data) {
+  restoreBackup(data)
+  window.location.reload()
+}
 
 const {
   state,
@@ -161,6 +177,10 @@ useTheme(prefs, updatePrefs)
         <span class="settings__label">Appearance</span>
         <ThemeToggle :theme="prefs.theme" @update="(theme) => updatePrefs({ theme })" />
       </div>
+      <section class="settings__data" aria-labelledby="data-heading">
+        <h3 id="data-heading" class="eyebrow">Data</h3>
+        <DataPanel @export="onExportData" @restore="onRestoreData" />
+      </section>
     </section>
 
     <template v-else>
@@ -445,6 +465,16 @@ useTheme(prefs, updatePrefs)
 .settings__label {
   font-size: var(--text-sm);
   color: var(--ink-secondary);
+}
+
+/* The last block in settings, and the only destructive one — a rule sets it
+   apart from the fields above. */
+.settings__data {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-4);
 }
 
 /* A timer screen: everything centred under the ring. */

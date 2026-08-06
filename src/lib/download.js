@@ -1,13 +1,21 @@
 // download.js — triggers a client-side file download. Kept out of the
-// components so both the per-session export and the audit-log export share
-// one implementation.
+// components so the markdown exports and the JSON backup share one
+// implementation.
 
-export function downloadMarkdown(text, filename) {
-  const blob = new Blob([text], { type: 'text/markdown' })
+function download(text, type, filename) {
+  const blob = new Blob([text], { type })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
   link.download = filename
   link.click()
   URL.revokeObjectURL(url)
+}
+
+export function downloadMarkdown(text, filename) {
+  download(text, 'text/markdown', filename)
+}
+
+export function downloadJSON(text, filename) {
+  download(text, 'application/json', filename)
 }

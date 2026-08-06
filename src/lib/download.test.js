@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { downloadMarkdown } from './download.js'
+import { downloadMarkdown, downloadJSON } from './download.js'
 
 beforeEach(() => {
   global.URL.createObjectURL = vi.fn(() => 'blob:mock')
@@ -36,5 +36,19 @@ describe('downloadMarkdown', () => {
       reader.readAsText(blob)
     })
     expect(contents).toBe('# Audit Log\n\nbody')
+  })
+})
+
+describe('downloadJSON', () => {
+  it('writes a JSON blob under the given filename', () => {
+    const created = vi.spyOn(document, 'createElement')
+    downloadJSON('{"format":"paradone-backup"}', 'paradone-backup-2026-08-05.json')
+
+    const blob = URL.createObjectURL.mock.calls[0][0]
+    expect(blob.type).toBe('application/json')
+
+    const link = created.mock.results.find((r) => r.value instanceof HTMLAnchorElement).value
+    expect(link.download).toBe('paradone-backup-2026-08-05.json')
+    expect(HTMLAnchorElement.prototype.click).toHaveBeenCalled()
   })
 })
