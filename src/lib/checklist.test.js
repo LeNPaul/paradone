@@ -5,6 +5,7 @@ import {
   addItem,
   removeItem,
   removeChecked,
+  markChecked,
   editItem,
   completedSince,
 } from './checklist.js'
@@ -140,6 +141,53 @@ describe('removeChecked', () => {
 
   it('is a no-op on an empty list', () => {
     expect(removeChecked('')).toEqual({ text: '', removed: [] })
+  })
+})
+
+describe('markChecked', () => {
+  it('ticks the named tasks, leaving the rest alone', () => {
+    const text = '- [ ] draft outline\n- [ ] send invoice\n- [ ] book flights'
+    expect(markChecked(text, ['send invoice'])).toBe(
+      '- [ ] draft outline\n- [x] send invoice\n- [ ] book flights',
+    )
+  })
+
+  it('ticks several at once', () => {
+    const text = '- [ ] draft outline\n- [ ] send invoice'
+    expect(markChecked(text, ['draft outline', 'send invoice'])).toBe(
+      '- [x] draft outline\n- [x] send invoice',
+    )
+  })
+
+  it('leaves an already-checked line untouched', () => {
+    const text = '- [x] send invoice'
+    expect(markChecked(text, ['send invoice'])).toBe(text)
+  })
+
+  it('leaves plain non-checkbox lines alone even when the text matches', () => {
+    const text = '- [ ] draft outline\nideas for post'
+    expect(markChecked(text, ['ideas for post'])).toBe(text)
+  })
+
+  it('ignores names that are not on the list', () => {
+    const text = '- [ ] draft outline'
+    expect(markChecked(text, ['book flights'])).toBe(text)
+  })
+
+  // Identity is the marker-stripped text, as it is for completedSince, so two
+  // lines reading the same thing are the same task and both get ticked.
+  it('ticks every line matching the name', () => {
+    const text = '- [ ] send invoice\n- [ ] send invoice'
+    expect(markChecked(text, ['send invoice'])).toBe('- [x] send invoice\n- [x] send invoice')
+  })
+
+  it('is a no-op with no names', () => {
+    const text = '- [ ] draft outline'
+    expect(markChecked(text, [])).toBe(text)
+  })
+
+  it('is a no-op on an empty list', () => {
+    expect(markChecked('', ['draft outline'])).toBe('')
   })
 })
 

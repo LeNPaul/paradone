@@ -85,7 +85,7 @@ describe('AuditPrompt', () => {
     await continueButton(wrapper).trigger('click')
 
     expect(wrapper.emitted('submit')).toEqual([
-      [{ auditProductive: 'distracted', auditNotes: 'tabbed out twice' }],
+      [{ auditProductive: 'distracted', auditNotes: 'tabbed out twice', checkedTasks: [] }],
     ])
   })
 
@@ -94,7 +94,9 @@ describe('AuditPrompt', () => {
     await wrapper.findAll('input[type="radio"]')[0].setValue()
     await continueButton(wrapper).trigger('click')
 
-    expect(wrapper.emitted('submit')).toEqual([[{ auditProductive: 'focused', auditNotes: '' }]])
+    expect(wrapper.emitted('submit')).toEqual([
+      [{ auditProductive: 'focused', auditNotes: '', checkedTasks: [] }],
+    ])
   })
 
   it('offers a Skip button that emits skip without requiring a quick-select choice', async () => {
@@ -133,5 +135,86 @@ describe('AuditPrompt', () => {
     await wrapper.findAll('button').find((b) => b.text() === 'Cancel').trigger('click')
 
     expect(wrapper.emitted('discard')).toBeUndefined()
+  })
+})
+
+describe('AuditPrompt ticking tasks off', () => {
+  const taskList = '- [ ] draft outline\n- [ ] send invoice'
+  const tick = (wrapper, index) =>
+    wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')[index]
+
+  it('leaves a ticked task on screen, checked, so a mis-click can be undone', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 1).trigger('change')
+
+    const list = wrapper.find('[aria-labelledby="audit-goal-heading"]')
+    expect(list.text()).toContain('send invoice')
+    expect(tick(wrapper, 1).element.checked).toBe(true)
+    expect(tick(wrapper, 0).element.checked).toBe(false)
+  })
+
+  it('does not move a ticked task into Completed this session mid-audit', async () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: taskList, completedTasks: [] },
+    })
+
+    await tick(wrapper, 1).trigger('change')
+
+    expect(wrapper.text()).toContain('No tasks checked off this session.')
+  })
+
+  it('reports the ticked tasks when the audit is submitted', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 1).trigger('change')
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await continueButton(wrapper).trigger('click')
+
+    expect(wrapper.emitted('submit')[0][0].checkedTasks).toEqual(['send invoice'])
+  })
+
+  it('reports the ticked tasks when the audit is skipped', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 0).trigger('change')
+    await wrapper.findAll('button').find((b) => b.text() === 'Skip').trigger('click')
+
+    expect(wrapper.emitted('skip')).toEqual([[{ checkedTasks: ['draft outline'] }]])
+  })
+
+  it('reports the ticked tasks when the session is discarded', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 0).trigger('change')
+    await discardButton(wrapper).trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard').trigger('click')
+
+    expect(wrapper.emitted('discard')).toEqual([[{ checkedTasks: ['draft outline'] }]])
+  })
+
+  it('forgets a tick that was undone before the audit was finished', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 1).trigger('change')
+    await tick(wrapper, 1).trigger('change')
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await continueButton(wrapper).trigger('click')
+
+    expect(wrapper.emitted('submit')[0][0].checkedTasks).toEqual([])
+  })
+
+  // The list is a frozen snapshot of the unchecked remainder: tasks checked
+  // before the audit stay under Completed this session and never become tickable.
+  it('still leaves tasks completed during the block out of the list', async () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: '- [x] send invoice\n- [ ] draft outline' },
+    })
+
+    const boxes = wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')
+    expect(boxes).toHaveLength(1)
+    expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).not.toContain(
+      'send invoice',
+    )
   })
 })

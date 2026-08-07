@@ -510,6 +510,49 @@ describe('audit and summary', () => {
     expect(summarised).toEqual(['draft outline'])
   })
 
+  it('counts a task ticked at the audit as completed, from the tick through to the log', async () => {
+    setGoalsList({ text: '- [ ] send invoice\n- [ ] draft outline', updatedAt: null })
+    const wrapper = mount(App)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Start').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Stop & log session').trigger('click')
+
+    // Nothing was ticked during the block, so both tasks are on the audit list.
+    const boxes = wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')
+    expect(boxes).toHaveLength(2)
+    await boxes[0].trigger('change')
+
+    // Deferred: the tick is held in the audit's draft until the audit is done.
+    expect(getGoalsList().text).toBe('- [ ] send invoice\n- [ ] draft outline')
+
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await wrapper.findAll('button').find((b) => b.text() === 'Continue').trigger('click')
+
+    expect(getGoalsList().text).toBe('- [x] send invoice\n- [ ] draft outline')
+    const summarised = wrapper.findAll('#summary-completed-heading ~ ul li').map((li) => li.text())
+    expect(summarised).toEqual(['send invoice'])
+    expect(getSessions()[0].completedTasks).toEqual(['send invoice'])
+  })
+
+  it('keeps a task ticked at the audit ticked when the session is discarded', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Start').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Stop & log session').trigger('click')
+    await wrapper
+      .find('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')
+      .trigger('change')
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard session').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Discard').trigger('click')
+
+    // The block is thrown away; the checked box is work state and survives it.
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
+    expect(getSessions()).toEqual([])
+    expect(getGoalsList().text).toBe('- [x] send invoice')
+  })
+
   it('submitting the audit prompt transitions to the summary screen', async () => {
     setActiveSession({
       state: 'audit',

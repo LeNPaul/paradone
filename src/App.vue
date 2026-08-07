@@ -11,7 +11,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import DataPanel from './components/DataPanel.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive, clearAll } from './lib/storage.js'
-import { completedSince, parseChecklist } from './lib/checklist.js'
+import { completedSince, parseChecklist, markChecked } from './lib/checklist.js'
 import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
@@ -143,6 +143,32 @@ const hiddenTaskHashes = computed(() =>
         .filter((item) => item.checked)
         .map((item) => item.hash),
 )
+
+// Ticks made at the Audit screen are held in that screen's draft until the
+// audit is finished, then committed here — through onTaskListUpdate, so they
+// get the same archive tick-time bookkeeping every other Task List write gets.
+// Order matters: logSession() re-reads the list from storage, so writing first
+// is what lands an audit tick in the logged record and the summary.
+function commitAuditChecks(checkedTasks) {
+  if (checkedTasks.length) onTaskListUpdate(markChecked(taskListText.value, checkedTasks))
+}
+
+function onAuditSubmit(payload) {
+  commitAuditChecks(payload.checkedTasks)
+  submitAudit(payload)
+}
+
+function onAuditSkip(payload) {
+  commitAuditChecks(payload.checkedTasks)
+  skipAudit()
+}
+
+// Discarding writes no session record, but the ticks still stand: the Task List
+// is persistent work state, so a checked box outlives the block it happened in.
+function onAuditDiscard(payload) {
+  commitAuditChecks(payload.checkedTasks)
+  discardSession()
+}
 
 // The setup ring previews the configured block, so it uses the same
 // minutes → ms conversion a real session's timer does.
@@ -386,9 +412,9 @@ useTheme(prefs, updatePrefs)
           :task-list-text="taskListText"
           :completed-tasks="completedTasks"
           :capture="capture"
-          @submit="submitAudit"
-          @skip="skipAudit"
-          @discard="discardSession"
+          @submit="onAuditSubmit"
+          @skip="onAuditSkip"
+          @discard="onAuditDiscard"
         />
       </section>
 

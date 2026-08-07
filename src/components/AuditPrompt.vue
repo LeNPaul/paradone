@@ -24,7 +24,15 @@ const emit = defineEmits(['submit', 'skip', 'discard'])
 
 // The Audit screen is a before/after read: completed work belongs under
 // "Completed this session", so the list below it shows only what's left.
-const remainingText = computed(() => removeChecked(props.taskListText).text)
+// Frozen when the screen mounts rather than computed off the prop — a tick
+// rewrites the draft in place, so the row stays on screen, checked, and a
+// mis-click can be undone before the audit is finished.
+const draft = ref(removeChecked(props.taskListText).text)
+
+// The draft started with every checked line stripped, so anything checked in it
+// now was ticked here, at the audit. The parent merges these back into the
+// persistent Task List when the audit is finished.
+const checkedTasks = computed(() => removeChecked(draft.value).removed)
 
 const auditProductive = ref('')
 const auditNotes = ref('')
@@ -32,12 +40,20 @@ const auditNotes = ref('')
 const confirmingDiscard = ref(false)
 
 function onSubmit() {
-  emit('submit', { auditProductive: auditProductive.value, auditNotes: auditNotes.value.trim() })
+  emit('submit', {
+    auditProductive: auditProductive.value,
+    auditNotes: auditNotes.value.trim(),
+    checkedTasks: checkedTasks.value,
+  })
+}
+
+function onSkip() {
+  emit('skip', { checkedTasks: checkedTasks.value })
 }
 
 function onConfirmDiscard() {
   confirmingDiscard.value = false
-  emit('discard')
+  emit('discard', { checkedTasks: checkedTasks.value })
 }
 </script>
 
@@ -53,7 +69,12 @@ function onConfirmDiscard() {
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading" class="eyebrow">Task list</h3>
-      <MarkdownChecklist v-if="remainingText" :model-value="remainingText" :editable="false" />
+      <MarkdownChecklist
+        v-if="draft"
+        :model-value="draft"
+        :editable="false"
+        @update:model-value="draft = $event"
+      />
       <p v-else class="audit-prompt__empty">Nothing left on the list.</p>
     </section>
 
@@ -89,7 +110,7 @@ function onConfirmDiscard() {
       <button type="button" class="btn-quiet audit-prompt__discard" @click="confirmingDiscard = true">
         Discard session
       </button>
-      <button type="button" class="btn-quiet" @click="emit('skip')">Skip</button>
+      <button type="button" class="btn-quiet" @click="onSkip">Skip</button>
       <button type="button" class="btn-primary" :disabled="!auditProductive" @click="onSubmit">
         Continue
       </button>

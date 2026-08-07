@@ -82,6 +82,21 @@ export function removeChecked(text) {
   }
 }
 
+// Tick the named tasks, keyed on marker-stripped text for the same reason
+// completedSince is: the hash covers the whole line, so it changes on toggle.
+// Already-checked, unnamed, and plain lines pass through untouched.
+export function markChecked(text, taskTexts) {
+  const wanted = new Set(taskTexts)
+  return text
+    .split('\n')
+    .map((line) => {
+      const match = line.match(CHECKBOX_RE)
+      if (!match || match[1].toLowerCase() === 'x' || !wanted.has(match[2])) return line
+      return `- [x] ${match[2]}`
+    })
+    .join('\n')
+}
+
 // Replace a line's text by hash. Checkbox lines keep their marker (and thus
 // their checked state); plain lines are replaced whole. Empty input is a no-op.
 export function editItem(text, hash, newText) {
