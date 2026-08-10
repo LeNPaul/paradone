@@ -46,4 +46,13 @@ describe('TaskModal', () => {
     await wrapper.find('dialog').trigger('close')
     expect(wrapper.emitted('close')).toHaveLength(1)
   })
+
+  // What Escape actually fires in Chrome. Without it the parent's `open` stays
+  // true while the dialog is shut, and nothing can reopen it.
+  it('emits close on the native dialog cancel event (Esc)', async () => {
+    const wrapper = mount(TaskModal, { props: { open: true } })
+
+    await wrapper.find('dialog').trigger('cancel')
+    expect(wrapper.emitted('close')).toHaveLength(1)
+  })
 })

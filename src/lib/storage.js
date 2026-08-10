@@ -24,8 +24,15 @@ function writeJSON(key, value) {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
+// theme is deliberately absent: useTheme seeds it from the OS the first time it
+// finds it missing, and a default here would rob it of that signal.
+const DEFAULT_PREFS = { workDuration: 25, breakDuration: 5, addTaskKey: 'n' }
+
+// Merged rather than used as a bare fallback, so prefs saved before a key
+// existed — or restored from an older backup — read as the default instead of
+// undefined.
 export function getPrefs() {
-  return readJSON(KEYS.prefs, { workDuration: 25, breakDuration: 5 })
+  return { ...DEFAULT_PREFS, ...readJSON(KEYS.prefs, {}) }
 }
 export function setPrefs(prefs) {
   writeJSON(KEYS.prefs, prefs)

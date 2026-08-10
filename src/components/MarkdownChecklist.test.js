@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import TaskModal from './TaskModal.vue'
@@ -169,6 +169,137 @@ describe('MarkdownChecklist', () => {
     expect(wrapper.find('.markdown-checklist__controls').exists()).toBe(true)
     expect(wrapper.findComponent(TaskModal).exists()).toBe(true)
     expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
+
+  describe('the add-task shortcut', () => {
+    function press(key, target = window, init = {}) {
+      const event = new KeyboardEvent('keydown', {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      })
+      target.dispatchEvent(event)
+      return event
+    }
+
+    const pressN = (target = window, init = {}) => press('n', target, init)
+
+    it('opens the modal in add mode', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+
+      pressN()
+      await wrapper.vm.$nextTick()
+
+      const modal = wrapper.findComponent(TaskModal)
+      expect(modal.props('open')).toBe(true)
+      expect(modal.props('title')).toBe('Add Task')
+      expect(modal.props('initialText')).toBe('')
+
+      wrapper.unmount()
+    })
+
+    // Without this the modal's input, focused on open, receives the same
+    // keystroke and the draft starts out as "n".
+    it('swallows the keystroke so it does not land in the modal input', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+
+      const event = pressN()
+      await wrapper.vm.$nextTick()
+
+      expect(event.defaultPrevented).toBe(true)
+
+      wrapper.unmount()
+    })
+
+    // The Capture box is on screen for the whole block, so a captured thought
+    // starting with "n" must not open the modal — and the field must still
+    // receive its "n", so the keystroke is left uncancelled.
+    it('ignores the key when it comes from a text field', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+      const textarea = document.createElement('textarea')
+      document.body.appendChild(textarea)
+
+      const event = pressN(textarea)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(false)
+      expect(event.defaultPrevented).toBe(false)
+
+      textarea.remove()
+      wrapper.unmount()
+    })
+
+    it('leaves Cmd+N to the browser', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+
+      pressN(window, { metaKey: true })
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(false)
+
+      wrapper.unmount()
+    })
+
+    it('is not bound when editable is false', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline', editable: false })
+
+      pressN()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(TaskModal).exists()).toBe(false)
+
+      wrapper.unmount()
+    })
+
+    it('removes the listener on unmount', () => {
+      const remove = vi.spyOn(window, 'removeEventListener')
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+
+      wrapper.unmount()
+
+      expect(remove).toHaveBeenCalledWith('keydown', expect.any(Function))
+      remove.mockRestore()
+    })
+
+    it('uses the configured key instead of the default', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline', shortcutKey: 't' })
+
+      pressN()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(false)
+
+      press('t')
+      await wrapper.vm.$nextTick()
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(true)
+
+      wrapper.unmount()
+    })
+
+    // Reads the prop at event time, so a change in Settings lands immediately.
+    it('follows a key change without remounting', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline' })
+
+      await wrapper.setProps({ shortcutKey: 'q' })
+      press('q')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(true)
+
+      wrapper.unmount()
+    })
+
+    it('does nothing when the key is blank', async () => {
+      const wrapper = mountChecklist({ modelValue: '- [ ] draft outline', shortcutKey: '' })
+
+      const event = pressN()
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(TaskModal).props('open')).toBe(false)
+      expect(event.defaultPrevented).toBe(false)
+
+      wrapper.unmount()
+    })
   })
 
   describe('hiddenHashes', () => {

@@ -3,9 +3,18 @@
 // Bound to the single persistent Task List, reused across every state that shows it.
 // Controlled component — the raw markdown string is owned by the parent,
 // which is the only thing allowed to touch storage.js.
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { parseChecklist, toggleItem, addItem, removeItem, editItem } from '../lib/checklist.js'
 import TaskModal from './TaskModal.vue'
+
+function isTyping(target) {
+  return (
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.tagName === 'SELECT' ||
+    target?.isContentEditable === true
+  )
+}
 
 const props = defineProps({
   modelValue: {
@@ -28,6 +37,11 @@ const props = defineProps({
   hiddenHashes: {
     type: Array,
     default: () => [],
+  },
+  // The letter that opens the Add Task modal. Empty string turns it off.
+  shortcutKey: {
+    type: String,
+    default: 'n',
   },
 })
 
@@ -57,6 +71,31 @@ function openAdd() {
   modalDraft.value = ''
   modalOpen.value = true
 }
+
+// The Capture textarea sits on screen for the whole block, and the modal has an
+// input of its own, so a bare letter has to ignore anything typed into a field —
+// otherwise the first letter of a captured thought opens the modal. Modifiers
+// are left alone so Cmd+N still opens a browser window. Read at event time, so
+// changing the key in Settings takes effect without rebinding.
+function onKeydown(event) {
+  if (!props.shortcutKey) return
+  if (event.key !== props.shortcutKey || event.metaKey || event.ctrlKey || event.altKey) return
+  if (modalOpen.value || isTyping(event.target)) return
+  // The modal focuses its input on open, and this keystroke's character would
+  // otherwise be inserted there — the draft would start out as "n".
+  event.preventDefault()
+  openAdd()
+}
+
+// Bound only where the list is editable, so the read-only Audit list doesn't
+// claim the key for a modal it never renders.
+onMounted(() => {
+  if (props.editable) window.addEventListener('keydown', onKeydown)
+})
+
+onUnmounted(() => {
+  if (props.editable) window.removeEventListener('keydown', onKeydown)
+})
 
 function openEdit(item) {
   editingHash.value = item.hash

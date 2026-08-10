@@ -14,18 +14,36 @@ beforeEach(() => {
 
 describe('prefs', () => {
   it('returns defaults when unset', () => {
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5 })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
   })
 
   it('round-trips a write', () => {
-    const prefs = { workDuration: 50, breakDuration: 10 }
+    const prefs = { workDuration: 50, breakDuration: 10, addTaskKey: 't' }
     setPrefs(prefs)
     expect(getPrefs()).toEqual(prefs)
   })
 
+  // Prefs saved before the shortcut key existed, or restored from an older
+  // backup, must read as the default rather than undefined.
+  it('fills in a missing key from the defaults', () => {
+    setPrefs({ workDuration: 50, breakDuration: 10, theme: 'dark' })
+    expect(getPrefs()).toEqual({
+      workDuration: 50,
+      breakDuration: 10,
+      theme: 'dark',
+      addTaskKey: 'n',
+    })
+  })
+
+  // Blank is a real stored choice — the shortcut off — not a missing value.
+  it('keeps a blank shortcut key instead of defaulting it', () => {
+    setPrefs({ workDuration: 25, breakDuration: 5, addTaskKey: '' })
+    expect(getPrefs().addTaskKey).toBe('')
+  })
+
   it('falls back to defaults on malformed JSON', () => {
     localStorage.setItem('paradone:prefs', '{not valid json')
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5 })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
   })
 })
 
@@ -118,7 +136,7 @@ describe('clearAll', () => {
 
     clearAll()
 
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5 })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
     expect(getGoalsList()).toEqual({ text: '', updatedAt: null })
     expect(getSessions()).toEqual([])
     expect(getActiveSession()).toBeNull()

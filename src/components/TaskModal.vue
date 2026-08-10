@@ -45,7 +45,10 @@ function onSubmit() {
 </script>
 
 <template>
-  <dialog ref="dialog" class="task-modal" @close="emit('close')">
+  <!-- Escape fires `cancel`, and Chrome does not reliably follow it with
+       `close` — without this the parent's `open` stays true while the dialog is
+       shut, and nothing can reopen it. -->
+  <dialog ref="dialog" class="task-modal" @cancel="emit('close')" @close="emit('close')">
     <form class="task-modal__form" @submit.prevent="onSubmit">
       <h3 class="task-modal__title">{{ title }}</h3>
       <input

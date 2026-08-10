@@ -50,3 +50,56 @@ describe('editing', () => {
     expect(wrapper.get('#break-duration').element.value).toBe('10')
   })
 })
+
+describe('the add-task shortcut key', () => {
+  const prefs = { workDuration: 25, breakDuration: 5, addTaskKey: 'n' }
+
+  function mountPanel(overrides = {}) {
+    return mount(SettingsPanel, { props: { prefs: { ...prefs, ...overrides } } })
+  }
+
+  async function setKey(wrapper, value) {
+    const input = wrapper.get('#add-task-key')
+    await input.setValue(value)
+    await input.trigger('change')
+    return input
+  }
+
+  it('renders the current key', () => {
+    expect(mountPanel().get('#add-task-key').element.value).toBe('n')
+  })
+
+  it('emits only the key, leaving the durations out of the payload', async () => {
+    const wrapper = mountPanel()
+    await setKey(wrapper, 't')
+    expect(wrapper.emitted('update')[0]).toEqual([{ addTaskKey: 't' }])
+  })
+
+  it('lowercases the key', async () => {
+    const wrapper = mountPanel()
+    const input = await setKey(wrapper, 'T')
+    expect(wrapper.emitted('update')[0]).toEqual([{ addTaskKey: 't' }])
+    expect(input.element.value).toBe('t')
+  })
+
+  // Blank is how the shortcut gets turned off, so it has to be emitted, not
+  // treated as a non-answer the way an empty duration is.
+  it('emits a blank key to disable the shortcut', async () => {
+    const wrapper = mountPanel()
+    await setKey(wrapper, '')
+    expect(wrapper.emitted('update')[0]).toEqual([{ addTaskKey: '' }])
+  })
+
+  it.each(['5', '?'])('reverts %s to the previous key', async (value) => {
+    const wrapper = mountPanel()
+    const input = await setKey(wrapper, value)
+    expect(wrapper.emitted('update')[0]).toEqual([{ addTaskKey: 'n' }])
+    expect(input.element.value).toBe('n')
+  })
+
+  it('updates the displayed key when the prefs prop changes', async () => {
+    const wrapper = mountPanel()
+    await wrapper.setProps({ prefs: { ...prefs, addTaskKey: 'q' } })
+    expect(wrapper.get('#add-task-key').element.value).toBe('q')
+  })
+})

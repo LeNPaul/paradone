@@ -53,6 +53,7 @@ There is no routing. One page, eight states.
   workDuration: 25,      // minutes, user-editable
   breakDuration: 5,      // minutes, user-editable; 0 = no breaks
   theme: "light",        // "light" | "dark"; seeded once from the OS, then fixed
+  addTaskKey: "n",       // single lowercase letter opening the Add Task modal; "" = shortcut off
 }
 
 // paradone:goalsList  — the single persistent Task List, cross-session
@@ -181,6 +182,8 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] During an active session a task can be added through the Add-Task modal, edited and deleted; it persists to `paradone:goalsList`, is tickable in the same block, and survives a mid-block reload
 - [ ] "Archive completed" is the one Setup control absent during an active session
 - [ ] A completed task that was added mid-session is badged `added` at the Audit, on the Summary and in the audit log, while one that pre-existed the block is not; the same rows carry an `(added mid-session)` suffix in both markdown exports
+- [ ] Pressing the add-task key outside a text field opens the Add Task modal at Setup and during an active session, and does nothing at the Audit or while typing in the Capture box
+- [ ] The add-task key is editable in the Settings view and persisted; it defaults to `n`, accepts a single letter (stored lowercase), rejects anything else, and clearing the field disables the shortcut
 - [ ] The logged session's `addedTasks` holds every task added during the block, including ones left unticked, and a record written without the field renders and exports without annotating anything
 - [ ] Summary shows no Task List, and exports valid markdown containing the completed-this-session list, capture notes, and audit answers
 - [ ] Audit log entries list the tasks completed in that block, on screen and in the log export

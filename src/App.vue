@@ -268,6 +268,7 @@ useTheme(prefs, updatePrefs)
         <h2 id="task-list-heading" class="eyebrow">Task List</h2>
         <MarkdownChecklist
           :model-value="taskListText"
+          :shortcut-key="prefs.addTaskKey"
           @update:model-value="onTaskListUpdate"
           @archive="onArchiveCompleted"
         />
@@ -365,6 +366,7 @@ useTheme(prefs, updatePrefs)
           :model-value="taskListText"
           :archivable="false"
           :hidden-hashes="hiddenTaskHashes"
+          :shortcut-key="prefs.addTaskKey"
           @update:model-value="onTaskListUpdate"
         />
       </section>

@@ -291,7 +291,7 @@ describe('updatePrefs', () => {
     machine.updatePrefs({ workDuration: 40, breakDuration: 0 })
     expect(machine.prefs.workDuration).toBe(40)
     expect(machine.prefs.breakDuration).toBe(0)
-    expect(getPrefs()).toEqual({ workDuration: 40, breakDuration: 0 })
+    expect(getPrefs()).toEqual({ workDuration: 40, breakDuration: 0, addTaskKey: 'n' })
   })
 
   it('a session started after updating prefs uses the new work duration', () => {
