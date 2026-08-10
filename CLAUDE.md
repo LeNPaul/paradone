@@ -87,7 +87,7 @@ Hard rules. Do not plan or write anything that violates them — flag the confli
 
 The Task List is a **flat markdown checklist**. It does not get due dates, projects, priority levels, tags, or sorting. If a request would add any of those, stop and flag it — that functionality belongs in a different product, not here.
 
-There is a single persistent Task List (the former Goals List and Session Goal field are merged). It's editable at Setup, checkbox-toggle-only during an active session, and shown read-only at Audit and Summary.
+There is a single persistent Task List (the former Goals List and Session Goal field are merged). It's editable at Setup and during an active session — with one exception, "Archive completed", which is Setup-only because sweeping checked lines off the list mid-block would erase that block's own completed-this-session diff — and shown toggle-only at Audit. Summary doesn't show it at all.
 
 v1 is **countdown only**. No stopwatch/flowtime mode. That is v1.1.
 

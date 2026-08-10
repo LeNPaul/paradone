@@ -54,7 +54,13 @@ function entryMarkdown(session) {
   // Records written before per-session completion tracking have no
   // completedTasks at all, so guard rather than printing an empty section.
   if (session.completedTasks?.length) {
-    lines.push(`- Completed: ${session.completedTasks.join(', ')}`)
+    // Records predating mid-session add tracking have no addedTasks, so nothing
+    // is annotated for them rather than everything.
+    const added = new Set(session.addedTasks ?? [])
+    const tasks = session.completedTasks.map(
+      (task) => `${task}${added.has(task) ? ' (added mid-session)' : ''}`,
+    )
+    lines.push(`- Completed: ${tasks.join(', ')}`)
   }
   if (session.primerIntent) {
     lines.push(`- Primer: ${session.primerIntent}`)

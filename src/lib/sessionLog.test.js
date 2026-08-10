@@ -106,6 +106,19 @@ describe('buildLogMarkdown', () => {
     expect(buildLogMarkdown([session({ completedTasks: [] })])).not.toContain('- Completed:')
   })
 
+  it('annotates the completed tasks that were added mid-session', () => {
+    const md = buildLogMarkdown([
+      session({ completedTasks: ['draft outline', 'reply to Mai'], addedTasks: ['reply to Mai'] }),
+    ])
+    expect(md).toContain('- Completed: draft outline, reply to Mai (added mid-session)')
+  })
+
+  it('annotates nothing on a record written before mid-session add tracking existed', () => {
+    const md = buildLogMarkdown([session({ completedTasks: ['draft outline'] })])
+    expect(md).toContain('- Completed: draft outline')
+    expect(md).not.toContain('(added mid-session)')
+  })
+
   it('does not throw on a record written before completed-task tracking existed', () => {
     const md = buildLogMarkdown([session()])
     expect(md).not.toContain('- Completed:')

@@ -41,6 +41,21 @@ export function completedSince(startText, endText) {
     .map((item) => item.text)
 }
 
+// Tasks on the list now that weren't on it when the block started. Identity is
+// the marker-stripped text, not the hash, for the same reason completedSince
+// uses it: hashLine covers the whole line, so a toggle changes an item's hash.
+// A task counts as pre-existing whether it was checked or unchecked at the start.
+export function addedSince(startText, endText) {
+  const atStart = new Set(
+    parseChecklist(startText)
+      .filter((item) => item.checkbox)
+      .map((item) => item.text),
+  )
+  return parseChecklist(endText)
+    .filter((item) => item.checkbox && !atStart.has(item.text))
+    .map((item) => item.text)
+}
+
 export function toggleItem(text, hash) {
   const lines = text.split('\n')
   const idx = lines.findIndex((line) => hashLine(line) === hash)

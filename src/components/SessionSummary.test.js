@@ -52,6 +52,19 @@ describe('SessionSummary', () => {
     expect(completed).toEqual(['draft outline', 'send invoice'])
   })
 
+  it('badges only the completed tasks that were added mid-session', () => {
+    const wrapper = mount(SessionSummary, {
+      props: {
+        ...baseProps,
+        completedTasks: ['draft outline', 'reply to Mai'],
+        addedTasks: ['reply to Mai'],
+      },
+    })
+    const items = wrapper.findAll('#summary-completed-heading ~ ul li')
+    expect(items[0].find('.task-badge').exists()).toBe(false)
+    expect(items[1].find('.task-badge').text()).toBe('added')
+  })
+
   it('renders a fallback message when nothing was completed this session', () => {
     const wrapper = mount(SessionSummary, { props: { ...baseProps, completedTasks: [] } })
     expect(wrapper.text()).toContain('No tasks checked off this session.')

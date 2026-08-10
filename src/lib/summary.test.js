@@ -32,6 +32,25 @@ reply to Mai re: weekend
     expect(markdown).toContain('## Completed this session\n- draft outline\n- send invoice')
   })
 
+  it('annotates the tasks that were added mid-session, in place', () => {
+    const markdown = buildSummaryMarkdown({
+      ...baseInput,
+      completedTasks: ['draft outline', 'reply to Mai'],
+      addedTasks: ['reply to Mai'],
+    })
+    expect(markdown).toContain(
+      '## Completed this session\n- draft outline\n- reply to Mai (added mid-session)',
+    )
+  })
+
+  it('annotates nothing when no addedTasks are given', () => {
+    const markdown = buildSummaryMarkdown({
+      ...baseInput,
+      completedTasks: ['draft outline', 'reply to Mai'],
+    })
+    expect(markdown).not.toContain('(added mid-session)')
+  })
+
   it('omits the entire Audit section when the audit was skipped', () => {
     const markdown = buildSummaryMarkdown({ ...baseInput, auditProductive: '', auditNotes: '' })
     expect(markdown).not.toContain('## Audit')

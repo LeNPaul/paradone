@@ -10,6 +10,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // Tasks that weren't on the list when the block started. A superset of what's
+  // completed — it includes ones still unticked — so it's intersected here.
+  addedTasks: {
+    type: Array,
+    default: () => [],
+  },
   capture: {
     type: String,
     default: '',
@@ -27,6 +33,8 @@ const props = defineProps({
 const emit = defineEmits(['start-new-session'])
 
 const markdown = computed(() => buildSummaryMarkdown(props))
+
+const addedSet = computed(() => new Set(props.addedTasks))
 
 const productiveLabel = computed(
   () => PRODUCTIVE_LABELS[props.auditProductive] ?? props.auditProductive,
@@ -46,7 +54,9 @@ function onDownload() {
     <section class="session-summary__block" aria-labelledby="summary-completed-heading">
       <h3 id="summary-completed-heading" class="eyebrow">Completed this session</h3>
       <ul v-if="completedTasks.length" class="list-reset session-summary__completed">
-        <li v-for="task in completedTasks" :key="task">{{ task }}</li>
+        <li v-for="task in completedTasks" :key="task">
+          {{ task }}<span v-if="addedSet.has(task)" class="task-badge">added</span>
+        </li>
       </ul>
       <p v-else class="session-summary__empty">No tasks checked off this session.</p>
     </section>

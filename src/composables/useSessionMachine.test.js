@@ -391,6 +391,7 @@ describe('audit and summary', () => {
       auditedAt: expect.any(String),
       taskListText: '- [ ] draft outline',
       completedTasks: [],
+      addedTasks: [],
       plannedDuration: 25,
       actualDuration: 25,
       capture: 'reply to Mai',
@@ -402,6 +403,37 @@ describe('audit and summary', () => {
     })
     expect(sessions[0].actualDuration).toBe(sessions[0].plannedDuration)
     expect(new Date(sessions[0].auditedAt).toISOString()).toBe(sessions[0].auditedAt)
+  })
+
+  it('records tasks added mid-session separately from ones that pre-existed it', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    // Both ticked during the block, but only one was on the list when it began.
+    setGoalsList({ text: '- [x] draft outline\n- [x] reply to Mai', updatedAt: null })
+    machine.tick(now + 25 * 60 * 1000)
+    machine.endSession()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+
+    const session = getSessions()[0]
+    expect(session.completedTasks).toEqual(['draft outline', 'reply to Mai'])
+    expect(session.addedTasks).toEqual(['reply to Mai'])
+  })
+
+  it('records an added task that was never ticked, without counting it completed', () => {
+    setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    setGoalsList({ text: '- [ ] draft outline\n- [ ] reply to Mai', updatedAt: null })
+    machine.tick(now + 25 * 60 * 1000)
+    machine.endSession()
+    machine.skipAudit()
+
+    const session = getSessions()[0]
+    expect(session.completedTasks).toEqual([])
+    expect(session.addedTasks).toEqual(['reply to Mai'])
   })
 
   it('startNewSession resets to setup without logging the session a second time', () => {

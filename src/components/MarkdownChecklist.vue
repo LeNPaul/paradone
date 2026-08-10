@@ -16,6 +16,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Split out of editable so an active session can add, edit and delete without
+  // offering the archive sweep: it strips checked lines out of the list, which
+  // would erase the block's own "completed this session" diff.
+  archivable: {
+    type: Boolean,
+    default: true,
+  },
   // Hashes to leave out of the render. Display-only: modelValue stays the full
   // list, so a toggle still writes back every line, hidden ones included.
   hiddenHashes: {
@@ -88,7 +95,7 @@ function onModalSubmit(text) {
   <div v-if="editable" class="markdown-checklist__actions">
     <button type="button" class="markdown-checklist__add btn-quiet" @click="openAdd">+ Add Task</button>
     <button
-      v-if="checkedCount"
+      v-if="archivable && checkedCount"
       type="button"
       class="markdown-checklist__archive btn-quiet"
       @click="emit('archive')"

@@ -30,6 +30,40 @@ describe('AuditPrompt', () => {
     expect(completed.map((li) => li.text())).toEqual(['send invoice'])
   })
 
+  it('badges only the completed tasks that were added mid-session', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: {
+        taskListText: '',
+        completedTasks: ['draft outline', 'reply to Mai'],
+        addedTasks: ['reply to Mai'],
+      },
+    })
+    const items = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(items[0].find('.task-badge').exists()).toBe(false)
+    expect(items[1].find('.task-badge').text()).toBe('added')
+  })
+
+  // addedTasks is a superset of what got completed: it includes tasks added and
+  // then left unticked, which belong on the remaining list, not this one.
+  it('does not invent a completed row for an added task that was never ticked', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: {
+        taskListText: '- [ ] reply to Mai',
+        completedTasks: [],
+        addedTasks: ['reply to Mai'],
+      },
+    })
+    expect(wrapper.findAll('#audit-completed-heading ~ ul li')).toHaveLength(0)
+    expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).toContain('reply to Mai')
+  })
+
+  it('badges nothing when no addedTasks are given', () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: '', completedTasks: ['draft outline'] },
+    })
+    expect(wrapper.find('.task-badge').exists()).toBe(false)
+  })
+
   it('says so when every task on the list is checked off', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '- [x] send invoice' } })
     expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).toContain(

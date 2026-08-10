@@ -6,14 +6,20 @@ import { PRODUCTIVE_LABELS } from './sessionLog.js'
 
 export function buildSummaryMarkdown({
   completedTasks = [],
+  addedTasks = [],
   capture = '',
   auditProductive = '',
   auditNotes = '',
 }) {
   const captureText = capture.trim() || '_No captures recorded._'
 
+  // Work that came up mid-block is annotated rather than listed apart, so the
+  // exported list still reads in the order the tasks were finished.
+  const added = new Set(addedTasks)
   const completedText = completedTasks.length
-    ? completedTasks.map((task) => `- ${task}`).join('\n')
+    ? completedTasks
+        .map((task) => `- ${task}${added.has(task) ? ' (added mid-session)' : ''}`)
+        .join('\n')
     : '_No tasks checked off this session._'
 
   // A skipped audit leaves auditProductive empty; a submitted one always has a

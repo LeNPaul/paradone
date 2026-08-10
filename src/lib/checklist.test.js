@@ -8,6 +8,7 @@ import {
   markChecked,
   editItem,
   completedSince,
+  addedSince,
 } from './checklist.js'
 
 describe('parseChecklist', () => {
@@ -269,6 +270,56 @@ describe('completedSince', () => {
   it('never reports plain non-checkbox lines', () => {
     expect(completedSince('- [ ] draft outline', '- [x] draft outline\n- ideas for post')).toEqual([
       'draft outline',
+    ])
+  })
+})
+
+describe('addedSince', () => {
+  it('reports a task appended mid-session', () => {
+    expect(addedSince('- [ ] draft outline', '- [ ] draft outline\n- [ ] reply to Mai')).toEqual([
+      'reply to Mai',
+    ])
+  })
+
+  it('reports an added task whether or not it has been checked', () => {
+    expect(addedSince('- [ ] draft outline', '- [ ] draft outline\n- [x] reply to Mai')).toEqual([
+      'reply to Mai',
+    ])
+  })
+
+  it('does not report a pre-existing task that was toggled', () => {
+    expect(addedSince('- [ ] draft outline', '- [x] draft outline')).toEqual([])
+  })
+
+  it('does not report a task that was already checked at the start', () => {
+    expect(addedSince('- [x] send invoice', '- [x] send invoice')).toEqual([])
+  })
+
+  it('is unaffected by reordering', () => {
+    const start = '- [x] send invoice\n- [ ] draft outline'
+    const end = '- [ ] reply to Mai\n- [x] draft outline\n- [x] send invoice'
+    expect(addedSince(start, end)).toEqual(['reply to Mai'])
+  })
+
+  it('reports every checkbox task when the start snapshot is empty', () => {
+    expect(addedSince('', '- [ ] draft outline\n- [x] reply to Mai')).toEqual([
+      'draft outline',
+      'reply to Mai',
+    ])
+  })
+
+  it('returns an empty array when nothing was added', () => {
+    const text = '- [ ] draft outline\n- [x] send invoice'
+    expect(addedSince(text, text)).toEqual([])
+  })
+
+  it('never reports plain non-checkbox lines', () => {
+    expect(addedSince('- [ ] draft outline', '- [ ] draft outline\n- ideas for post')).toEqual([])
+  })
+
+  it('treats an edited pre-existing task as added (the text is what identifies it)', () => {
+    expect(addedSince('- [ ] draft outline', '- [ ] draft full outline')).toEqual([
+      'draft full outline',
     ])
   })
 })

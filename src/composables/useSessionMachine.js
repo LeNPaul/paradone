@@ -13,7 +13,7 @@ import {
   setSessions,
   getGoalsList,
 } from '../lib/storage.js'
-import { completedSince } from '../lib/checklist.js'
+import { completedSince, addedSince } from '../lib/checklist.js'
 
 const PRIMER_DURATION_MINUTES = 2
 
@@ -172,6 +172,10 @@ export function useSessionMachine() {
         taskListStartText.value === null
           ? []
           : completedSince(taskListStartText.value, taskListText),
+      // Derived at log time from the snapshot already in hand, so nothing new
+      // has to be tracked across the session or persisted to activeSession.
+      addedTasks:
+        taskListStartText.value === null ? [] : addedSince(taskListStartText.value, taskListText),
       plannedDuration: plannedDurationMin.value ?? prefs.workDuration,
       actualDuration: Math.round((actualDurationMs.value ?? prefs.workDuration * 60 * 1000) / (60 * 1000)),
       capture: capture.value,

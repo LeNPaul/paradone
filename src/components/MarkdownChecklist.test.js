@@ -151,9 +151,23 @@ describe('MarkdownChecklist', () => {
     expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
   })
 
-  // Archiving is a Setup-only action; during a session the list is toggle-only.
+  // Archiving is a Setup-only action.
   it('hides the archive button when editable is false', () => {
     const wrapper = mountChecklist({ modelValue: '- [x] send invoice', editable: false })
+    expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
+
+  // What an active session uses: the full add/edit/delete kit, minus the sweep
+  // that would strip checked lines out from under the session's own diff.
+  it('keeps add/edit/delete but hides the archive button when archivable is false', () => {
+    const wrapper = mountChecklist({
+      modelValue: '- [ ] draft outline\n- [x] send invoice',
+      archivable: false,
+    })
+
+    expect(wrapper.find('.markdown-checklist__add').exists()).toBe(true)
+    expect(wrapper.find('.markdown-checklist__controls').exists()).toBe(true)
+    expect(wrapper.findComponent(TaskModal).exists()).toBe(true)
     expect(wrapper.find('.markdown-checklist__archive').exists()).toBe(false)
   })
 

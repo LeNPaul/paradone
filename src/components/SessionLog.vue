@@ -24,6 +24,12 @@ const confirmMessage = computed(() => {
   return `This permanently deletes ${count} logged audit${count === 1 ? '' : 's'}. It cannot be undone.`
 })
 
+// Records written before mid-session adds were tracked have no addedTasks, so
+// nothing is badged for them rather than everything.
+function wasAdded(entry, task) {
+  return entry.addedTasks?.includes(task) ?? false
+}
+
 function onDownload() {
   downloadMarkdown(buildLogMarkdown(props.sessions), 'paradone-audit-log.md')
 }
@@ -61,7 +67,9 @@ function onConfirmClear() {
         <p class="session-log__meta">Started: {{ formatTime(entry.date) }} · Audited: {{ formatTime(entry.auditedAt ?? entry.date) }}</p>
         <p class="session-log__meta">{{ entry.plannedDuration }} min planned / {{ entry.actualDuration }} min actual</p>
         <ul v-if="entry.completedTasks?.length" class="list-reset session-log__tasks">
-          <li v-for="task in entry.completedTasks" :key="task">{{ task }}</li>
+          <li v-for="task in entry.completedTasks" :key="task">
+            {{ task }}<span v-if="wasAdded(entry, task)" class="task-badge">added</span>
+          </li>
         </ul>
         <p v-if="entry.primerIntent" class="session-log__meta">Primer: {{ entry.primerIntent }}</p>
         <p class="session-log__rating">{{ productiveLabel(entry.auditProductive) }}</p>

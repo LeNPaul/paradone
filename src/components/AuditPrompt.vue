@@ -14,6 +14,12 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // Tasks that weren't on the list when the block started. A superset of what's
+  // completed — it includes ones still unticked — so it's intersected here.
+  addedTasks: {
+    type: Array,
+    default: () => [],
+  },
   capture: {
     type: String,
     default: '',
@@ -33,6 +39,8 @@ const draft = ref(removeChecked(props.taskListText).text)
 // now was ticked here, at the audit. The parent merges these back into the
 // persistent Task List when the audit is finished.
 const checkedTasks = computed(() => removeChecked(draft.value).removed)
+
+const addedSet = computed(() => new Set(props.addedTasks))
 
 const auditProductive = ref('')
 const auditNotes = ref('')
@@ -62,7 +70,9 @@ function onConfirmDiscard() {
     <section class="audit-prompt__block" aria-labelledby="audit-completed-heading">
       <h3 id="audit-completed-heading" class="eyebrow">Completed this session</h3>
       <ul v-if="completedTasks.length" class="list-reset audit-prompt__completed">
-        <li v-for="task in completedTasks" :key="task">{{ task }}</li>
+        <li v-for="task in completedTasks" :key="task">
+          {{ task }}<span v-if="addedSet.has(task)" class="task-badge">added</span>
+        </li>
       </ul>
       <p v-else class="audit-prompt__empty">No tasks checked off this session.</p>
     </section>

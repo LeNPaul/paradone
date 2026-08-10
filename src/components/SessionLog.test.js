@@ -50,6 +50,30 @@ describe('SessionLog', () => {
     expect(items.map((li) => li.text())).toEqual(['draft outline', 'send invoice'])
   })
 
+  it('badges only the completed tasks that were added mid-session', () => {
+    const wrapper = mount(SessionLog, {
+      props: {
+        sessions: [
+          session({
+            completedTasks: ['draft outline', 'reply to Mai'],
+            addedTasks: ['reply to Mai'],
+          }),
+        ],
+      },
+    })
+    const items = wrapper.findAll('.session-log__entry li')
+    expect(items[0].find('.task-badge').exists()).toBe(false)
+    expect(items[1].find('.task-badge').text()).toBe('added')
+  })
+
+  it('badges nothing on a record written before mid-session add tracking existed', () => {
+    const wrapper = mount(SessionLog, {
+      props: { sessions: [session({ completedTasks: ['draft outline'] })] },
+    })
+    expect(wrapper.findAll('.session-log__entry li')).toHaveLength(1)
+    expect(wrapper.find('.task-badge').exists()).toBe(false)
+  })
+
   it('renders a record written before completed-task tracking existed', () => {
     const wrapper = mount(SessionLog, { props: { sessions: [session()] } })
     expect(wrapper.findAll('.session-log__entry li')).toHaveLength(0)

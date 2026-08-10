@@ -188,6 +188,20 @@ input[type='checkbox']:checked::after {
   padding: 0;
 }
 
+/* Marks a completed task that wasn't on the list when the block started. Quiet
+   on purpose — it annotates the task, it doesn't compete with it. Shared by the
+   audit, summary and log, which all render the same completed list. */
+.task-badge {
+  display: inline-block;
+  margin-left: var(--space-2);
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--control);
+  color: var(--ink-secondary);
+  font-size: var(--text-xs);
+  vertical-align: middle;
+}
+
 /* Readable by screen readers, invisible on screen. Lets an icon-only control
    keep a real text label instead of leaning on a title attribute. */
 .sr-only {

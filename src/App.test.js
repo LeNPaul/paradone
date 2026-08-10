@@ -204,7 +204,7 @@ describe('primer setup', () => {
   })
 })
 
-// Add a task at Setup through the Add-Task modal.
+// Add a task through the Add-Task modal, at Setup or during an active session.
 async function addTaskViaModal(wrapper, text) {
   const addButton = wrapper.findAll('button').find((b) => b.text().includes('Add Task'))
   await addButton.trigger('click')
@@ -232,7 +232,7 @@ describe('adding to the Task List', () => {
     expect(reloadedSection.text()).toContain('draft outline')
   })
 
-  it('Active state renders the Task List without a textarea (checkbox-toggle only)', () => {
+  it('Active state keeps the capture textarea out of the Task List section', () => {
     setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     setActiveSession({
       state: 'active',
@@ -241,7 +241,7 @@ describe('adding to the Task List', () => {
     const wrapper = mount(App)
     const activeSection = wrapper.find('[aria-labelledby="active-heading"]')
     expect(activeSection.exists()).toBe(true)
-    // The Task List is checkbox-toggle only here; the capture textarea lives in its own section.
+    // The capture textarea lives in its own section, not in with the tasks.
     expect(activeSection.find('textarea').exists()).toBe(false)
     expect(activeSection.find('input[type="checkbox"]').exists()).toBe(true)
   })
@@ -256,6 +256,92 @@ describe('adding to the Task List', () => {
     await wrapper.get('input[type="checkbox"]').setValue(true)
 
     expect(getGoalsList().text).toBe('- [x] draft outline')
+  })
+})
+
+describe('adding tasks during an active session', () => {
+  function startSession(text) {
+    setGoalsList({ text, updatedAt: null })
+    const wrapper = mount(App)
+    return wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Start')
+      .trigger('click')
+      .then(() => wrapper)
+  }
+
+  const activeCheckboxes = (wrapper) =>
+    wrapper.get('[aria-labelledby="active-heading"]').findAll('input[type="checkbox"]')
+
+  const clickButton = (wrapper, label) =>
+    wrapper
+      .findAll('button')
+      .find((b) => b.text() === label)
+      .trigger('click')
+
+  // Seed one pre-existing task, add a second mid-block, tick both.
+  async function sessionWithBothKinds() {
+    const wrapper = await startSession('- [ ] draft outline')
+    await addTaskViaModal(wrapper, 'reply to Mai')
+    await activeCheckboxes(wrapper)[0].setValue(true)
+    await activeCheckboxes(wrapper)[1].setValue(true)
+    return wrapper
+  }
+
+  it('offers add, edit and delete during a session, but not the archive sweep', async () => {
+    const wrapper = await startSession('- [x] send invoice\n- [ ] draft outline')
+
+    const activeSection = wrapper.get('[aria-labelledby="active-heading"]')
+    expect(activeSection.find('.markdown-checklist__add').exists()).toBe(true)
+    expect(activeSection.find('.markdown-checklist__controls').exists()).toBe(true)
+    // Archiving strips checked lines out of the list, which would erase this
+    // block's own completed-this-session diff. Setup-only.
+    expect(activeSection.find('.markdown-checklist__archive').exists()).toBe(false)
+  })
+
+  it('persists a task added mid-session and lets it be ticked in the same block', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+    await addTaskViaModal(wrapper, 'reply to Mai')
+
+    expect(getGoalsList().text).toBe('- [ ] draft outline\n- [ ] reply to Mai')
+    expect(activeCheckboxes(wrapper)).toHaveLength(2)
+
+    await activeCheckboxes(wrapper)[1].setValue(true)
+    expect(getGoalsList().text).toBe('- [ ] draft outline\n- [x] reply to Mai')
+  })
+
+  it('a task added mid-session survives a reload mid-block, still ticked', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+    await addTaskViaModal(wrapper, 'reply to Mai')
+    await activeCheckboxes(wrapper)[1].setValue(true)
+
+    const reloaded = mount(App)
+    const checkboxes = activeCheckboxes(reloaded)
+    expect(checkboxes).toHaveLength(2)
+    expect(checkboxes[1].element.checked).toBe(true)
+    expect(reloaded.get('[aria-labelledby="active-heading"]').text()).toContain('reply to Mai')
+  })
+
+  it('badges the mid-session addition at the audit, but not the task that pre-existed the block', async () => {
+    const wrapper = await sessionWithBothKinds()
+    await clickButton(wrapper, 'Stop & log session')
+
+    const items = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(items).toHaveLength(2)
+    expect(items[0].text()).toContain('draft outline')
+    expect(items[0].find('.task-badge').exists()).toBe(false)
+    expect(items[1].text()).toContain('reply to Mai')
+    expect(items[1].find('.task-badge').text()).toBe('added')
+  })
+
+  it('records the mid-session addition on the logged session', async () => {
+    const wrapper = await sessionWithBothKinds()
+    await clickButton(wrapper, 'Stop & log session')
+    await clickButton(wrapper, 'Skip')
+
+    const session = getSessions()[0]
+    expect(session.completedTasks).toEqual(['draft outline', 'reply to Mai'])
+    expect(session.addedTasks).toEqual(['reply to Mai'])
   })
 })
 

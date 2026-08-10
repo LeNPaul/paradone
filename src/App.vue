@@ -11,7 +11,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import DataPanel from './components/DataPanel.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive, clearAll } from './lib/storage.js'
-import { completedSince, parseChecklist, markChecked } from './lib/checklist.js'
+import { completedSince, addedSince, parseChecklist, markChecked } from './lib/checklist.js'
 import { createTimer } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
@@ -131,6 +131,13 @@ const completedTasks = computed(() =>
   taskListStartText.value === null
     ? []
     : completedSince(taskListStartText.value, taskListText.value),
+)
+
+// Which of those weren't on the list when the block started. Work that came up
+// mid-session is a different signal from work you sat down intending to do, so
+// the audit marks it rather than folding it in silently.
+const addedTasks = computed(() =>
+  taskListStartText.value === null ? [] : addedSince(taskListStartText.value, taskListText.value),
 )
 
 // Tasks already ticked before this block began are finished work — hide them
@@ -356,7 +363,7 @@ useTheme(prefs, updatePrefs)
         <h3 id="active-task-list-heading" class="eyebrow">Task List</h3>
         <MarkdownChecklist
           :model-value="taskListText"
-          :editable="false"
+          :archivable="false"
           :hidden-hashes="hiddenTaskHashes"
           @update:model-value="onTaskListUpdate"
         />
@@ -411,6 +418,7 @@ useTheme(prefs, updatePrefs)
         <AuditPrompt
           :task-list-text="taskListText"
           :completed-tasks="completedTasks"
+          :added-tasks="addedTasks"
           :capture="capture"
           @submit="onAuditSubmit"
           @skip="onAuditSkip"
@@ -422,6 +430,7 @@ useTheme(prefs, updatePrefs)
         <h2 id="summary-heading" class="eyebrow">Summary</h2>
         <SessionSummary
           :completed-tasks="completedTasks"
+          :added-tasks="addedTasks"
           :capture="capture"
           :audit-productive="auditProductive"
           :audit-notes="auditNotes"
