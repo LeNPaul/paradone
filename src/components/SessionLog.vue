@@ -72,7 +72,10 @@ function onConfirmClear() {
           </li>
         </ul>
         <p v-if="entry.primerIntent" class="session-log__meta">Primer: {{ entry.primerIntent }}</p>
-        <p class="session-log__rating">{{ productiveLabel(entry.auditProductive) }}</p>
+        <p class="session-log__rating">
+          <strong v-if="entry.auditProductive">Focus:</strong>
+          {{ productiveLabel(entry.auditProductive) }}
+        </p>
         <p v-if="entry.auditProductive && entry.auditNotes">{{ entry.auditNotes }}</p>
       </li>
     </ol>
@@ -142,6 +145,5 @@ function onConfirmClear() {
 
 .session-log__rating {
   margin-top: var(--space-2);
-  font-weight: 600;
 }
 </style>

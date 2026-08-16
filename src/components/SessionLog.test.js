@@ -31,6 +31,7 @@ describe('SessionLog', () => {
     expect(wrapper.findAll('.session-log__entry')).toHaveLength(1)
     const text = wrapper.text()
     expect(text).toContain('25 min planned / 25 min actual')
+    expect(text).toContain('Focus:')
     expect(text).toContain('Focused')
     expect(text).toContain('got the outline done')
   })
@@ -99,6 +100,7 @@ describe('SessionLog', () => {
       props: { sessions: [session({ auditProductive: '', auditNotes: '' })] },
     })
     expect(wrapper.text()).toContain('Audit skipped')
+    expect(wrapper.text()).not.toContain('Focus:')
   })
 
   it('shows an empty state when nothing has been logged', () => {
