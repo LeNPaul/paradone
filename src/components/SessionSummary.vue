@@ -51,19 +51,26 @@ function onDownload() {
 
 <template>
   <div class="session-summary">
-    <section class="session-summary__block" aria-labelledby="summary-completed-heading">
+    <section
+      v-if="completedTasks.length"
+      class="session-summary__block"
+      aria-labelledby="summary-completed-heading"
+    >
       <h3 id="summary-completed-heading" class="eyebrow">Completed this session</h3>
-      <ul v-if="completedTasks.length" class="list-reset session-summary__completed">
+      <ul class="list-reset session-summary__completed">
         <li v-for="task in completedTasks" :key="task">
           {{ task }}<span v-if="addedSet.has(task)" class="task-badge">added</span>
         </li>
       </ul>
-      <p v-else class="session-summary__empty">No tasks checked off this session.</p>
     </section>
 
-    <section class="session-summary__block" aria-labelledby="summary-captures-heading">
+    <section
+      v-if="capture.trim()"
+      class="session-summary__block"
+      aria-labelledby="summary-captures-heading"
+    >
       <h3 id="summary-captures-heading" class="eyebrow">Captures</h3>
-      <pre class="session-summary__capture">{{ capture.trim() || 'No captures recorded.' }}</pre>
+      <pre class="session-summary__capture">{{ capture.trim() }}</pre>
     </section>
 
     <section

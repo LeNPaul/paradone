@@ -79,9 +79,9 @@ describe('AuditPrompt', () => {
     expect(items.map((li) => li.text())).toEqual(['draft outline', 'send invoice'])
   })
 
-  it('says so when nothing was checked off during the session', () => {
+  it('hides the completed section when nothing was checked off during the session', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '', completedTasks: [] } })
-    expect(wrapper.text()).toContain('No tasks checked off this session.')
+    expect(wrapper.find('#audit-completed-heading').exists()).toBe(false)
   })
 
   it('shows the captures recorded during the session', () => {
@@ -91,9 +91,9 @@ describe('AuditPrompt', () => {
     expect(wrapper.text()).toContain('tabbed out to check email')
   })
 
-  it('shows a fallback when no captures were recorded', () => {
+  it('hides the captures section when nothing was recorded', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '', capture: '   ' } })
-    expect(wrapper.text()).toContain('No captures recorded.')
+    expect(wrapper.find('#audit-capture-heading').exists()).toBe(false)
   })
 
   it('renders exactly three quick-select options', () => {
@@ -195,7 +195,7 @@ describe('AuditPrompt ticking tasks off', () => {
 
     await tick(wrapper, 1).trigger('change')
 
-    expect(wrapper.text()).toContain('No tasks checked off this session.')
+    expect(wrapper.find('#audit-completed-heading').exists()).toBe(false)
   })
 
   it('reports the ticked tasks when the audit is submitted', async () => {

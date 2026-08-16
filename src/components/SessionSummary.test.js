@@ -65,14 +65,14 @@ describe('SessionSummary', () => {
     expect(items[1].find('.task-badge').text()).toBe('added')
   })
 
-  it('renders a fallback message when nothing was completed this session', () => {
+  it('hides the completed section when nothing was completed this session', () => {
     const wrapper = mount(SessionSummary, { props: { ...baseProps, completedTasks: [] } })
-    expect(wrapper.text()).toContain('No tasks checked off this session.')
+    expect(wrapper.find('#summary-completed-heading').exists()).toBe(false)
   })
 
-  it('renders a fallback message when the capture is empty', () => {
+  it('hides the captures section when the capture is empty', () => {
     const wrapper = mount(SessionSummary, { props: { ...baseProps, capture: '   ' } })
-    expect(wrapper.text()).toContain('No captures recorded.')
+    expect(wrapper.find('#summary-captures-heading').exists()).toBe(false)
   })
 
   // The screen renders structured markup; the export stays markdown, built from

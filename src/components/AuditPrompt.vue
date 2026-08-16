@@ -67,14 +67,17 @@ function onConfirmDiscard() {
 
 <template>
   <div class="audit-prompt">
-    <section class="audit-prompt__block" aria-labelledby="audit-completed-heading">
+    <section
+      v-if="completedTasks.length"
+      class="audit-prompt__block"
+      aria-labelledby="audit-completed-heading"
+    >
       <h3 id="audit-completed-heading" class="eyebrow">Completed this session</h3>
-      <ul v-if="completedTasks.length" class="list-reset audit-prompt__completed">
+      <ul class="list-reset audit-prompt__completed">
         <li v-for="task in completedTasks" :key="task">
           {{ task }}<span v-if="addedSet.has(task)" class="task-badge">added</span>
         </li>
       </ul>
-      <p v-else class="audit-prompt__empty">No tasks checked off this session.</p>
     </section>
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
@@ -88,9 +91,13 @@ function onConfirmDiscard() {
       <p v-else class="audit-prompt__empty">Nothing left on the list.</p>
     </section>
 
-    <section class="audit-prompt__block" aria-labelledby="audit-capture-heading">
+    <section
+      v-if="capture.trim()"
+      class="audit-prompt__block"
+      aria-labelledby="audit-capture-heading"
+    >
       <h3 id="audit-capture-heading" class="eyebrow">Captures</h3>
-      <pre class="audit-prompt__capture">{{ capture.trim() || 'No captures recorded.' }}</pre>
+      <pre class="audit-prompt__capture">{{ capture.trim() }}</pre>
     </section>
 
     <div class="audit-prompt__block">
