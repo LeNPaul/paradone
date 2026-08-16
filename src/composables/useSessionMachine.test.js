@@ -77,7 +77,7 @@ describe('pausing and stopping an active session', () => {
 })
 
 describe('block end', () => {
-  it('takeBreak moves blockEnd -> break with a break-duration timer, auto-ending to audit', () => {
+  it('takeBreak moves blockEnd -> break with a break-duration timer, auto-ending back to blockEnd', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
@@ -85,10 +85,10 @@ describe('block end', () => {
     machine.takeBreak(now + 25 * 60 * 1000)
     expect(machine.state.value).toBe('break')
     machine.tick(now + 25 * 60 * 1000 + 5 * 60 * 1000)
-    expect(machine.state.value).toBe('audit')
+    expect(machine.state.value).toBe('blockEnd')
   })
 
-  it('endBreak ends an in-progress break early, moving break -> audit', () => {
+  it('endBreak ends an in-progress break early, moving break -> blockEnd', () => {
     const machine = useSessionMachine()
     const now = 1000
     machine.startSession(now)
@@ -96,7 +96,44 @@ describe('block end', () => {
     machine.takeBreak(now + 25 * 60 * 1000)
     expect(machine.state.value).toBe('break')
     machine.endBreak()
-    expect(machine.state.value).toBe('audit')
+    expect(machine.state.value).toBe('blockEnd')
+  })
+
+  it('keepGoing chains another block after a break has run its course', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    const breakEndedAt = now + 30 * 60 * 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+    machine.tick(breakEndedAt)
+    machine.keepGoing(breakEndedAt)
+    expect(machine.state.value).toBe('active')
+    expect(machine.remainingMs.value).toBe(25 * 60 * 1000)
+
+    machine.tick(breakEndedAt + 25 * 60 * 1000)
+    machine.endSession()
+    machine.skipAudit()
+    const sessions = getSessions()
+    expect(sessions[0].plannedDuration).toBe(50)
+    expect(sessions[0].actualDuration).toBe(50)
+  })
+
+  it('flags blockEnd as after a break only when it was reached from one', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    expect(machine.afterBreak.value).toBe(false)
+
+    machine.takeBreak(now + 25 * 60 * 1000)
+    machine.endBreak()
+    expect(machine.afterBreak.value).toBe(true)
+
+    machine.keepGoing(now + 26 * 60 * 1000)
+    machine.tick(now + 51 * 60 * 1000)
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.afterBreak.value).toBe(false)
   })
 
   it('endBreak does nothing outside the break state', () => {
@@ -533,6 +570,7 @@ describe('audit and summary', () => {
     machine.tick(now + 25 * 60 * 1000)
     machine.takeBreak(now + 25 * 60 * 1000)
     machine.tick(now + 25 * 60 * 1000 + 5 * 60 * 1000)
+    machine.endSession()
     machine.submitAudit({ auditProductive: 'mixed', auditNotes: '' })
 
     const sessions = getSessions()
@@ -549,6 +587,7 @@ describe('audit and summary', () => {
     machine.takeBreak(now + 25 * 60 * 1000)
     machine.tick(now + 25 * 60 * 1000 + 60 * 1000)
     machine.endBreak()
+    machine.endSession()
     machine.skipAudit()
 
     const sessions = getSessions()
@@ -612,6 +651,7 @@ describe('activeSession persistence', () => {
       primerSkipped: false,
       primerIntent: '',
       stoppedEarly: false,
+      afterBreak: false,
       actualDurationMs: null,
       plannedDurationMin: 25,
       taskListStartText: '',

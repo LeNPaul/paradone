@@ -98,6 +98,7 @@ const {
   totalMs,
   isPaused,
   showPrimerChoice,
+  afterBreak,
   prefs,
   capture,
   primerIntent,
@@ -372,8 +373,16 @@ useTheme(prefs, updatePrefs)
       </section>
 
       <section v-if="state === 'blockEnd'" class="card stage" aria-labelledby="block-end-heading">
-        <h2 id="block-end-heading" class="eyebrow stage__heading">Block complete</h2>
-        <p class="stage__question">Take the break, keep going, or wrap up?</p>
+        <h2 id="block-end-heading" class="eyebrow stage__heading">
+          {{ afterBreak ? 'Break complete' : 'Block complete' }}
+        </h2>
+        <p class="stage__question">
+          {{
+            afterBreak
+              ? 'Take another break, keep going, or wrap up?'
+              : 'Take the break, keep going, or wrap up?'
+          }}
+        </p>
         <div class="actions actions--centred">
           <button
             v-if="prefs.breakDuration > 0"

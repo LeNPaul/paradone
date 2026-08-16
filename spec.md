@@ -28,7 +28,7 @@ There is no routing. One page, eight states.
 | **Primer** *(optional)* | 2-minute timer showing that breakdown, then: commit to a full session, or stop here |
 | **Active** | Countdown, task list rendered with live checkboxes and the same add/edit/delete controls Setup has (no textarea, and no archive sweep) minus anything already checked when the session started, capture scratchpad always available |
 | **Block end** | Bell → "take the break, keep going, or wrap up?" — keeping going chains another block onto the same session |
-| **Break** *(skippable)* | Break countdown |
+| **Break** *(skippable)* | Break countdown — running out or ending it early both return to Block end, so a break pauses the session rather than ending it |
 | **Audit** | What actually got done? Focused or distracted? Shown alongside the still-tickable remainder of the task list — or discard the block outright |
 | **Summary** | Compiled markdown (completed-this-session list, capture notes, audit), copy or download, start new session |
 
@@ -173,7 +173,8 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break, continue, or end the session
 - [ ] "Keep going" starts another work block immediately, in the same session — planned and actual duration accumulate across chained blocks into one log record
-- [ ] An in-progress break can be ended early, going straight to the audit
+- [ ] An in-progress break can be ended early; both that and letting it run out return to the block-end choice, reading "Break complete" rather than "Block complete"
+- [ ] "Keep going" after a break chains another block onto the same session, the audit only arriving when the user picks "End session"
 - [ ] Audit prompt shows the unchecked remainder of the Task List alongside the questions; checked tasks appear only under Completed this session
 - [ ] Tasks on the audit list can still be ticked; a ticked row stays on screen, checked, and does not move to Completed this session until the audit is finished
 - [ ] A task ticked at the audit persists to `paradone:goalsList` once the audit is answered or skipped, and appears both under Completed this session on the Summary and in the logged session's `completedTasks`

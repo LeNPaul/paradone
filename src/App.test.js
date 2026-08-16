@@ -477,6 +477,23 @@ describe('block end', () => {
     expect(wrapper.text()).toContain('25:00')
   })
 
+  it('reads "Break complete" when the block end was reached from a break', () => {
+    setActiveSession({
+      state: 'blockEnd',
+      afterBreak: true,
+      timer: { durationMs: 5 * 60 * 1000, startedAt: Date.now(), elapsedMs: 5 * 60 * 1000, running: false },
+    })
+    const wrapper = mount(App)
+    expect(wrapper.find('#block-end-heading').text()).toBe('Break complete')
+    expect(wrapper.text()).toContain('Take another break, keep going, or wrap up?')
+  })
+
+  it('reads "Block complete" when a work block ran out', () => {
+    const wrapper = mountBlockEnd()
+    expect(wrapper.find('#block-end-heading').text()).toBe('Block complete')
+    expect(wrapper.text()).toContain('Take the break, keep going, or wrap up?')
+  })
+
   it('clicking End session transitions to the Audit screen', async () => {
     const wrapper = mountBlockEnd()
     await wrapper
@@ -502,14 +519,14 @@ describe('break', () => {
     expect(wrapper.findAll('button').map((b) => b.text())).toContain('End break')
   })
 
-  it('clicking End break transitions to the Audit screen', async () => {
+  it('clicking End break returns to the block-end choice', async () => {
     const wrapper = mountBreak()
     await wrapper
       .findAll('button')
       .find((b) => b.text() === 'End break')
       .trigger('click')
     expect(wrapper.find('#break-heading').exists()).toBe(false)
-    expect(wrapper.find('#audit-heading').exists()).toBe(true)
+    expect(wrapper.find('#block-end-heading').text()).toBe('Break complete')
   })
 })
 

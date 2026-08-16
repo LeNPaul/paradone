@@ -32,6 +32,9 @@ export function useSessionMachine() {
   const primerSkipped = ref(stored?.primerSkipped ?? false)
   const primerIntent = ref(stored?.primerIntent ?? '')
   const stoppedEarly = ref(stored?.stoppedEarly ?? false)
+  // Display-only: whether blockEnd was reached from a break rather than from a
+  // work block finishing. Drives the copy on that screen, never a guard.
+  const afterBreak = ref(stored?.afterBreak ?? false)
   const actualDurationMs = ref(stored?.actualDurationMs ?? null)
   // Planned minutes across every block chained into this session. null means "no
   // record" — a session rehydrated from before this existed falls back to the
@@ -58,8 +61,12 @@ export function useSessionMachine() {
     if (state.value === 'active' && isFinished(timer.value, at)) {
       actualDurationMs.value =
         (actualDurationMs.value ?? 0) + (timer.value.durationMs - getRemainingMs(timer.value, at))
+      afterBreak.value = false
       state.value = 'blockEnd'
-    } else if (state.value === 'break' && isFinished(timer.value, at)) state.value = 'audit'
+    } else if (state.value === 'break' && isFinished(timer.value, at)) {
+      afterBreak.value = true
+      state.value = 'blockEnd'
+    }
   }
   tick(now.value) // correct immediately on rehydration, don't wait for the first interval tick
 
@@ -138,9 +145,12 @@ export function useSessionMachine() {
     state.value = 'break'
   }
 
+  // A break is a pause in the session, not the end of it: either way out of one
+  // lands back on the block-end choice so another block can still be chained.
   function endBreak() {
     if (state.value !== 'break') return
-    state.value = 'audit'
+    afterBreak.value = true
+    state.value = 'blockEnd'
   }
 
   // Chains another block onto the same session: sessionStartedAt, the Task List
@@ -219,6 +229,7 @@ export function useSessionMachine() {
     auditNotes.value = ''
     sessionStartedAt.value = null
     stoppedEarly.value = false
+    afterBreak.value = false
     actualDurationMs.value = null
     plannedDurationMin.value = null
     taskListStartText.value = null
@@ -236,6 +247,7 @@ export function useSessionMachine() {
       primerSkipped,
       primerIntent,
       stoppedEarly,
+      afterBreak,
       actualDurationMs,
       plannedDurationMin,
       taskListStartText,
@@ -255,6 +267,7 @@ export function useSessionMachine() {
               primerSkipped: primerSkipped.value,
               primerIntent: primerIntent.value,
               stoppedEarly: stoppedEarly.value,
+              afterBreak: afterBreak.value,
               actualDurationMs: actualDurationMs.value,
               plannedDurationMin: plannedDurationMin.value,
               taskListStartText: taskListStartText.value,
@@ -275,6 +288,7 @@ export function useSessionMachine() {
     totalMs,
     isPaused,
     showPrimerChoice,
+    afterBreak,
     prefs,
     capture,
     usedPrimer,
