@@ -20,7 +20,7 @@ reply to Mai re: weekend
 
 ## Audit
 - **Focus:** Focused
-- **What actually got done:** got the outline done
+- **Notes:** got the outline done
 `)
   })
 
@@ -66,6 +66,6 @@ reply to Mai re: weekend
     })
     expect(markdown).toContain('## Completed this session\n_No tasks checked off this session._')
     expect(markdown).toContain('## Captures\n_No captures recorded._')
-    expect(markdown).toContain('- **What actually got done:** _(none noted)_')
+    expect(markdown).toContain('- **Notes:** _(none noted)_')
   })
 })

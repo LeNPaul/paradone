@@ -86,13 +86,13 @@ describe('buildLogMarkdown', () => {
     expect(md).toContain('· Audited:')
     expect(md).toContain('- Duration: 25 min planned / 25 min actual')
     expect(md).toContain('- Focus: Focused')
-    expect(md).toContain('- What got done: got the outline done')
+    expect(md).toContain('- Notes: got the outline done')
   })
 
   it('marks a skipped audit and omits its notes line', () => {
     const md = buildLogMarkdown([session({ auditProductive: '', auditNotes: '' })])
     expect(md).toContain('- Focus: _Audit skipped_')
-    expect(md).not.toContain('What got done')
+    expect(md).not.toContain('Notes:')
   })
 
   it('includes the 2-minute breakdown when the session used the primer, and omits the line otherwise', () => {
@@ -126,7 +126,7 @@ describe('buildLogMarkdown', () => {
 
   it('notes an answered audit that was left without notes', () => {
     const md = buildLogMarkdown([session({ auditNotes: '' })])
-    expect(md).toContain('- What got done: _(none noted)_')
+    expect(md).toContain('- Notes: _(none noted)_')
   })
 
   it('lists multiple audits newest first', () => {

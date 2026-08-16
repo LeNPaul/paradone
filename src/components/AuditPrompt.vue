@@ -101,7 +101,7 @@ function onConfirmDiscard() {
     </section>
 
     <div class="audit-prompt__block">
-      <label for="audit-notes" class="eyebrow">What actually got done?</label>
+      <label for="audit-notes" class="eyebrow">Anything worth noting?</label>
       <textarea id="audit-notes" v-model="auditNotes"></textarea>
     </div>
 

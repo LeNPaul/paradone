@@ -80,11 +80,7 @@ function onDownload() {
     >
       <h3 id="summary-audit-heading" class="eyebrow">Audit</h3>
       <p><strong>Focus:</strong> {{ productiveLabel }}</p>
-      <p v-if="auditNotes"><strong>What actually got done:</strong> {{ auditNotes }}</p>
-      <p v-else>
-        <strong>What actually got done:</strong>
-        <span class="session-summary__empty">(none noted)</span>
-      </p>
+      <p v-if="auditNotes"><strong>Notes:</strong> {{ auditNotes }}</p>
     </section>
 
     <div class="session-summary__actions">
@@ -120,10 +116,6 @@ function onDownload() {
   content: '✓';
   color: var(--accent);
   margin-right: var(--space-2);
-}
-
-.session-summary__empty {
-  color: var(--ink-muted);
 }
 
 .session-summary__capture {

@@ -66,7 +66,7 @@ function entryMarkdown(session) {
     lines.push(`- Primer: ${session.primerIntent}`)
   }
   if (session.auditProductive) {
-    lines.push(`- What got done: ${session.auditNotes || '_(none noted)_'}`)
+    lines.push(`- Notes: ${session.auditNotes || '_(none noted)_'}`)
   }
   return lines.join('\n')
 }

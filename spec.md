@@ -133,7 +133,7 @@ The **source of truth is a raw markdown string**, not a structured array. Parse 
 | `TimerDisplay.vue` | Countdown render (mm:ss), visually distinct primer vs. session states |
 | `MarkdownChecklist.vue` | Parse → render → toggle → write-back. Bound to the single persistent Task List, reused across Setup/Active/Audit/Summary |
 | `CaptureBox.vue` | Freeform scratchpad textarea |
-| `AuditPrompt.vue` | Two questions: what got done, focused/distracted/mixed. Quick-select + optional free text |
+| `AuditPrompt.vue` | The required focused/distracted/mixed quick-select, plus optional free-text notes on the block |
 | `SessionSummary.vue` | Assembles markdown, copy + download |
 | `SessionLog.vue` | Read-only list of past audits, newest first, + download-whole-log, + clear-log |
 | `ArchiveView.vue` | Read-only list of archived tasks with completion times, newest first, + download-archive, + clear-archive |
@@ -180,6 +180,7 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] A task ticked at the audit and then unticked before finishing is not recorded as completed
 - [ ] Audit prompt lists the tasks ticked during the block — not ones already checked before it started — and omits the section entirely when there were none
 - [ ] The Completed this session and Captures sections are hidden at both Audit and Summary when nothing was completed or captured, while the markdown export still emits both headings with their placeholder lines
+- [ ] Audit notes are optional: the Notes line is dropped from the Summary when an answered audit has none, while both markdown exports still emit their `_(none noted)_` placeholder
 - [ ] During an active session a task can be added through the Add-Task modal, edited and deleted; it persists to `paradone:goalsList`, is tickable in the same block, and survives a mid-block reload
 - [ ] "Archive completed" is the one Setup control absent during an active session
 - [ ] A completed task that was added mid-session is badged `added` at the Audit, on the Summary and in the audit log, while one that pre-existed the block is not; the same rows carry an `(added mid-session)` suffix in both markdown exports

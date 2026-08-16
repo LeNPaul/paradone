@@ -31,7 +31,7 @@ export function buildSummaryMarkdown({
 
 ## Audit
 - **Focus:** ${productiveLabel}
-- **What actually got done:** ${auditNotes || '_(none noted)_'}`
+- **Notes:** ${auditNotes || '_(none noted)_'}`
     : ''
 
   return `# Session Summary

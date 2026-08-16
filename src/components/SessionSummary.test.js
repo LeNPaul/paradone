@@ -42,6 +42,15 @@ describe('SessionSummary', () => {
     expect(wrapper.text()).not.toContain('Focus:')
   })
 
+  it('hides the notes line when an answered audit has none', () => {
+    const wrapper = mount(SessionSummary, { props: { ...baseProps, auditNotes: '' } })
+    // The audit was answered, so the section and its Focus line stay.
+    expect(wrapper.find('#summary-audit-heading').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Focus:')
+    expect(wrapper.text()).not.toContain('Notes:')
+    expect(wrapper.text()).not.toContain('(none noted)')
+  })
+
   it('lists the tasks completed this session in their own section', () => {
     const wrapper = mount(SessionSummary, {
       props: { ...baseProps, completedTasks: ['draft outline', 'send invoice'] },

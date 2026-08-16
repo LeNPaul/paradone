@@ -112,6 +112,13 @@ describe('AuditPrompt', () => {
     expect(button.attributes('disabled')).toBeUndefined()
   })
 
+  // The notes field is free text the user may leave blank, so it asks rather
+  // than demands — nothing about it gates Continue.
+  it('labels the notes field as an invitation, not a required question', () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
+    expect(wrapper.find('label[for="audit-notes"]').text()).toBe('Anything worth noting?')
+  })
+
   it('emits submit with the chosen quick-select value and trimmed notes', async () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '' } })
     await wrapper.findAll('input[type="radio"]')[1].setValue()
