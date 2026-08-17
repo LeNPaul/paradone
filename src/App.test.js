@@ -637,6 +637,51 @@ describe('audit and summary', () => {
     expect(getSessions()[0].completedTasks).toEqual(['send invoice'])
   })
 
+  it('counts a task added and ticked at the audit, from the add through to the log', async () => {
+    setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
+    const wrapper = mount(App)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Start').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Stop & log session').trigger('click')
+
+    await addTaskViaModal(wrapper, 'reply to Mai')
+
+    // Deferred like a tick: the addition is held in the audit's draft.
+    expect(getGoalsList().text).toBe('- [ ] send invoice')
+
+    const boxes = wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')
+    expect(boxes).toHaveLength(2)
+    await boxes[1].trigger('change')
+
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await wrapper.findAll('button').find((b) => b.text() === 'Continue').trigger('click')
+
+    expect(getGoalsList().text).toBe('- [ ] send invoice\n- [x] reply to Mai')
+    const summarised = wrapper.findAll('#summary-completed-heading ~ ul li')
+    expect(summarised.map((li) => li.text())).toEqual(['reply to Maiadded'])
+    expect(summarised[0].find('.task-badge').text()).toBe('added')
+    expect(getSessions()[0].completedTasks).toEqual(['reply to Mai'])
+    expect(getSessions()[0].addedTasks).toEqual(['reply to Mai'])
+  })
+
+  it('keeps a task deleted at the audit off the list once the audit is finished', async () => {
+    setGoalsList({ text: '- [ ] send invoice\n- [ ] draft outline', updatedAt: null })
+    const wrapper = mount(App)
+
+    await wrapper.findAll('button').find((b) => b.text() === 'Start').trigger('click')
+    await wrapper.findAll('button').find((b) => b.text() === 'Stop & log session').trigger('click')
+
+    await wrapper
+      .findAll('[aria-labelledby="audit-goal-heading"] button[aria-label="Delete task"]')[0]
+      .trigger('click')
+    expect(getGoalsList().text).toBe('- [ ] send invoice\n- [ ] draft outline')
+
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await wrapper.findAll('button').find((b) => b.text() === 'Continue').trigger('click')
+
+    expect(getGoalsList().text).toBe('- [ ] draft outline')
+  })
+
   it('keeps a task ticked at the audit ticked when the session is discarded', async () => {
     setGoalsList({ text: '- [ ] send invoice', updatedAt: null })
     const wrapper = mount(App)

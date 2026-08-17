@@ -66,9 +66,11 @@ describe('AuditPrompt', () => {
 
   it('says so when every task on the list is checked off', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '- [x] send invoice' } })
-    expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).toContain(
-      'Nothing left on the list.',
-    )
+    const taskList = wrapper.find('[aria-labelledby="audit-goal-heading"]')
+    expect(taskList.text()).toContain('Nothing left on the list.')
+    // Still offers a way to add: work that surfaced during the block has to go
+    // somewhere even when nothing is left over.
+    expect(taskList.findAll('button').some((b) => b.text() === '+ Add Task')).toBe(true)
   })
 
   it('lists the tasks checked off during the session', () => {
@@ -126,7 +128,7 @@ describe('AuditPrompt', () => {
     await continueButton(wrapper).trigger('click')
 
     expect(wrapper.emitted('submit')).toEqual([
-      [{ auditProductive: 'distracted', auditNotes: 'tabbed out twice', checkedTasks: [] }],
+      [{ auditProductive: 'distracted', auditNotes: 'tabbed out twice', taskListText: '' }],
     ])
   })
 
@@ -136,7 +138,7 @@ describe('AuditPrompt', () => {
     await continueButton(wrapper).trigger('click')
 
     expect(wrapper.emitted('submit')).toEqual([
-      [{ auditProductive: 'focused', auditNotes: '', checkedTasks: [] }],
+      [{ auditProductive: 'focused', auditNotes: '', taskListText: '' }],
     ])
   })
 
@@ -212,7 +214,9 @@ describe('AuditPrompt ticking tasks off', () => {
     await wrapper.findAll('input[type="radio"]')[0].setValue()
     await continueButton(wrapper).trigger('click')
 
-    expect(wrapper.emitted('submit')[0][0].checkedTasks).toEqual(['send invoice'])
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(
+      '- [ ] draft outline\n- [x] send invoice',
+    )
   })
 
   it('reports the ticked tasks when the audit is skipped', async () => {
@@ -221,7 +225,9 @@ describe('AuditPrompt ticking tasks off', () => {
     await tick(wrapper, 0).trigger('change')
     await wrapper.findAll('button').find((b) => b.text() === 'Skip').trigger('click')
 
-    expect(wrapper.emitted('skip')).toEqual([[{ checkedTasks: ['draft outline'] }]])
+    expect(wrapper.emitted('skip')).toEqual([
+      [{ taskListText: '- [x] draft outline\n- [ ] send invoice' }],
+    ])
   })
 
   it('reports the ticked tasks when the session is discarded', async () => {
@@ -231,7 +237,9 @@ describe('AuditPrompt ticking tasks off', () => {
     await discardButton(wrapper).trigger('click')
     await wrapper.findAll('button').find((b) => b.text() === 'Discard').trigger('click')
 
-    expect(wrapper.emitted('discard')).toEqual([[{ checkedTasks: ['draft outline'] }]])
+    expect(wrapper.emitted('discard')).toEqual([
+      [{ taskListText: '- [x] draft outline\n- [ ] send invoice' }],
+    ])
   })
 
   it('forgets a tick that was undone before the audit was finished', async () => {
@@ -242,10 +250,10 @@ describe('AuditPrompt ticking tasks off', () => {
     await wrapper.findAll('input[type="radio"]')[0].setValue()
     await continueButton(wrapper).trigger('click')
 
-    expect(wrapper.emitted('submit')[0][0].checkedTasks).toEqual([])
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(taskList)
   })
 
-  // The list is a frozen snapshot of the unchecked remainder: tasks checked
+  // The list is a frozen snapshot with the checked lines hidden: tasks checked
   // before the audit stay under Completed this session and never become tickable.
   it('still leaves tasks completed during the block out of the list', async () => {
     const wrapper = mount(AuditPrompt, {
@@ -256,6 +264,90 @@ describe('AuditPrompt ticking tasks off', () => {
     expect(boxes).toHaveLength(1)
     expect(wrapper.find('[aria-labelledby="audit-goal-heading"]').text()).not.toContain(
       'send invoice',
+    )
+  })
+})
+
+describe('AuditPrompt editing the task list', () => {
+  const taskList = '- [ ] draft outline\n- [ ] send invoice'
+  const tick = (wrapper, index) =>
+    wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')[index]
+
+  const addTask = async (wrapper, text) => {
+    await wrapper.findAll('button').find((b) => b.text().includes('Add Task')).trigger('click')
+    await wrapper.find('dialog input[type="text"]').setValue(text)
+    await wrapper.find('dialog form').trigger('submit')
+  }
+
+  const finish = async (wrapper) => {
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await continueButton(wrapper).trigger('click')
+  }
+
+  it('adds a task as a tickable row and reports it when the audit is finished', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    await addTask(wrapper, 'reply to Mai')
+
+    const boxes = wrapper.findAll('[aria-labelledby="audit-goal-heading"] input[type="checkbox"]')
+    expect(boxes).toHaveLength(2)
+    await boxes[1].trigger('change')
+
+    await finish(wrapper)
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(
+      '- [ ] draft outline\n- [x] reply to Mai',
+    )
+  })
+
+  // The hidden lines are hidden, not stripped — otherwise adding a task at the
+  // audit would quietly delete the work the block just completed.
+  it('keeps the tasks completed during the block in the reported list', async () => {
+    const wrapper = mount(AuditPrompt, {
+      props: { taskListText: '- [x] send invoice\n- [ ] draft outline' },
+    })
+
+    await addTask(wrapper, 'reply to Mai')
+    await finish(wrapper)
+
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(
+      '- [x] send invoice\n- [ ] draft outline\n- [ ] reply to Mai',
+    )
+  })
+
+  it('drops a deleted task from the reported list', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await wrapper
+      .findAll('[aria-labelledby="audit-goal-heading"] button[aria-label="Delete task"]')[0]
+      .trigger('click')
+    await finish(wrapper)
+
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe('- [ ] send invoice')
+  })
+
+  // The audit asks what actually got done, and the answer is often "that, plus
+  // this new thing I just remembered" — so the shortcut is live here too.
+  it('opens the Add Task modal from the configured shortcut key', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList, shortcutKey: 'a' } })
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'a', bubbles: true, cancelable: true }))
+    await wrapper.vm.$nextTick()
+
+    await wrapper.find('dialog input[type="text"]').setValue('reply to Mai')
+    await wrapper.find('dialog form').trigger('submit')
+    await finish(wrapper)
+
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(`${taskList}\n- [ ] reply to Mai`)
+    wrapper.unmount()
+  })
+
+  it('does not offer the archive sweep, which would strip the block\'s own diff', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: taskList } })
+
+    await tick(wrapper, 0).trigger('change')
+
+    expect(wrapper.findAll('button').some((b) => b.text().startsWith('Archive completed'))).toBe(
+      false,
     )
   })
 })

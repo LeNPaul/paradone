@@ -3,7 +3,7 @@
 import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
-import { removeChecked } from '../lib/checklist.js'
+import { parseChecklist } from '../lib/checklist.js'
 
 const props = defineProps({
   taskListText: {
@@ -24,21 +24,37 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // The letter that opens the Add Task modal. Empty string turns it off.
+  shortcutKey: {
+    type: String,
+    default: 'n',
+  },
 })
 
 const emit = defineEmits(['submit', 'skip', 'discard'])
 
-// The Audit screen is a before/after read: completed work belongs under
-// "Completed this session", so the list below it shows only what's left.
-// Frozen when the screen mounts rather than computed off the prop — a tick
-// rewrites the draft in place, so the row stays on screen, checked, and a
-// mis-click can be undone before the audit is finished.
-const draft = ref(removeChecked(props.taskListText).text)
+// Frozen when the screen mounts rather than computed off the prop — every
+// change rewrites the draft in place, so rows hold still and a mis-click can be
+// undone before the audit is finished. The draft holds the *whole* list, with
+// what was already checked hidden rather than stripped, so add/edit/delete
+// rewrite a complete list and the parent can write the finished draft back
+// whole.
+const draft = ref(props.taskListText)
 
-// The draft started with every checked line stripped, so anything checked in it
-// now was ticked here, at the audit. The parent merges these back into the
-// persistent Task List when the audit is finished.
-const checkedTasks = computed(() => removeChecked(draft.value).removed)
+// The Audit screen is a before/after read: completed work belongs under
+// "Completed this session", so the list below it leaves it out. Frozen like the
+// draft, so a task ticked here keeps its row on screen instead of vanishing.
+const hiddenHashes = parseChecklist(props.taskListText)
+  .filter((item) => item.checked)
+  .map((item) => item.hash)
+
+// An empty string parses to a single blank line, so it gets its own case —
+// same reason MarkdownChecklist has one.
+const visibleCount = computed(() =>
+  draft.value === ''
+    ? 0
+    : parseChecklist(draft.value).filter((item) => !hiddenHashes.includes(item.hash)).length,
+)
 
 const addedSet = computed(() => new Set(props.addedTasks))
 
@@ -51,17 +67,17 @@ function onSubmit() {
   emit('submit', {
     auditProductive: auditProductive.value,
     auditNotes: auditNotes.value.trim(),
-    checkedTasks: checkedTasks.value,
+    taskListText: draft.value,
   })
 }
 
 function onSkip() {
-  emit('skip', { checkedTasks: checkedTasks.value })
+  emit('skip', { taskListText: draft.value })
 }
 
 function onConfirmDiscard() {
   confirmingDiscard.value = false
-  emit('discard', { checkedTasks: checkedTasks.value })
+  emit('discard', { taskListText: draft.value })
 }
 </script>
 
@@ -82,13 +98,16 @@ function onConfirmDiscard() {
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading" class="eyebrow">Task list</h3>
+      <!-- Sits above the list rather than replacing it: work that surfaced
+           during the block still has to have somewhere to go. -->
+      <p v-if="!visibleCount" class="audit-prompt__empty">Nothing left on the list.</p>
       <MarkdownChecklist
-        v-if="draft"
         :model-value="draft"
-        :editable="false"
+        :hidden-hashes="hiddenHashes"
+        :archivable="false"
+        :shortcut-key="shortcutKey"
         @update:model-value="draft = $event"
       />
-      <p v-else class="audit-prompt__empty">Nothing left on the list.</p>
     </section>
 
     <section
