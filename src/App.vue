@@ -12,7 +12,7 @@ import ThemeToggle from './components/ThemeToggle.vue'
 import DataPanel from './components/DataPanel.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive, clearAll } from './lib/storage.js'
 import { completedSince, addedSince, parseChecklist } from './lib/checklist.js'
-import { createTimer } from './lib/timer.js'
+import { createTimer, formatDuration } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
 import { downloadJSON } from './lib/download.js'
@@ -96,6 +96,7 @@ const {
   state,
   remainingMs,
   totalMs,
+  focusedMs,
   isPaused,
   showPrimerChoice,
   afterBreak,
@@ -331,6 +332,7 @@ useTheme(prefs, updatePrefs)
           variant="session"
           :label="isPaused ? 'Paused' : 'Focus'"
         />
+        <p class="stage__note">{{ formatDuration(focusedMs) }} focused so far</p>
         <div class="transport">
           <button
             v-if="!isPaused"
@@ -378,6 +380,7 @@ useTheme(prefs, updatePrefs)
         <h2 id="block-end-heading" class="eyebrow stage__heading">
           {{ afterBreak ? 'Break complete' : 'Block complete' }}
         </h2>
+        <p class="stage__note">{{ formatDuration(focusedMs) }} focused so far</p>
         <p class="stage__question">
           {{
             afterBreak
@@ -429,6 +432,7 @@ useTheme(prefs, updatePrefs)
       <section v-if="state === 'audit'" class="card" aria-labelledby="audit-heading">
         <h2 id="audit-heading" class="eyebrow">Audit</h2>
         <AuditPrompt
+          :focused-ms="focusedMs"
           :task-list-text="taskListText"
           :completed-tasks="completedTasks"
           :added-tasks="addedTasks"
@@ -443,6 +447,7 @@ useTheme(prefs, updatePrefs)
       <section v-if="state === 'summary'" class="card" aria-labelledby="summary-heading">
         <h2 id="summary-heading" class="eyebrow">Summary</h2>
         <SessionSummary
+          :focused-ms="focusedMs"
           :completed-tasks="completedTasks"
           :added-tasks="addedTasks"
           :capture="capture"

@@ -178,6 +178,87 @@ describe('block end', () => {
   })
 })
 
+describe('focused time so far', () => {
+  it('is zero before a session starts', () => {
+    const machine = useSessionMachine()
+    expect(machine.focusedMs.value).toBe(0)
+  })
+
+  it('counts the running block as it elapses', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 10 * 60 * 1000)
+    expect(machine.focusedMs.value).toBe(10 * 60 * 1000)
+  })
+
+  it('stops climbing while paused and resumes with the resumed block', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.pauseSession(now + 10 * 60 * 1000)
+    machine.tick(now + 20 * 60 * 1000)
+    expect(machine.focusedMs.value).toBe(10 * 60 * 1000)
+
+    machine.resumeSession(now + 20 * 60 * 1000)
+    machine.tick(now + 25 * 60 * 1000)
+    expect(machine.focusedMs.value).toBe(15 * 60 * 1000)
+  })
+
+  it('holds the finished block at blockEnd without counting it twice', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.focusedMs.value).toBe(25 * 60 * 1000)
+  })
+
+  it('does not count break time', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+    machine.tick(now + 28 * 60 * 1000)
+    expect(machine.focusedMs.value).toBe(25 * 60 * 1000)
+
+    machine.tick(now + 30 * 60 * 1000)
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.focusedMs.value).toBe(25 * 60 * 1000)
+  })
+
+  it('accumulates across blocks chained with keepGoing', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    const breakEndedAt = now + 30 * 60 * 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+    machine.tick(breakEndedAt)
+    machine.keepGoing(breakEndedAt)
+    machine.tick(breakEndedAt + 5 * 60 * 1000)
+    expect(machine.focusedMs.value).toBe(30 * 60 * 1000)
+
+    machine.tick(breakEndedAt + 25 * 60 * 1000)
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.focusedMs.value).toBe(50 * 60 * 1000)
+  })
+
+  it('matches the actualDuration logged for the session', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.keepGoing(now + 25 * 60 * 1000)
+    machine.tick(now + 40 * 60 * 1000)
+    const shown = machine.focusedMs.value
+    machine.stopSession(now + 40 * 60 * 1000)
+    machine.skipAudit()
+    expect(getSessions()[0].actualDuration).toBe(shown / (60 * 1000))
+  })
+})
+
 describe('primer', () => {
   it('openPrimerSetup moves setup -> primerSetup without starting a countdown', () => {
     const machine = useSessionMachine()

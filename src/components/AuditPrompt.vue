@@ -4,8 +4,13 @@ import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
 import { parseChecklist } from '../lib/checklist.js'
+import { formatDuration } from '../lib/timer.js'
 
 const props = defineProps({
+  focusedMs: {
+    type: Number,
+    default: 0,
+  },
   taskListText: {
     type: String,
     default: '',
@@ -83,6 +88,8 @@ function onConfirmDiscard() {
 
 <template>
   <div class="audit-prompt">
+    <p class="audit-prompt__focused">{{ formatDuration(focusedMs) }} focused</p>
+
     <section
       v-if="completedTasks.length"
       class="audit-prompt__block"
@@ -177,6 +184,10 @@ function onConfirmDiscard() {
   margin: 0;
   padding: 0;
   border: none;
+}
+
+.audit-prompt__focused {
+  color: var(--ink-secondary);
 }
 
 .audit-prompt__completed {

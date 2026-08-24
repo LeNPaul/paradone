@@ -3,8 +3,10 @@
 // so Copy and Download stay identical to each other and stable across restyles.
 
 import { PRODUCTIVE_LABELS } from './sessionLog.js'
+import { formatDuration } from './timer.js'
 
 export function buildSummaryMarkdown({
+  focusedMs = 0,
   completedTasks = [],
   addedTasks = [],
   capture = '',
@@ -35,6 +37,8 @@ export function buildSummaryMarkdown({
     : ''
 
   return `# Session Summary
+
+**Focused time:** ${formatDuration(focusedMs)}
 
 ## Completed this session
 ${completedText}

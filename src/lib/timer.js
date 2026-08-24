@@ -45,3 +45,12 @@ export function formatMs(ms) {
   const seconds = totalSeconds % 60
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
 }
+
+// Human-readable elapsed total for a session that has run past one block.
+// Distinct from formatMs, which is the countdown readout and stays mm:ss.
+export function formatDuration(ms) {
+  const totalMinutes = Math.floor(ms / (60 * 1000))
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  return hours ? `${hours}h ${String(minutes).padStart(2, '0')}m` : `${minutes}m`
+}

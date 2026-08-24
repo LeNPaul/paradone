@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createTimer, start, pause, resume, reset, getRemainingMs, isFinished, formatMs } from './timer.js'
+import { createTimer, start, pause, resume, reset, getRemainingMs, isFinished, formatMs, formatDuration } from './timer.js'
 
 describe('createTimer', () => {
   it('converts minutes to milliseconds', () => {
@@ -103,5 +103,23 @@ describe('formatMs', () => {
 
   it('lets minutes run past 60 instead of rolling over to hours', () => {
     expect(formatMs(90 * 60 * 1000)).toBe('90:00')
+  })
+})
+
+describe('formatDuration', () => {
+  it('reports minutes alone under an hour', () => {
+    expect(formatDuration(0)).toBe('0m')
+    expect(formatDuration(45 * 60 * 1000)).toBe('45m')
+  })
+
+  it('floors a partial minute rather than rounding up', () => {
+    expect(formatDuration(59 * 1000)).toBe('0m')
+    expect(formatDuration(119 * 1000)).toBe('1m')
+  })
+
+  it('rolls over to hours, unlike formatMs', () => {
+    expect(formatDuration(60 * 60 * 1000)).toBe('1h 00m')
+    expect(formatDuration(75 * 60 * 1000)).toBe('1h 15m')
+    expect(formatDuration(125 * 60 * 1000)).toBe('2h 05m')
   })
 })

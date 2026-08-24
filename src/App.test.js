@@ -530,6 +530,45 @@ describe('break', () => {
   })
 })
 
+describe('focused time so far', () => {
+  it('shows the session total under the running timer', () => {
+    setActiveSession({
+      state: 'active',
+      timer: {
+        durationMs: 25 * 60 * 1000,
+        startedAt: Date.now() - 10 * 60 * 1000,
+        elapsedMs: 0,
+        running: true,
+      },
+      actualDurationMs: 65 * 60 * 1000,
+    })
+    expect(mount(App).text()).toContain('1h 15m focused so far')
+  })
+
+  it('shows the session total at the block-end choice', () => {
+    setActiveSession({
+      state: 'blockEnd',
+      timer: {
+        durationMs: 25 * 60 * 1000,
+        startedAt: Date.now(),
+        elapsedMs: 25 * 60 * 1000,
+        running: false,
+      },
+      actualDurationMs: 75 * 60 * 1000,
+    })
+    expect(mount(App).text()).toContain('1h 15m focused so far')
+  })
+
+  it('is not shown during a break', () => {
+    setActiveSession({
+      state: 'break',
+      timer: { durationMs: 5 * 60 * 1000, startedAt: Date.now(), elapsedMs: 0, running: true },
+      actualDurationMs: 75 * 60 * 1000,
+    })
+    expect(mount(App).text()).not.toContain('focused so far')
+  })
+})
+
 describe('capture box', () => {
   it.each(['primer', 'active', 'break'])('is shown while state is %s', (state) => {
     setActiveSession({
@@ -571,6 +610,23 @@ describe('capture box', () => {
 })
 
 describe('audit and summary', () => {
+  it('opens the audit and the summary with the session\'s focused time', () => {
+    const session = {
+      timer: null,
+      capture: '',
+      usedPrimer: false,
+      auditProductive: 'focused',
+      auditNotes: '',
+      sessionStartedAt: Date.now(),
+      actualDurationMs: 75 * 60 * 1000,
+    }
+    setActiveSession({ ...session, state: 'audit' })
+    expect(mount(App).text()).toContain('1h 15m focused')
+
+    setActiveSession({ ...session, state: 'summary' })
+    expect(mount(App).text()).toContain('1h 15m focused')
+  })
+
   it('shows the audit prompt with the current Task List and session captures when state is audit', () => {
     setGoalsList({ text: '- [ ] draft outline', updatedAt: null })
     setActiveSession({

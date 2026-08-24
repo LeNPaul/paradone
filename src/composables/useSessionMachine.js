@@ -51,6 +51,14 @@ export function useSessionMachine() {
   // variant — work, break, and the fixed 2-minute primer — without reconstruction.
   const totalMs = computed(() => timer.value?.durationMs ?? 0)
   const isPaused = computed(() => !!timer.value && !timer.value.running)
+  // Focused time across every block chained into this session, including the one
+  // currently running. Breaks and paused time don't count — this is the same
+  // number logged as actualDuration, just live.
+  const focusedMs = computed(() => {
+    const banked = actualDurationMs.value ?? 0
+    if (state.value !== 'active' || !timer.value) return banked
+    return banked + (timer.value.durationMs - getRemainingMs(timer.value, now.value))
+  })
   const showPrimerChoice = computed(
     () => state.value === 'primer' && (primerSkipped.value || isFinished(timer.value, now.value)),
   )
@@ -286,6 +294,7 @@ export function useSessionMachine() {
     state,
     remainingMs,
     totalMs,
+    focusedMs,
     isPaused,
     showPrimerChoice,
     afterBreak,

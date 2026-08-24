@@ -10,6 +10,15 @@ const discardButton = (wrapper) =>
   wrapper.findAll('button').find((b) => b.text() === 'Discard session')
 
 describe('AuditPrompt', () => {
+  it('opens with the focused time the session actually ran for', () => {
+    const wrapper = mount(AuditPrompt, { props: { focusedMs: 75 * 60 * 1000 } })
+    expect(wrapper.text()).toContain('1h 15m focused')
+  })
+
+  it('reports zero focused time when none is given', () => {
+    expect(mount(AuditPrompt).text()).toContain('0m focused')
+  })
+
   it('shows the current Task List alongside the questions', () => {
     const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
     expect(wrapper.text()).toContain('draft outline')

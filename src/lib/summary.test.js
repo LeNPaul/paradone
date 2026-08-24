@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { buildSummaryMarkdown } from './summary.js'
 
 const baseInput = {
+  focusedMs: 75 * 60 * 1000,
   completedTasks: ['draft outline'],
   capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
@@ -11,6 +12,8 @@ const baseInput = {
 describe('buildSummaryMarkdown', () => {
   it('builds the whole document for an answered audit', () => {
     expect(buildSummaryMarkdown(baseInput)).toBe(`# Session Summary
+
+**Focused time:** 1h 15m
 
 ## Completed this session
 - draft outline
@@ -22,6 +25,14 @@ reply to Mai re: weekend
 - **Focus:** Focused
 - **Notes:** got the outline done
 `)
+  })
+
+  it('reports the focused time, falling back to zero when none is given', () => {
+    expect(buildSummaryMarkdown({ ...baseInput, focusedMs: 45 * 60 * 1000 })).toContain(
+      '**Focused time:** 45m',
+    )
+    const { focusedMs, ...withoutDuration } = baseInput
+    expect(buildSummaryMarkdown(withoutDuration)).toContain('**Focused time:** 0m')
   })
 
   it('lists every completed task as its own bullet', () => {

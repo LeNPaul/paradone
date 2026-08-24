@@ -4,6 +4,7 @@ import SessionSummary from './SessionSummary.vue'
 import { buildSummaryMarkdown } from '../lib/summary.js'
 
 const baseProps = {
+  focusedMs: 75 * 60 * 1000,
   completedTasks: ['draft outline'],
   capture: 'reply to Mai re: weekend',
   auditProductive: 'focused',
@@ -18,6 +19,24 @@ beforeEach(() => {
 })
 
 describe('SessionSummary', () => {
+  it('opens with the focused time the session actually ran for', () => {
+    const wrapper = mount(SessionSummary, { props: baseProps })
+    expect(wrapper.text()).toContain('1h 15m focused')
+  })
+
+  it('reports zero focused time when none is given', () => {
+    const { focusedMs, ...withoutDuration } = baseProps
+    expect(mount(SessionSummary, { props: withoutDuration }).text()).toContain('0m focused')
+  })
+
+  it('carries the focused time into the copied markdown', async () => {
+    const wrapper = mount(SessionSummary, { props: baseProps })
+    await wrapper.findAll('button').find((b) => b.text() === 'Copy').trigger('click')
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      expect.stringContaining('**Focused time:** 1h 15m'),
+    )
+  })
+
   it('renders the capture text and the audit answers', () => {
     const wrapper = mount(SessionSummary, { props: baseProps })
     const text = wrapper.text()

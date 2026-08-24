@@ -173,6 +173,8 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] Reloading the page mid-session restores the running block from `paradone:activeSession`
 - [ ] At block end, user can choose break, continue, or end the session
 - [ ] "Keep going" starts another work block immediately, in the same session — planned and actual duration accumulate across chained blocks into one log record
+- [ ] Focused time so far — work blocks only, excluding breaks and paused time — is shown at the block-end choice and under the running timer
+- [ ] The audit and summary screens both open with that same focused time, and the exported summary markdown carries it as a Focused time line
 - [ ] An in-progress break can be ended early; both that and letting it run out return to the block-end choice, reading "Break complete" rather than "Block complete"
 - [ ] "Keep going" after a break chains another block onto the same session, the audit only arriving when the user picks "End session"
 - [ ] Audit prompt shows the unchecked remainder of the Task List alongside the questions; checked tasks appear only under Completed this session

@@ -4,8 +4,13 @@ import { computed } from 'vue'
 import { PRODUCTIVE_LABELS } from '../lib/sessionLog.js'
 import { buildSummaryMarkdown } from '../lib/summary.js'
 import { downloadMarkdown } from '../lib/download.js'
+import { formatDuration } from '../lib/timer.js'
 
 const props = defineProps({
+  focusedMs: {
+    type: Number,
+    default: 0,
+  },
   completedTasks: {
     type: Array,
     default: () => [],
@@ -51,6 +56,8 @@ function onDownload() {
 
 <template>
   <div class="session-summary">
+    <p class="session-summary__focused">{{ formatDuration(focusedMs) }} focused</p>
+
     <section
       v-if="completedTasks.length"
       class="session-summary__block"
@@ -104,6 +111,10 @@ function onDownload() {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+}
+
+.session-summary__focused {
+  color: var(--ink-secondary);
 }
 
 .session-summary__completed {
