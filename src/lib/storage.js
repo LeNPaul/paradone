@@ -26,7 +26,7 @@ function writeJSON(key, value) {
 
 // theme is deliberately absent: useTheme seeds it from the OS the first time it
 // finds it missing, and a default here would rob it of that signal.
-const DEFAULT_PREFS = { workDuration: 25, breakDuration: 5, addTaskKey: 'n' }
+const DEFAULT_PREFS = { workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false }
 
 // Merged rather than used as a bare fallback, so prefs saved before a key
 // existed — or restored from an older backup — read as the default instead of

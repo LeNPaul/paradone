@@ -18,6 +18,7 @@ import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
 import { downloadJSON } from './lib/download.js'
 import { useSessionMachine } from './composables/useSessionMachine.js'
 import { useDocumentTitle } from './composables/useDocumentTitle.js'
+import { useSessionAlerts } from './composables/useSessionAlerts.js'
 import { useTheme } from './composables/useTheme.js'
 
 const taskListText = ref(getGoalsList().text)
@@ -100,6 +101,7 @@ const {
   isPaused,
   showPrimerChoice,
   afterBreak,
+  timerEnds,
   prefs,
   capture,
   primerIntent,
@@ -192,6 +194,7 @@ watch(state, () => {
 })
 
 useDocumentTitle(state, remainingMs, isPaused)
+useSessionAlerts(timerEnds, afterBreak, prefs)
 useTheme(prefs, updatePrefs)
 </script>
 

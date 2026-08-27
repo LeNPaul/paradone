@@ -1230,7 +1230,7 @@ describe('data export and restore', () => {
     wrapper.findComponent(DataPanel).vm.$emit('clear')
     await nextTick()
 
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false })
     expect(getGoalsList()).toEqual({ text: '', updatedAt: null })
     expect(getSessions()).toEqual([])
     expect(getActiveSession()).toBeNull()

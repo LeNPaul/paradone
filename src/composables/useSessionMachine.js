@@ -45,6 +45,11 @@ export function useSessionMachine() {
   // snapshot" — a session rehydrated from before this existed reports nothing
   // rather than claiming every already-checked task was done in this block.
   const taskListStartText = ref(stored?.taskListStartText ?? null)
+  // Bumped only where a countdown runs out on its own, so alerts can hang off
+  // it. Deliberately not persisted to activeSession — a stored count would ring
+  // a stale bell on reload. endBreak() and stopSession() reach the same states
+  // manually and leave it alone: the user is already looking at the screen.
+  const timerEnds = ref(0)
 
   const remainingMs = computed(() => (timer.value ? getRemainingMs(timer.value, now.value) : 0))
   // The ring's denominator. Comes off the timer itself so it's correct for every
@@ -71,9 +76,11 @@ export function useSessionMachine() {
         (actualDurationMs.value ?? 0) + (timer.value.durationMs - getRemainingMs(timer.value, at))
       afterBreak.value = false
       state.value = 'blockEnd'
+      timerEnds.value++
     } else if (state.value === 'break' && isFinished(timer.value, at)) {
       afterBreak.value = true
       state.value = 'blockEnd'
+      timerEnds.value++
     }
   }
   tick(now.value) // correct immediately on rehydration, don't wait for the first interval tick
@@ -298,6 +305,7 @@ export function useSessionMachine() {
     isPaused,
     showPrimerChoice,
     afterBreak,
+    timerEnds,
     prefs,
     capture,
     usedPrimer,

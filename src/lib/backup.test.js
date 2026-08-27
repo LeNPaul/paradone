@@ -10,7 +10,7 @@ import {
 
 const NOW = '2026-08-05T09:14:00.000Z'
 
-const PREFS = { workDuration: 50, breakDuration: 10, theme: 'dark', addTaskKey: 'n' }
+const PREFS = { workDuration: 50, breakDuration: 10, theme: 'dark', addTaskKey: 'n', sound: false, notify: true }
 const GOALS_LIST = { text: '- [ ] draft outline\n- [x] send invoice', updatedAt: NOW }
 const SESSIONS = [{
   id: 'abc-123',
@@ -73,7 +73,7 @@ describe('buildBackup', () => {
 
   it('falls back to storage defaults when nothing has been saved', () => {
     expect(buildBackup(NOW).data).toEqual({
-      prefs: { workDuration: 25, breakDuration: 5, addTaskKey: 'n' },
+      prefs: { workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false },
       goalsList: { text: '', updatedAt: null },
       sessions: [],
       archive: { completedAt: {}, archived: [] },

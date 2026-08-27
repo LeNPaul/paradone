@@ -1,7 +1,8 @@
 <script setup>
-// SettingsPanel: work/break durations and the add-task shortcut key, stored
-// separately from session data
+// SettingsPanel: work/break durations, the add-task shortcut key and the
+// block-end alerts, stored separately from session data
 import { ref, watch } from 'vue'
+import { notificationPermission, requestNotificationPermission } from '../lib/notify.js'
 
 const props = defineProps({
   prefs: {
@@ -15,6 +16,12 @@ const emit = defineEmits(['update'])
 const workDuration = ref(props.prefs.workDuration)
 const breakDuration = ref(props.prefs.breakDuration)
 const addTaskKey = ref(props.prefs.addTaskKey)
+const sound = ref(props.prefs.sound)
+const notify = ref(props.prefs.notify)
+
+// Read once: the browser only changes this behind a page-level permission UI,
+// and re-reading on every render would say nothing new.
+const permission = ref(notificationPermission())
 
 watch(
   () => props.prefs,
@@ -22,6 +29,8 @@ watch(
     workDuration.value = prefs.workDuration
     breakDuration.value = prefs.breakDuration
     addTaskKey.value = prefs.addTaskKey
+    sound.value = prefs.sound
+    notify.value = prefs.notify
   },
 )
 
@@ -58,6 +67,26 @@ function onKeyChange() {
   addTaskKey.value = value
   emit('update', { addTaskKey: value })
 }
+
+function onSoundChange() {
+  emit('update', { sound: sound.value })
+}
+
+// Switching the popup on is the user gesture the permission prompt needs. A
+// refusal reverts the box rather than storing a preference the browser will
+// silently ignore.
+async function onNotifyChange() {
+  if (!notify.value) {
+    emit('update', { notify: false })
+    return
+  }
+  permission.value = await requestNotificationPermission()
+  if (permission.value !== 'granted') {
+    notify.value = false
+    return
+  }
+  emit('update', { notify: true })
+}
 </script>
 
 <template>
@@ -75,6 +104,31 @@ function onKeyChange() {
     <div class="settings-panel__field settings-panel__field--key">
       <label for="add-task-key">Add-task key (blank = off)</label>
       <input id="add-task-key" v-model="addTaskKey" type="text" maxlength="1" @change="onKeyChange" />
+    </div>
+
+    <div class="settings-panel__alerts">
+      <div class="settings-panel__check">
+        <input id="alert-sound" v-model="sound" type="checkbox" @change="onSoundChange" />
+        <label for="alert-sound">Sound at block end</label>
+      </div>
+
+      <div class="settings-panel__check">
+        <input
+          id="alert-notify"
+          v-model="notify"
+          type="checkbox"
+          :disabled="permission === 'unsupported'"
+          @change="onNotifyChange"
+        />
+        <label for="alert-notify">Desktop notification</label>
+      </div>
+
+      <p v-if="permission === 'unsupported'" class="settings-panel__hint">
+        This browser has no desktop notifications.
+      </p>
+      <p v-else-if="permission === 'denied'" class="settings-panel__hint">
+        Blocked by your browser — allow notifications for this site to use this.
+      </p>
     </div>
   </div>
 </template>
@@ -104,6 +158,31 @@ function onKeyChange() {
 }
 
 .settings-panel__field label {
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+}
+
+/* Its own full-width row under the fields: these read as on/off switches, not
+   as a fourth value to type into. */
+.settings-panel__alerts {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.settings-panel__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.settings-panel__check label {
+  font-size: var(--text-sm);
+  color: var(--ink-secondary);
+}
+
+.settings-panel__hint {
   font-size: var(--text-sm);
   color: var(--ink-secondary);
 }

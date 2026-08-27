@@ -409,7 +409,7 @@ describe('updatePrefs', () => {
     machine.updatePrefs({ workDuration: 40, breakDuration: 0 })
     expect(machine.prefs.workDuration).toBe(40)
     expect(machine.prefs.breakDuration).toBe(0)
-    expect(getPrefs()).toEqual({ workDuration: 40, breakDuration: 0, addTaskKey: 'n' })
+    expect(getPrefs()).toEqual({ workDuration: 40, breakDuration: 0, addTaskKey: 'n', sound: true, notify: false })
   })
 
   it('a session started after updating prefs uses the new work duration', () => {
@@ -874,5 +874,69 @@ describe('rehydration', () => {
     const machine = useSessionMachine()
     expect(machine.state.value).toBe('primer')
     expect(machine.showPrimerChoice.value).toBe(true)
+  })
+})
+
+describe('timerEnds — the countdown-ran-out signal alerts hang off', () => {
+  it('bumps when a work block runs out on its own', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    expect(machine.timerEnds.value).toBe(0)
+
+    machine.tick(now + 25 * 60 * 1000)
+
+    expect(machine.timerEnds.value).toBe(1)
+  })
+
+  it('bumps again when a break runs out on its own', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+
+    machine.tick(now + 30 * 60 * 1000)
+
+    expect(machine.timerEnds.value).toBe(2)
+  })
+
+  // Both reach blockEnd/audit by a button press, and the user pressing it is
+  // already looking at the screen.
+  it('stays put when the user ends a break early', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    machine.takeBreak(now + 25 * 60 * 1000)
+
+    machine.endBreak()
+
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.timerEnds.value).toBe(1)
+  })
+
+  it('stays put when the user stops the block early', () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+
+    machine.stopSession(now + 5 * 60 * 1000)
+
+    expect(machine.state.value).toBe('audit')
+    expect(machine.timerEnds.value).toBe(0)
+  })
+
+  // A stale count read back from paradone:activeSession would ring the bell on
+  // every reload, so it is deliberately not persisted.
+  it('is not persisted to the in-flight session', async () => {
+    const machine = useSessionMachine()
+    const now = 1000
+    machine.startSession(now)
+    machine.tick(now + 25 * 60 * 1000)
+    await nextTick()
+
+    expect(getActiveSession().state).toBe('blockEnd')
+    expect(getActiveSession()).not.toHaveProperty('timerEnds')
   })
 })

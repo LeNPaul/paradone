@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
 import SettingsPanel from './SettingsPanel.vue'
 
 describe('rendering', () => {
@@ -101,5 +101,93 @@ describe('the add-task shortcut key', () => {
     const wrapper = mountPanel()
     await wrapper.setProps({ prefs: { ...prefs, addTaskKey: 'q' } })
     expect(wrapper.get('#add-task-key').element.value).toBe('q')
+  })
+})
+
+describe('the block-end alerts', () => {
+  const prefs = { workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false }
+
+  // jsdom has no Notification API, so without a stub every case would render
+  // the unsupported branch.
+  function stubNotification(permission, answer = permission) {
+    class FakeNotification {}
+    FakeNotification.permission = permission
+    FakeNotification.requestPermission = vi.fn(async () => answer)
+    window.Notification = FakeNotification
+    return FakeNotification
+  }
+
+  function mountPanel(overrides = {}) {
+    return mount(SettingsPanel, { props: { prefs: { ...prefs, ...overrides } } })
+  }
+
+  beforeEach(() => {
+    stubNotification('default')
+  })
+
+  afterEach(() => {
+    delete window.Notification
+  })
+
+  it('renders both toggles from the prefs', () => {
+    const wrapper = mountPanel({ sound: false, notify: true })
+    expect(wrapper.get('#alert-sound').element.checked).toBe(false)
+    expect(wrapper.get('#alert-notify').element.checked).toBe(true)
+  })
+
+  it('emits only the sound flag when it is switched off', async () => {
+    const wrapper = mountPanel()
+    await wrapper.get('#alert-sound').setValue(false)
+    expect(wrapper.emitted('update')[0]).toEqual([{ sound: false }])
+  })
+
+  it('asks the browser for permission before storing the popup preference', async () => {
+    const Fake = stubNotification('default', 'granted')
+    const wrapper = mountPanel()
+
+    await wrapper.get('#alert-notify').setValue(true)
+    await flushPromises()
+
+    expect(Fake.requestPermission).toHaveBeenCalled()
+    expect(wrapper.emitted('update')[0]).toEqual([{ notify: true }])
+  })
+
+  // Storing it anyway would leave a toggle switched on that the browser will
+  // silently ignore.
+  it('reverts the toggle and stores nothing when permission is refused', async () => {
+    stubNotification('default', 'denied')
+    const wrapper = mountPanel()
+
+    await wrapper.get('#alert-notify').setValue(true)
+    await flushPromises()
+
+    expect(wrapper.emitted('update')).toBeUndefined()
+    expect(wrapper.get('#alert-notify').element.checked).toBe(false)
+    expect(wrapper.text()).toContain('Blocked by your browser')
+  })
+
+  it('switches the popup off without re-asking for permission', async () => {
+    const Fake = stubNotification('granted')
+    const wrapper = mountPanel({ notify: true })
+
+    await wrapper.get('#alert-notify').setValue(false)
+    await flushPromises()
+
+    expect(Fake.requestPermission).not.toHaveBeenCalled()
+    expect(wrapper.emitted('update')[0]).toEqual([{ notify: false }])
+  })
+
+  it('disables the popup toggle where the browser has no notifications', () => {
+    delete window.Notification
+    const wrapper = mountPanel()
+    expect(wrapper.get('#alert-notify').element.disabled).toBe(true)
+    expect(wrapper.text()).toContain('no desktop notifications')
+  })
+
+  it('updates the displayed toggles when the prefs prop changes', async () => {
+    const wrapper = mountPanel()
+    await wrapper.setProps({ prefs: { ...prefs, sound: false, notify: true } })
+    expect(wrapper.get('#alert-sound').element.checked).toBe(false)
+    expect(wrapper.get('#alert-notify').element.checked).toBe(true)
   })
 })

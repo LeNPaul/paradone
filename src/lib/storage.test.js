@@ -14,11 +14,11 @@ beforeEach(() => {
 
 describe('prefs', () => {
   it('returns defaults when unset', () => {
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false })
   })
 
   it('round-trips a write', () => {
-    const prefs = { workDuration: 50, breakDuration: 10, addTaskKey: 't' }
+    const prefs = { workDuration: 50, breakDuration: 10, addTaskKey: 't', sound: false, notify: true }
     setPrefs(prefs)
     expect(getPrefs()).toEqual(prefs)
   })
@@ -32,6 +32,8 @@ describe('prefs', () => {
       breakDuration: 10,
       theme: 'dark',
       addTaskKey: 'n',
+      sound: true,
+      notify: false,
     })
   })
 
@@ -43,7 +45,7 @@ describe('prefs', () => {
 
   it('falls back to defaults on malformed JSON', () => {
     localStorage.setItem('paradone:prefs', '{not valid json')
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false })
   })
 })
 
@@ -136,7 +138,7 @@ describe('clearAll', () => {
 
     clearAll()
 
-    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n' })
+    expect(getPrefs()).toEqual({ workDuration: 25, breakDuration: 5, addTaskKey: 'n', sound: true, notify: false })
     expect(getGoalsList()).toEqual({ text: '', updatedAt: null })
     expect(getSessions()).toEqual([])
     expect(getActiveSession()).toBeNull()
