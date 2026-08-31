@@ -716,6 +716,128 @@ describe('audit and summary', () => {
   })
 })
 
+// The break offered at the Summary. Same countdown as any other, but the
+// session behind it is already in the log, so it returns to setup rather than
+// chaining another block onto a record that is already written.
+describe('a break taken after the session', () => {
+  // Runs a full session through to the summary, ready for the break.
+  function summarised(now = 1000) {
+    const machine = useSessionMachine()
+    machine.startSession(now)
+    machine.capture.value = 'reply to Mai'
+    machine.tick(now + 25 * 60 * 1000)
+    machine.endSession()
+    machine.submitAudit({ auditProductive: 'focused', auditNotes: 'done' })
+    return machine
+  }
+
+  const AT = 1000 + 25 * 60 * 1000
+
+  it('takePostSessionBreak moves summary -> break with a break-duration timer', () => {
+    const machine = summarised()
+    machine.takePostSessionBreak(AT)
+
+    expect(machine.state.value).toBe('break')
+    machine.tick(AT)
+    expect(machine.remainingMs.value).toBe(5 * 60 * 1000)
+    expect(machine.postSessionBreak.value).toBe(true)
+  })
+
+  it('returns to setup when the break runs out, not to blockEnd', async () => {
+    const machine = summarised()
+    machine.takePostSessionBreak(AT)
+    machine.tick(AT + 5 * 60 * 1000)
+
+    expect(machine.state.value).toBe('setup')
+    expect(machine.capture.value).toBe('')
+    expect(machine.postSessionBreak.value).toBe(false)
+    await nextTick()
+    expect(getActiveSession()).toBeNull()
+  })
+
+  it('returns to setup when the break is ended early', () => {
+    const machine = summarised()
+    machine.takePostSessionBreak(AT)
+    machine.endBreak()
+
+    expect(machine.state.value).toBe('setup')
+    expect(machine.postSessionBreak.value).toBe(false)
+  })
+
+  it('does nothing outside the summary state', () => {
+    const machine = useSessionMachine()
+    machine.startSession(1000)
+    machine.takePostSessionBreak(AT)
+
+    expect(machine.state.value).toBe('active')
+    expect(machine.postSessionBreak.value).toBe(false)
+  })
+
+  it('does not log the session a second time', () => {
+    const machine = summarised()
+    expect(getSessions()).toHaveLength(1)
+
+    machine.takePostSessionBreak(AT)
+    machine.tick(AT + 5 * 60 * 1000)
+
+    expect(getSessions()).toHaveLength(1)
+  })
+
+  it('still bumps timerEnds so the bell rings when it runs out', () => {
+    const machine = summarised()
+    const before = machine.timerEnds.value
+    machine.takePostSessionBreak(AT)
+    machine.tick(AT + 5 * 60 * 1000)
+
+    expect(machine.timerEnds.value).toBe(before + 1)
+  })
+
+  it('persists postSessionBreak, so a reload mid-break still exits to setup', async () => {
+    const machine = summarised()
+    // Wall-clock, not the fake timeline the rest of these use: the rehydrated
+    // machine ticks against Date.now(), so the break has to still be running.
+    machine.takePostSessionBreak(Date.now())
+    await nextTick()
+    expect(getActiveSession().postSessionBreak).toBe(true)
+
+    const reloaded = useSessionMachine()
+    expect(reloaded.state.value).toBe('break')
+    reloaded.endBreak()
+    expect(reloaded.state.value).toBe('setup')
+  })
+
+  // Tab closed during the break, reopened long after it expired. The stored
+  // session is only rewritten once something changes — the construction-time
+  // tick runs before the persistence watch exists, exactly as it does for an
+  // expired work block — so storage catches up on the next action.
+  it('lands at setup when rehydrated after the break has already run out', async () => {
+    const machine = summarised()
+    machine.takePostSessionBreak(AT)
+    await nextTick()
+
+    const reloaded = useSessionMachine()
+    expect(reloaded.state.value).toBe('setup')
+
+    reloaded.startSession(Date.now())
+    await nextTick()
+    expect(getActiveSession().state).toBe('active')
+    expect(getActiveSession().postSessionBreak).toBe(false)
+  })
+
+  // The mid-session break is the one that pauses rather than ends a session.
+  it('leaves a mid-session break returning to blockEnd', () => {
+    const machine = useSessionMachine()
+    machine.startSession(1000)
+    machine.tick(AT)
+    machine.takeBreak(AT)
+    expect(machine.postSessionBreak.value).toBe(false)
+
+    machine.tick(AT + 5 * 60 * 1000)
+    expect(machine.state.value).toBe('blockEnd')
+    expect(machine.afterBreak.value).toBe(true)
+  })
+})
+
 describe('activeSession persistence', () => {
   it('persists state and timer on transition', async () => {
     const machine = useSessionMachine()
@@ -733,6 +855,7 @@ describe('activeSession persistence', () => {
       primerIntent: '',
       stoppedEarly: false,
       afterBreak: false,
+      postSessionBreak: false,
       actualDurationMs: null,
       plannedDurationMin: 25,
       taskListStartText: '',

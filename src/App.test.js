@@ -530,6 +530,79 @@ describe('break', () => {
   })
 })
 
+// The break offered once the audit is done. The session is already logged, so
+// there is nothing to chain onto and it drops back to Setup.
+describe('a break taken from the summary', () => {
+  function mountSummary() {
+    setActiveSession({
+      state: 'summary',
+      timer: null,
+      capture: 'reply to Mai',
+      usedPrimer: false,
+      auditProductive: 'focused',
+      auditNotes: 'got it done',
+      sessionStartedAt: Date.now(),
+    })
+    return mount(App)
+  }
+
+  function takeBreak(wrapper) {
+    return wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Take a break')
+      .trigger('click')
+  }
+
+  it('offers "Take a break" beside "Start new session"', () => {
+    const buttons = mountSummary()
+      .findAll('button')
+      .map((b) => b.text())
+    expect(buttons).toContain('Take a break')
+    expect(buttons).toContain('Start new session')
+  })
+
+  it('hides "Take a break" when breakDuration is 0', () => {
+    setPrefs({ workDuration: 25, breakDuration: 0 })
+    const buttons = mountSummary()
+      .findAll('button')
+      .map((b) => b.text())
+    expect(buttons).not.toContain('Take a break')
+    expect(buttons).toContain('Start new session')
+  })
+
+  it('starts the break countdown', async () => {
+    const wrapper = mountSummary()
+    await takeBreak(wrapper)
+    expect(wrapper.find('#break-heading').exists()).toBe(true)
+    expect(wrapper.find('#summary-heading').exists()).toBe(false)
+  })
+
+  // Anything typed there would go nowhere: the session it belonged to is closed,
+  // and the capture is cleared on the way back to Setup.
+  it('hides the capture box, unlike a mid-session break', async () => {
+    const wrapper = mountSummary()
+    await takeBreak(wrapper)
+    expect(wrapper.find('#capture-heading').exists()).toBe(false)
+  })
+
+  it('returns to Setup on End break, with the Task List preserved', async () => {
+    setGoalsList({ text: '- [x] draft outline', updatedAt: null })
+    const wrapper = mountSummary()
+    await takeBreak(wrapper)
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'End break')
+      .trigger('click')
+
+    expect(wrapper.find('#break-heading').exists()).toBe(false)
+    expect(wrapper.find('#block-end-heading').exists()).toBe(false)
+    expect(wrapper.find('#start-heading').exists()).toBe(true)
+    expect(wrapper.get('section[aria-labelledby="task-list-heading"]').text()).toContain(
+      'draft outline',
+    )
+  })
+})
+
 describe('focused time so far', () => {
   it('shows the session total under the running timer', () => {
     setActiveSession({

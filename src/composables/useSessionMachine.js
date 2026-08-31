@@ -35,6 +35,10 @@ export function useSessionMachine() {
   // Display-only: whether blockEnd was reached from a break rather than from a
   // work block finishing. Drives the copy on that screen, never a guard.
   const afterBreak = ref(stored?.afterBreak ?? false)
+  // Whether the in-flight break was taken from the Summary rather than from
+  // block end. The session is already logged by then, so there is nothing to
+  // chain onto — both ways out of such a break land at Setup.
+  const postSessionBreak = ref(stored?.postSessionBreak ?? false)
   const actualDurationMs = ref(stored?.actualDurationMs ?? null)
   // Planned minutes across every block chained into this session. null means "no
   // record" — a session rehydrated from before this existed falls back to the
@@ -78,8 +82,12 @@ export function useSessionMachine() {
       state.value = 'blockEnd'
       timerEnds.value++
     } else if (state.value === 'break' && isFinished(timer.value, at)) {
-      afterBreak.value = true
-      state.value = 'blockEnd'
+      if (postSessionBreak.value) {
+        startNewSession()
+      } else {
+        afterBreak.value = true
+        state.value = 'blockEnd'
+      }
       timerEnds.value++
     }
   }
@@ -156,14 +164,30 @@ export function useSessionMachine() {
   }
 
   function takeBreak(at = Date.now()) {
+    postSessionBreak.value = false
     timer.value = start(createTimer(prefs.breakDuration), at)
     state.value = 'break'
   }
 
-  // A break is a pause in the session, not the end of it: either way out of one
-  // lands back on the block-end choice so another block can still be chained.
+  // The break offered at the Summary, once the session has been logged. Same
+  // countdown, but it belongs to no session, so it returns to Setup instead of
+  // chaining another block onto a record that is already written.
+  function takePostSessionBreak(at = Date.now()) {
+    if (state.value !== 'summary') return
+    postSessionBreak.value = true
+    timer.value = start(createTimer(prefs.breakDuration), at)
+    state.value = 'break'
+  }
+
+  // A mid-session break is a pause in the session, not the end of it: either way
+  // out of one lands back on the block-end choice so another block can still be
+  // chained. A post-session break has no session left to pause.
   function endBreak() {
     if (state.value !== 'break') return
+    if (postSessionBreak.value) {
+      startNewSession()
+      return
+    }
     afterBreak.value = true
     state.value = 'blockEnd'
   }
@@ -245,6 +269,7 @@ export function useSessionMachine() {
     sessionStartedAt.value = null
     stoppedEarly.value = false
     afterBreak.value = false
+    postSessionBreak.value = false
     actualDurationMs.value = null
     plannedDurationMin.value = null
     taskListStartText.value = null
@@ -263,6 +288,7 @@ export function useSessionMachine() {
       primerIntent,
       stoppedEarly,
       afterBreak,
+      postSessionBreak,
       actualDurationMs,
       plannedDurationMin,
       taskListStartText,
@@ -283,6 +309,7 @@ export function useSessionMachine() {
               primerIntent: primerIntent.value,
               stoppedEarly: stoppedEarly.value,
               afterBreak: afterBreak.value,
+              postSessionBreak: postSessionBreak.value,
               actualDurationMs: actualDurationMs.value,
               plannedDurationMin: plannedDurationMin.value,
               taskListStartText: taskListStartText.value,
@@ -305,6 +332,7 @@ export function useSessionMachine() {
     isPaused,
     showPrimerChoice,
     afterBreak,
+    postSessionBreak,
     timerEnds,
     prefs,
     capture,
@@ -325,6 +353,7 @@ export function useSessionMachine() {
     resumeSession,
     stopSession,
     takeBreak,
+    takePostSessionBreak,
     endBreak,
     keepGoing,
     endSession,

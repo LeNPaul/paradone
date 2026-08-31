@@ -28,9 +28,9 @@ There is no routing. One page, eight states.
 | **Primer** *(optional)* | 2-minute timer showing that breakdown, then: commit to a full session, or stop here |
 | **Active** | Countdown, task list rendered with live checkboxes and the same add/edit/delete controls Setup has (no textarea, and no archive sweep) minus anything already checked when the session started, capture scratchpad always available |
 | **Block end** | Bell → "take the break, keep going, or wrap up?" — keeping going chains another block onto the same session |
-| **Break** *(skippable)* | Break countdown — running out or ending it early both return to Block end, so a break pauses the session rather than ending it |
+| **Break** *(skippable)* | Break countdown — running out or ending it early both return to Block end, so a break pauses the session rather than ending it. The same countdown is also offered at the Summary, where the session is already logged and so belongs to no session: that one returns to Setup |
 | **Audit** | What actually got done? Focused or distracted? Shown alongside the remainder of the task list, still tickable and still editable — or discard the block outright |
-| **Summary** | Compiled markdown (completed-this-session list, capture notes, audit), copy or download, start new session |
+| **Summary** | Compiled markdown (completed-this-session list, capture notes, audit), copy or download, take a break, start new session |
 
 ### Screen behaviours
 
@@ -177,6 +177,9 @@ Keeping logic out of the SFCs is deliberate — it's what makes the tricky parts
 - [ ] The audit and summary screens both open with that same focused time, and the exported summary markdown carries it as a Focused time line
 - [ ] An in-progress break can be ended early; both that and letting it run out return to the block-end choice, reading "Break complete" rather than "Block complete"
 - [ ] "Keep going" after a break chains another block onto the same session, the audit only arriving when the user picks "End session"
+- [ ] "Take a break" at the Summary runs a break countdown that returns to Setup, whether it runs out or is ended early — the session is already logged, so there is nothing to chain onto
+- [ ] The Summary's "Take a break" is hidden when the break duration is 0
+- [ ] The Capture box is hidden during a break taken from the Summary
 - [ ] Audit prompt shows the unchecked remainder of the Task List alongside the questions; checked tasks appear only under Completed this session
 - [ ] Tasks on the audit list can still be ticked; a ticked row stays on screen, checked, and does not move to Completed this session until the audit is finished
 - [ ] A task ticked at the audit persists to `paradone:goalsList` once the audit is answered or skipped, and appears both under Completed this session on the Summary and in the logged session's `completedTasks`

@@ -12,9 +12,10 @@ function setHidden(hidden) {
 }
 
 // The state useSessionMachine hands over: a counter bumped only when a
-// countdown runs out, and the flag saying which kind of block it was.
-function machine({ afterBreak = false } = {}) {
-  return { timerEnds: ref(0), afterBreak: ref(afterBreak) }
+// countdown runs out, the flag saying which kind of block it was, and the
+// state the machine landed in once the transition was done.
+function machine({ afterBreak = false, state = 'blockEnd' } = {}) {
+  return { timerEnds: ref(0), afterBreak: ref(afterBreak), state: ref(state) }
 }
 
 beforeEach(() => {
@@ -24,8 +25,8 @@ beforeEach(() => {
 
 describe('the chime', () => {
   it('plays when a countdown runs out and sound is on', async () => {
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: true, notify: false }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: true, notify: false }))
 
     timerEnds.value++
     await nextTick()
@@ -34,8 +35,8 @@ describe('the chime', () => {
   })
 
   it('stays silent when sound is off', async () => {
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: false, notify: false }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: false, notify: false }))
 
     timerEnds.value++
     await nextTick()
@@ -44,8 +45,8 @@ describe('the chime', () => {
   })
 
   it('plays again on the next block', async () => {
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: true, notify: false }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: true, notify: false }))
 
     timerEnds.value++
     await nextTick()
@@ -59,10 +60,10 @@ describe('the chime', () => {
   // session, so a tab reopened after its block expired must land on the
   // block-end screen without a bell going off at page load.
   it('does not fire for a countdown that ran out before it was wired up', async () => {
-    const { timerEnds, afterBreak } = machine()
+    const { timerEnds, afterBreak, state } = machine()
     timerEnds.value++
 
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: true, notify: true }))
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: true, notify: true }))
     await nextTick()
 
     expect(playChime).not.toHaveBeenCalled()
@@ -72,8 +73,8 @@ describe('the chime', () => {
 
 describe('the notification', () => {
   it('raises a Block complete popup when the tab is hidden', async () => {
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: false, notify: true }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: false, notify: true }))
 
     timerEnds.value++
     await nextTick()
@@ -85,8 +86,8 @@ describe('the notification', () => {
   })
 
   it('says Break complete when the countdown that ran out was a break', async () => {
-    const { timerEnds, afterBreak } = machine({ afterBreak: true })
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: false, notify: true }))
+    const { timerEnds, afterBreak, state } = machine({ afterBreak: true })
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: false, notify: true }))
 
     timerEnds.value++
     await nextTick()
@@ -94,12 +95,24 @@ describe('the notification', () => {
     expect(showNotification.mock.calls[0][0]).toBe('Break complete')
   })
 
+  // A break taken from the Summary lands at Setup, so none of the block-end
+  // choices the usual body offers actually exist.
+  it('offers another session when the break that ran out was a post-session one', async () => {
+    const { timerEnds, afterBreak, state } = machine({ state: 'setup' })
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: false, notify: true }))
+
+    timerEnds.value++
+    await nextTick()
+
+    expect(showNotification).toHaveBeenCalledWith('Break complete', 'Ready for another session?')
+  })
+
   // On screen the block-end prompt has already said it; the popup exists to
   // reach a user who tabbed away.
   it('raises nothing while the tab is visible, but still chimes', async () => {
     setHidden(false)
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: true, notify: true }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: true, notify: true }))
 
     timerEnds.value++
     await nextTick()
@@ -109,8 +122,8 @@ describe('the notification', () => {
   })
 
   it('raises nothing when the popup is switched off', async () => {
-    const { timerEnds, afterBreak } = machine()
-    useSessionAlerts(timerEnds, afterBreak, reactive({ sound: true, notify: false }))
+    const { timerEnds, afterBreak, state } = machine()
+    useSessionAlerts(timerEnds, afterBreak, state, reactive({ sound: true, notify: false }))
 
     timerEnds.value++
     await nextTick()

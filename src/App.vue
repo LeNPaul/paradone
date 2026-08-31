@@ -101,6 +101,7 @@ const {
   isPaused,
   showPrimerChoice,
   afterBreak,
+  postSessionBreak,
   timerEnds,
   prefs,
   capture,
@@ -120,6 +121,7 @@ const {
   resumeSession,
   stopSession,
   takeBreak,
+  takePostSessionBreak,
   endBreak,
   keepGoing,
   endSession,
@@ -194,7 +196,7 @@ watch(state, () => {
 })
 
 useDocumentTitle(state, remainingMs, isPaused)
-useSessionAlerts(timerEnds, afterBreak, prefs)
+useSessionAlerts(timerEnds, afterBreak, state, prefs)
 useTheme(prefs, updatePrefs)
 </script>
 
@@ -424,7 +426,9 @@ useTheme(prefs, updatePrefs)
       </section>
 
       <section
-        v-if="state === 'primer' || state === 'active' || state === 'break'"
+        v-if="
+          state === 'primer' || state === 'active' || (state === 'break' && !postSessionBreak)
+        "
         class="card"
         aria-labelledby="capture-heading"
       >
@@ -456,7 +460,9 @@ useTheme(prefs, updatePrefs)
           :capture="capture"
           :audit-productive="auditProductive"
           :audit-notes="auditNotes"
+          :can-break="prefs.breakDuration > 0"
           @start-new-session="startNewSession"
+          @take-break="takePostSessionBreak"
         />
       </section>
 

@@ -5,7 +5,7 @@ import { watch } from 'vue'
 import { playChime } from '../lib/chime.js'
 import { showNotification } from '../lib/notify.js'
 
-export function useSessionAlerts(timerEnds, afterBreak, prefs) {
+export function useSessionAlerts(timerEnds, afterBreak, state, prefs) {
   // Not immediate, and that is load-bearing: useSessionMachine ticks once at
   // construction to correct a rehydrated session, so a tab reopened after its
   // block expired bumps the counter before this watcher exists — and lands on
@@ -15,10 +15,16 @@ export function useSessionAlerts(timerEnds, afterBreak, prefs) {
     // The popup exists to reach a user who has tabbed away. On screen, the
     // block-end prompt has already said it.
     if (prefs.notify && document.hidden) {
-      showNotification(
-        afterBreak.value ? 'Break complete' : 'Block complete',
-        'Take a break, keep going, or wrap up?',
-      )
+      // A break taken from the Summary ends at Setup, where none of the
+      // block-end choices exist — so it gets its own copy.
+      if (state.value === 'setup') {
+        showNotification('Break complete', 'Ready for another session?')
+      } else {
+        showNotification(
+          afterBreak.value ? 'Break complete' : 'Block complete',
+          'Take a break, keep going, or wrap up?',
+        )
+      }
     }
   })
 }

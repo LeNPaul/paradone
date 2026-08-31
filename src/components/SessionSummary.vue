@@ -33,9 +33,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // A break duration of 0 means no breaks, so the offer is withheld entirely.
+  canBreak: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits(['start-new-session'])
+const emit = defineEmits(['start-new-session', 'take-break'])
 
 const markdown = computed(() => buildSummaryMarkdown(props))
 
@@ -94,9 +99,12 @@ function onDownload() {
       <button type="button" @click="onCopy">Copy</button>
       <button type="button" @click="onDownload">Download</button>
     </div>
-    <button type="button" class="btn-primary" @click="emit('start-new-session')">
-      Start new session
-    </button>
+    <div class="session-summary__next">
+      <button v-if="canBreak" type="button" @click="emit('take-break')">Take a break</button>
+      <button type="button" class="btn-primary" @click="emit('start-new-session')">
+        Start new session
+      </button>
+    </div>
   </div>
 </template>
 
@@ -139,5 +147,16 @@ function onDownload() {
 .session-summary__actions {
   display: flex;
   gap: var(--space-2);
+}
+
+.session-summary__next {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* Starting the next block stays the dominant answer, whether or not the break
+   button is sitting next to it. */
+.session-summary__next .btn-primary {
+  flex: 1;
 }
 </style>

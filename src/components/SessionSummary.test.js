@@ -127,4 +127,21 @@ describe('SessionSummary', () => {
     await buttons[2].trigger('click')
     expect(wrapper.emitted('start-new-session')).toEqual([[]])
   })
+
+  it('offers a break alongside the next session when breaks are on', () => {
+    const wrapper = mount(SessionSummary, { props: { ...baseProps, canBreak: true } })
+    expect(wrapper.findAll('button').some((b) => b.text() === 'Take a break')).toBe(true)
+  })
+
+  // A break duration of 0 means no breaks.
+  it('withholds the break button when breaks are off', () => {
+    const wrapper = mount(SessionSummary, { props: baseProps })
+    expect(wrapper.findAll('button').some((b) => b.text() === 'Take a break')).toBe(false)
+  })
+
+  it('emits take-break with no payload', async () => {
+    const wrapper = mount(SessionSummary, { props: { ...baseProps, canBreak: true } })
+    await wrapper.findAll('button').find((b) => b.text() === 'Take a break').trigger('click')
+    expect(wrapper.emitted('take-break')).toEqual([[]])
+  })
 })
