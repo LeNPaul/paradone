@@ -3,6 +3,7 @@ import {
   parseChecklist,
   toggleItem,
   addItem,
+  addDoneItem,
   removeItem,
   removeChecked,
   markChecked,
@@ -92,6 +93,33 @@ describe('addItem', () => {
 
   it('is a no-op when the task text is empty or whitespace', () => {
     expect(addItem('- [ ] draft outline', '   ')).toBe('- [ ] draft outline')
+  })
+})
+
+describe('addDoneItem', () => {
+  it('appends an already-checked task line to a non-empty list', () => {
+    expect(addDoneItem('- [ ] draft outline', 'send invoice')).toBe(
+      '- [ ] draft outline\n- [x] send invoice'
+    )
+  })
+
+  it('yields just the one line when the list is empty (no leading blank line)', () => {
+    expect(addDoneItem('', 'draft outline')).toBe('- [x] draft outline')
+  })
+
+  it('trims the task text', () => {
+    expect(addDoneItem('', '  draft outline  ')).toBe('- [x] draft outline')
+  })
+
+  it('is a no-op when the task text is empty or whitespace', () => {
+    expect(addDoneItem('- [ ] draft outline', '   ')).toBe('- [ ] draft outline')
+  })
+
+  // The whole point of typing it in at the audit: it lands in the block's diff.
+  it('counts as completed and as added for the block', () => {
+    const next = addDoneItem('- [ ] draft outline', 'send invoice')
+    expect(completedSince('- [ ] draft outline', next)).toEqual(['send invoice'])
+    expect(addedSince('- [ ] draft outline', next)).toEqual(['send invoice'])
   })
 })
 

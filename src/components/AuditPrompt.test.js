@@ -206,6 +206,74 @@ describe('AuditPrompt ticking tasks off', () => {
     expect(tick(wrapper, 0).element.checked).toBe(false)
   })
 
+  it('logs a typed task as completed on Enter, and clears the field', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    const field = wrapper.find('#audit-done')
+    await field.setValue('answered support mail')
+    await field.trigger('keydown.enter')
+
+    const completed = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(completed).toHaveLength(1)
+    expect(completed[0].text()).toContain('answered support mail')
+    expect(completed[0].find('.task-badge').text()).toBe('added')
+    expect(field.element.value).toBe('')
+  })
+
+  // It reads as done work, so it belongs under Completed — not as a checked row
+  // in the list of what's left.
+  it('keeps a typed task out of the remaining Task list', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    const field = wrapper.find('#audit-done')
+    await field.setValue('answered support mail')
+    await field.trigger('keydown.enter')
+
+    const list = wrapper.find('[aria-labelledby="audit-goal-heading"]')
+    expect(list.text()).toContain('draft outline')
+    expect(list.text()).not.toContain('answered support mail')
+  })
+
+  it('reports typed tasks as checked lines when the audit is submitted', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    const field = wrapper.find('#audit-done')
+    await field.setValue('answered support mail')
+    await field.trigger('keydown.enter')
+    await field.setValue('fixed the build')
+    await field.trigger('keydown.enter')
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await continueButton(wrapper).trigger('click')
+
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe(
+      '- [ ] draft outline\n- [x] answered support mail\n- [x] fixed the build',
+    )
+  })
+
+  it('ignores Enter on an empty field', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    const field = wrapper.find('#audit-done')
+    await field.setValue('   ')
+    await field.trigger('keydown.enter')
+
+    expect(wrapper.find('#audit-completed-heading').exists()).toBe(false)
+  })
+
+  it('takes a typed task back out of the list when it is removed', async () => {
+    const wrapper = mount(AuditPrompt, { props: { taskListText: '- [ ] draft outline' } })
+
+    const field = wrapper.find('#audit-done')
+    await field.setValue('anwsered support mial')
+    await field.trigger('keydown.enter')
+    await wrapper.find('[aria-label="Remove completed task"]').trigger('click')
+
+    expect(wrapper.find('#audit-completed-heading').exists()).toBe(false)
+    await wrapper.findAll('input[type="radio"]')[0].setValue()
+    await continueButton(wrapper).trigger('click')
+    expect(wrapper.emitted('submit')[0][0].taskListText).toBe('- [ ] draft outline')
+  })
+
   it('does not move a ticked task into Completed this session mid-audit', async () => {
     const wrapper = mount(AuditPrompt, {
       props: { taskListText: taskList, completedTasks: [] },

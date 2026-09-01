@@ -76,6 +76,15 @@ export function addItem(text, taskText) {
   return text === '' ? line : `${text}\n${line}`
 }
 
+// Append a task that's already done — the Audit screen's "type what you did"
+// entry, where recording the work and ticking it off are one gesture.
+export function addDoneItem(text, taskText) {
+  const trimmed = taskText.trim()
+  if (trimmed === '') return text
+  const line = `- [x] ${trimmed}`
+  return text === '' ? line : `${text}\n${line}`
+}
+
 export function removeItem(text, hash) {
   const lines = text.split('\n')
   const idx = lines.findIndex((line) => hashLine(line) === hash)

@@ -3,7 +3,7 @@
 import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
-import { parseChecklist } from '../lib/checklist.js'
+import { parseChecklist, addDoneItem, removeItem } from '../lib/checklist.js'
 import { formatDuration } from '../lib/timer.js'
 
 const props = defineProps({
@@ -49,17 +49,49 @@ const draft = ref(props.taskListText)
 // The Audit screen is a before/after read: completed work belongs under
 // "Completed this session", so the list below it leaves it out. Frozen like the
 // draft, so a task ticked here keeps its row on screen instead of vanishing.
-const hiddenHashes = parseChecklist(props.taskListText)
+const checkedAtStart = parseChecklist(props.taskListText)
   .filter((item) => item.checked)
   .map((item) => item.hash)
+
+// Work typed into "What did you get done?" this screen: recorded and ticked in
+// one gesture. Kept as its own list so it can show up under Completed straight
+// away — the completedTasks prop is derived from the committed list, which
+// doesn't move until the audit is finished.
+const logged = ref([])
+
+// Typed-done work reads as completed, so it belongs above rather than as a
+// checked row down in the remaining list.
+const hiddenHashes = computed(() => [
+  ...checkedAtStart,
+  ...logged.value.map((entry) => entry.hash),
+])
 
 // An empty string parses to a single blank line, so it gets its own case —
 // same reason MarkdownChecklist has one.
 const visibleCount = computed(() =>
   draft.value === ''
     ? 0
-    : parseChecklist(draft.value).filter((item) => !hiddenHashes.includes(item.hash)).length,
+    : parseChecklist(draft.value).filter((item) => !hiddenHashes.value.includes(item.hash)).length,
 )
+
+const doneDraft = ref('')
+
+// Appended, so the new line is the last one — that's where its hash comes from,
+// and the hash is what undoing the entry removes.
+function logDone() {
+  const text = doneDraft.value.trim()
+  if (text === '') return
+  const next = addDoneItem(draft.value, text)
+  const items = parseChecklist(next)
+  draft.value = next
+  logged.value.push({ text, hash: items[items.length - 1].hash })
+  doneDraft.value = ''
+}
+
+function unlogDone(hash) {
+  draft.value = removeItem(draft.value, hash)
+  logged.value = logged.value.filter((entry) => entry.hash !== hash)
+}
 
 const addedSet = computed(() => new Set(props.addedTasks))
 
@@ -91,7 +123,7 @@ function onConfirmDiscard() {
     <p class="audit-prompt__focused">{{ formatDuration(focusedMs) }} focused</p>
 
     <section
-      v-if="completedTasks.length"
+      v-if="completedTasks.length || logged.length"
       class="audit-prompt__block"
       aria-labelledby="audit-completed-heading"
     >
@@ -100,8 +132,30 @@ function onConfirmDiscard() {
         <li v-for="task in completedTasks" :key="task">
           {{ task }}<span v-if="addedSet.has(task)" class="task-badge">added</span>
         </li>
+        <li v-for="(entry, i) in logged" :key="`${entry.hash}-${i}`">
+          {{ entry.text }}<span class="task-badge">added</span>
+          <button
+            type="button"
+            class="btn-quiet audit-prompt__unlog"
+            aria-label="Remove completed task"
+            @click="unlogDone(entry.hash)"
+          >
+            ✕
+          </button>
+        </li>
       </ul>
     </section>
+
+    <div class="audit-prompt__block">
+      <label for="audit-done" class="eyebrow">What did you get done?</label>
+      <input
+        id="audit-done"
+        type="text"
+        v-model="doneDraft"
+        placeholder="Type a task and press Enter"
+        @keydown.enter.prevent="logDone"
+      />
+    </div>
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading" class="eyebrow">Task list</h3>
@@ -196,10 +250,24 @@ function onConfirmDiscard() {
   gap: var(--space-1);
 }
 
+.audit-prompt__completed li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .audit-prompt__completed li::before {
   content: '✓';
   color: var(--accent);
-  margin-right: var(--space-2);
+}
+
+/* The badge already carries its own left margin; the row's gap is enough. */
+.audit-prompt__completed .task-badge {
+  margin-left: 0;
+}
+
+.audit-prompt__unlog {
+  margin-left: auto;
 }
 
 .audit-prompt__empty {
