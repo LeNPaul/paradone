@@ -279,6 +279,12 @@ describe('adding tasks during an active session', () => {
       .find((b) => b.text() === label)
       .trigger('click')
 
+  async function typeDone(wrapper, text) {
+    const field = wrapper.find('#active-done')
+    await field.setValue(text)
+    await field.trigger('keydown.enter')
+  }
+
   // Seed one pre-existing task, add a second mid-block, tick both.
   async function sessionWithBothKinds() {
     const wrapper = await startSession('- [ ] draft outline')
@@ -332,6 +338,66 @@ describe('adding tasks during an active session', () => {
     expect(items[0].find('.task-badge').exists()).toBe(false)
     expect(items[1].text()).toContain('reply to Mai')
     expect(items[1].find('.task-badge').text()).toBe('added')
+  })
+
+  // The one-gesture path: type what you just finished instead of adding a task
+  // and then hunting for its checkbox.
+  it('logs typed-done work as a checked task, mid-block', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+
+    await typeDone(wrapper, 'answered support mail')
+
+    expect(getGoalsList().text).toBe('- [ ] draft outline\n- [x] answered support mail')
+    const checkboxes = activeCheckboxes(wrapper)
+    expect(checkboxes).toHaveLength(2)
+    expect(checkboxes[1].element.checked).toBe(true)
+    expect(wrapper.get('[aria-labelledby="active-heading"]').text()).toContain(
+      'answered support mail',
+    )
+  })
+
+  it('takes one typed-done entry after another', async () => {
+    const wrapper = await startSession('')
+
+    await typeDone(wrapper, 'answered support mail')
+    await typeDone(wrapper, 'fixed the build')
+
+    expect(getGoalsList().text).toBe('- [x] answered support mail\n- [x] fixed the build')
+  })
+
+  it('typed-done work survives a reload mid-block, still ticked', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+    await typeDone(wrapper, 'answered support mail')
+
+    const reloaded = mount(App)
+    const checkboxes = activeCheckboxes(reloaded)
+    expect(checkboxes).toHaveLength(2)
+    expect(checkboxes[1].element.checked).toBe(true)
+    expect(reloaded.get('[aria-labelledby="active-heading"]').text()).toContain(
+      'answered support mail',
+    )
+  })
+
+  it('carries typed-done work into the audit as completed and added', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+    await typeDone(wrapper, 'answered support mail')
+    await clickButton(wrapper, 'Stop & log session')
+
+    const items = wrapper.findAll('#audit-completed-heading ~ ul li')
+    expect(items).toHaveLength(1)
+    expect(items[0].text()).toContain('answered support mail')
+    expect(items[0].find('.task-badge').text()).toBe('added')
+  })
+
+  it('records typed-done work on the logged session', async () => {
+    const wrapper = await startSession('- [ ] draft outline')
+    await typeDone(wrapper, 'answered support mail')
+    await clickButton(wrapper, 'Stop & log session')
+    await clickButton(wrapper, 'Skip')
+
+    const session = getSessions()[0]
+    expect(session.completedTasks).toEqual(['answered support mail'])
+    expect(session.addedTasks).toEqual(['answered support mail'])
   })
 
   it('records the mid-session addition on the logged session', async () => {

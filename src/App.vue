@@ -4,6 +4,7 @@ import MarkdownChecklist from './components/MarkdownChecklist.vue'
 import TimerDisplay from './components/TimerDisplay.vue'
 import CaptureBox from './components/CaptureBox.vue'
 import AuditPrompt from './components/AuditPrompt.vue'
+import DoneEntry from './components/DoneEntry.vue'
 import SessionSummary from './components/SessionSummary.vue'
 import SessionLog from './components/SessionLog.vue'
 import ArchiveView from './components/ArchiveView.vue'
@@ -11,7 +12,7 @@ import SettingsPanel from './components/SettingsPanel.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import DataPanel from './components/DataPanel.vue'
 import { getGoalsList, setGoalsList, getSessions, setSessions, getArchive, setArchive, clearAll } from './lib/storage.js'
-import { completedSince, addedSince, parseChecklist } from './lib/checklist.js'
+import { completedSince, addedSince, parseChecklist, addDoneItem } from './lib/checklist.js'
 import { createTimer, formatDuration } from './lib/timer.js'
 import { syncCompletions, archiveChecked } from './lib/archive.js'
 import { buildBackup, backupFilename, restoreBackup } from './lib/backup.js'
@@ -35,6 +36,13 @@ function onTaskListUpdate(text) {
   setArchive(archive.value)
   taskListText.value = text
   setGoalsList({ text, updatedAt: now })
+}
+
+// Work finished mid-block that was never on the list: recorded and ticked in one
+// gesture. Routed through onTaskListUpdate like every other write, so it picks
+// up its archive completion time.
+function onLogDone(text) {
+  onTaskListUpdate(addDoneItem(taskListText.value, text))
 }
 
 function onArchiveCompleted() {
@@ -379,6 +387,7 @@ useTheme(prefs, updatePrefs)
           :shortcut-key="prefs.addTaskKey"
           @update:model-value="onTaskListUpdate"
         />
+        <DoneEntry input-id="active-done" @submit="onLogDone" />
       </section>
 
       <section v-if="state === 'blockEnd'" class="card stage" aria-labelledby="block-end-heading">
@@ -590,7 +599,8 @@ useTheme(prefs, updatePrefs)
   font-weight: 600;
 }
 
-.stage :deep(.markdown-checklist) {
+.stage :deep(.markdown-checklist),
+.stage :deep(.done-entry) {
   align-self: stretch;
   text-align: left;
 }

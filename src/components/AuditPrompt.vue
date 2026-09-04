@@ -3,6 +3,7 @@
 import { computed, ref } from 'vue'
 import MarkdownChecklist from './MarkdownChecklist.vue'
 import ConfirmDialog from './ConfirmDialog.vue'
+import DoneEntry from './DoneEntry.vue'
 import { parseChecklist, addDoneItem, removeItem } from '../lib/checklist.js'
 import { formatDuration } from '../lib/timer.js'
 
@@ -74,18 +75,13 @@ const visibleCount = computed(() =>
     : parseChecklist(draft.value).filter((item) => !hiddenHashes.value.includes(item.hash)).length,
 )
 
-const doneDraft = ref('')
-
 // Appended, so the new line is the last one — that's where its hash comes from,
 // and the hash is what undoing the entry removes.
-function logDone() {
-  const text = doneDraft.value.trim()
-  if (text === '') return
+function logDone(text) {
   const next = addDoneItem(draft.value, text)
   const items = parseChecklist(next)
   draft.value = next
   logged.value.push({ text, hash: items[items.length - 1].hash })
-  doneDraft.value = ''
 }
 
 function unlogDone(hash) {
@@ -146,16 +142,7 @@ function onConfirmDiscard() {
       </ul>
     </section>
 
-    <div class="audit-prompt__block">
-      <label for="audit-done" class="eyebrow">What did you get done?</label>
-      <input
-        id="audit-done"
-        type="text"
-        v-model="doneDraft"
-        placeholder="Type a task and press Enter"
-        @keydown.enter.prevent="logDone"
-      />
-    </div>
+    <DoneEntry input-id="audit-done" @submit="logDone" />
 
     <section class="audit-prompt__block" aria-labelledby="audit-goal-heading">
       <h3 id="audit-goal-heading" class="eyebrow">Task list</h3>
